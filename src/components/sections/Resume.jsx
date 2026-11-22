@@ -1,3 +1,4 @@
+import WordReveal from "../WordReveal.jsx";
 import { profile } from "../../content/site.js";
 
 export default function Resume() {
@@ -5,11 +6,11 @@ export default function Resume() {
     <section className="resume section" id="resume">
       <div className="wrap resume-inner">
         <p className="eyebrow">08 / THE NEXT STEP</p>
-        <h2>
+        <WordReveal as="h2">
           Let’s make
           <br />
           <em>something matter.</em>
-        </h2>
+        </WordReveal>
         <p>
           Interested in AI, cloud, or software engineering opportunities? Let’s
           connect.

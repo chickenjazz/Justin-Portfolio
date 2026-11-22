@@ -1,3 +1,4 @@
+import WordReveal from "../WordReveal.jsx";
 import { projects, skills } from "../../content/site.js";
 
 export default function Skills() {
@@ -6,11 +7,11 @@ export default function Skills() {
       <div className="wrap">
         <div className="section-head">
           <p className="eyebrow">05 / THE TOOLKIT</p>
-          <h2>
+          <WordReveal as="h2">
             Skills, in
             <br />
             <em>context.</em>
-          </h2>
+          </WordReveal>
           <p>Tools and technologies used across my projects.</p>
         </div>
         <div className="skill-grid">

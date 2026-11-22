@@ -1,3 +1,4 @@
+import WordReveal from "../WordReveal.jsx";
 import { education } from "../../content/site.js";
 
 export default function Education() {
@@ -5,11 +6,11 @@ export default function Education() {
     <section className="education section wrap" id="education">
       <div className="section-head">
         <p className="eyebrow">06 / EDUCATION</p>
-        <h2>
+        <WordReveal as="h2">
           Foundations
           <br />
           <em>for what’s next.</em>
-        </h2>
+        </WordReveal>
       </div>
       <div className="timeline">
         <div className="timeline-dot" />

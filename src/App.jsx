@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import Header from "./components/sections/Header.jsx";
-import Hero from "./components/sections/Hero.jsx";
-import About from "./components/sections/About.jsx";
+import HeroAbout from "./components/HeroAbout.jsx";
 import Achievements from "./components/sections/Achievements.jsx";
 import Projects from "./components/sections/Projects.jsx";
 import Credentials from "./components/sections/Credentials.jsx";
@@ -16,7 +15,7 @@ export default function App() {
     if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const targets = document.querySelectorAll(
-      ".section-head, .about-grid, .stats-grid, .showcase-heading, .credential-list, .skill-grid, .timeline, .gallery-grid, .resume-inner",
+      ".stats-grid, .credential-list, .skill-grid, .timeline, .gallery-grid",
     );
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -27,7 +26,9 @@ export default function App() {
     }, { threshold: 0.05 });
 
     targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -37,8 +38,7 @@ export default function App() {
       </a>
       <Header />
       <main id="main">
-        <Hero />
-        <About />
+        <HeroAbout />
         <Achievements />
         <Projects />
         <Credentials />

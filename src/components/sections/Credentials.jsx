@@ -1,3 +1,4 @@
+import WordReveal from "../WordReveal.jsx";
 import { credentials } from "../../content/site.js";
 
 export default function Credentials() {
@@ -5,11 +6,11 @@ export default function Credentials() {
     <section className="credentials section wrap" id="credentials">
       <div className="section-head">
         <p className="eyebrow">04 / CREDENTIALS</p>
-        <h2>
+        <WordReveal as="h2">
           Always
           <br />
           <em>learning.</em>
-        </h2>
+        </WordReveal>
       </div>
       <div className="credential-list">
         {credentials.map((c) => (

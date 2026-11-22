@@ -1,45 +1,16 @@
 import { profile } from "../../content/site.js";
+import Mascot from "../Mascot.jsx";
+import WordReveal from "../WordReveal.jsx";
 
 export default function About() {
   return (
-    <section className="about section wrap" id="about">
-      <div className="section-head">
-        <p className="eyebrow">01 / THE PERSON</p>
-        <h2>
-          Curious by nature.
-          <br />
-          <em>Builder by choice.</em>
-        </h2>
+    <section className="about about-slide" id="about" aria-label="About Justin">
+      <div className="about-copy">
+        <WordReveal className="about-label" scrub>01 / ABOUT ME</WordReveal>
+        <WordReveal as="h2" className="about-title" scrub offset={4}>Curiosity, put<br />into practice.</WordReveal>
+        <WordReveal className="about-statement" scrub offset={8}>{profile.introduction}</WordReveal>
       </div>
-      <div className="about-grid">
-        <div className="big-number">✳</div>
-        <div>
-          <p className="lead">Software engineering meets AI and cloud.</p>
-          <p className="muted">{profile.introduction}</p>
-          <p className="muted">{profile.experience}</p>
-          <p className="muted">{profile.approach}</p>
-          <div className="mini-grid">
-            <div>
-              <span>01</span>
-              <h3>Areas of interest</h3>
-              <ul>
-                {profile.interests.map((interest) => (
-                  <li key={interest}>{interest}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <span>02</span>
-              <h3>Target roles</h3>
-              <ul>
-                {profile.roles.map((role) => (
-                  <li key={role}>{role}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Mascot className="about-mascot" />
     </section>
   );
 }

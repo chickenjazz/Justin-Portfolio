@@ -1,3 +1,4 @@
+import WordReveal from "../WordReveal.jsx";
 import { achievements } from "../../content/site.js";
 
 export default function Achievements() {
@@ -6,11 +7,11 @@ export default function Achievements() {
       <div className="wrap">
         <div className="section-head light">
           <p className="eyebrow">02 / THE MILESTONES</p>
-          <h2>
+          <WordReveal as="h2">
             Progress worth
             <br />
             <em>remembering.</em>
-          </h2>
+          </WordReveal>
           <p>Meaningful milestones, backed by real information.</p>
         </div>
         <div className="stats-grid">
