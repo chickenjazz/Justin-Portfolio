@@ -1,0 +1,183 @@
+export const profile = {
+  name: "Justin Manuzon",
+  tagline: "Computer Science Student | Aspiring AI & Cloud Engineer",
+  introduction:
+    "I’m a Computer Science student specializing in Software Engineering at FEU Institute of Technology, with a strong interest in building practical software solutions, artificial intelligence, and cloud technologies.",
+  experience:
+    "My experience spans web development, AI/ML experimentation, prompt optimization, and automation. I enjoy connecting APIs, developing software systems, and exploring how AI can solve real-world problems.",
+  approach:
+    "I’m particularly interested in the intersection of software engineering, AI infrastructure, and cloud computing. I aim to build scalable, useful, and well-engineered applications while continuously expanding my technical skills.",
+  interests: [
+    "Artificial Intelligence and Machine Learning",
+    "Cloud Engineering and Cloud Infrastructure",
+    "Software Engineering and Full-Stack Development",
+    "DevOps and Automation",
+    "MLOps and AI Infrastructure",
+  ],
+  roles: [
+    "AI Engineer",
+    "Cloud Engineer",
+    "Software Engineer",
+    "DevOps / Cloud Infrastructure Intern",
+  ],
+  links: [
+    { label: "GitHub", href: "https://github.com/chickenjazz" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/jrmanuzon/" },
+    { label: "Email", href: "mailto:justinmanuzon413@gmail.com" },
+  ],
+  email: "justinmanuzon413@gmail.com",
+  phone: { label: "+63 915 312 9975", href: "tel:+639153129975" },
+  mascot: "Holographic Cube Chick",
+};
+export const education = {
+  institution: "FEU Institute of Technology",
+  degree: "Bachelor of Science in Computer Science",
+  specialization: "Software Engineering",
+  graduation: "September 2027",
+  distinctions: [
+    "Top Performing Student (2024–2026)",
+    "Dean’s Lister (5 Terms)",
+  ],
+};
+export const projects = [
+  {
+    id: "promptee",
+    shortTitle: "Promptee",
+    oneLiner: "Turning rough ideas into clearer AI prompts.",
+    keyTechnologies: ["React", "FastAPI", "PyTorch", "QLoRA"],
+    title: "Promptee",
+    category: "Featured project · Thesis / AI Engineering",
+    description:
+      "Promptee is a web-based AI prompt optimization system that transforms vague, unstructured, or poorly written prompts into clearer and more effective instructions using multi-criteria heuristic evaluation and transformer fine-tuning.",
+    contributions: [
+      "Led the development of the thesis system.",
+      "Designed the prompt optimization pipeline.",
+      "Implemented multi-criteria heuristic scoring.",
+      "Worked on QLoRA, supervised fine-tuning, and Direct Preference Optimization (DPO).",
+      "Developed the React frontend and FastAPI backend.",
+      "Integrated prompt evaluation and rewriting workflows.",
+    ],
+    technologies: [
+      "Python",
+      "React",
+      "FastAPI",
+      "PyTorch",
+      "Hugging Face Transformers",
+      "QLoRA",
+      "LoRA",
+      "DPO",
+      "PEFT",
+      "TRL",
+      "spaCy",
+      "SentenceTransformers",
+      "CUDA",
+      "RunPod",
+    ],
+    results: [
+      { label: "Overall Quality", value: "26.23 → 67.08" },
+      { label: "Human expert preference win rate", value: "85.33%" },
+    ],
+    resultNote:
+      "These are study-specific evaluation results, not general guarantees of model performance. Thesis documentation will be added when available.",
+    missingAssets:
+      "Screenshots, GitHub repository, live demo, and thesis documentation to be provided.",
+  },
+  {
+    id: "vertex-7",
+    shortTitle: "Vertex 7",
+    oneLiner: "A digital home for heavy equipment and construction services.",
+    keyTechnologies: ["React", "JavaScript", "CSS", "Vercel"],
+    title: "Vertex 7 Heavy Equipment Rentals and Construction Supplies",
+    category: "Featured project · Client project",
+    description:
+      "A responsive brochure website developed for Vertex 7 Heavy Equipment Rentals and Construction Supplies to establish an online presence, showcase available equipment and services, and provide customers with a way to inquire about rentals.",
+    contributions: [
+      "UI/UX design and frontend development.",
+      "Created responsive website layouts.",
+      "Implemented reusable components.",
+      "Developed Home, About, Machines, Services, Projects, and Contact sections.",
+      "Configured SEO metadata and search engine indexing resources.",
+      "Deployed the website using Vercel.",
+      "Connected the custom domain and configured Google Search Console.",
+    ],
+    technologies: [
+      "React",
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Vercel",
+      "DNS and domain configuration",
+      "SEO",
+      "sitemap.xml",
+      "robots.txt",
+      "Google Search Console",
+    ],
+    missingAssets:
+      "Live website, screenshots, and GitHub repository (if publicly shareable) to be provided.",
+  },
+];
+export const credentials = [
+  {
+    title: "PMI Project Management Ready®",
+    issuer: "Project Management Institute",
+    year: "2026",
+  },
+  {
+    title: "Information Technology Specialist: Python",
+    issuer: "Certiport",
+    year: "2025",
+  },
+];
+export const achievements = [
+  { value: "5", label: "Dean’s List terms", context: "Academic distinction" },
+  { value: "3", label: "Top Performing Student", context: "years" },
+  {
+    value: String(credentials.length),
+    label: "Certifications",
+    context: "PMI · Certiport",
+  },
+  {
+    value: String(projects.length),
+    label: "Selected projects",
+    context: "Thesis system · Client website",
+  },
+];
+// Tool experience is grounded in the supplied project descriptions.
+// Interests and target roles are kept separate from demonstrated experience.
+export const skills = [
+  { category: "Programming languages", items: ["Python", "JavaScript"] },
+  {
+    category: "Frontend development",
+    items: ["React", "HTML", "CSS", "Responsive layouts", "UI/UX design"],
+  },
+  { category: "Backend development", items: ["FastAPI", "API integration"] },
+  {
+    category: "AI & machine learning",
+    items: [
+      "PyTorch",
+      "Hugging Face Transformers",
+      "QLoRA / LoRA",
+      "DPO",
+      "PEFT",
+      "TRL",
+      "spaCy",
+      "SentenceTransformers",
+      "Prompt optimization",
+    ],
+  },
+  {
+    category: "Cloud computing & DevOps",
+    items: [
+      "Vercel deployment",
+      "RunPod",
+      "CUDA",
+      "DNS and domain configuration",
+      "Automation",
+    ],
+  },
+  {
+    category: "Databases & developer tools",
+    items: ["Google Search Console"],
+    note: "Database technologies to be provided.",
+  },
+];
