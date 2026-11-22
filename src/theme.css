@@ -662,3 +662,52 @@ body {
   pointer-events: none;
   mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
 }
+/* Content remains visible until its one-time entrance begins. */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal {
+    animation: scroll-reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes scroll-reveal {
+    from { opacity: 0.55; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 800px) {
+    @keyframes scroll-reveal {
+      from { opacity: 0.7; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+}
+
+/* Center the identity around the floating mascot. */
+.hero { display: flex; justify-content: center; }
+.hero-copy { width: 100%; text-align: center; padding: 60px 0 110px; }
+.hero h1 { display: flex; align-items: center; justify-content: center; gap: clamp(0.2rem, 1.5vw, 1.5rem); margin: 2rem 0; font-size: clamp(3rem, 7.5vw, 8rem); }
+.hero h1 em { font-size: .79em; }
+.hero .intro { margin: 0 auto; }
+.hero .actions { justify-content: center; }
+.hero h1 .hero-art { display: block; flex: 0 0 clamp(120px, 19vw, 260px); width: clamp(120px, 19vw, 260px); height: clamp(160px, 24vw, 320px); min-height: 0; max-height: none; background: radial-gradient(ellipse, #49327588, transparent 70%); overflow: visible; }
+.hero-art:before { display: none; }
+.hero h1 .orb { display: block; width: 64%; left: 18%; top: 23%; animation: chick-float 5s ease-in-out infinite; }
+.hero h1 .shape { display: block; animation: hero-float 6s ease-in-out infinite; }
+.hero h1 .cube { font-size: clamp(2rem, 5vw, 4rem); }
+.hero h1 .ring { border-width: clamp(5px, 1vw, 12px); animation-delay: -2s; }
+.hero h1 .square { animation-delay: -4s; }
+.hero-first-name, .hero h1 em, .hero .eyebrow, .hero .intro { animation: hero-float 7s ease-in-out infinite; }
+.hero h1 em { animation-delay: -3s; }
+@keyframes chick-float { 0%, 100% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-12px) rotate(-6deg); } }
+@keyframes hero-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
+@media (max-width: 800px) {
+  .hero { min-height: calc(100svh - 80px); padding-top: 30px; }
+  .hero-copy { padding: 30px 0 40px; }
+  .hero h1 { flex-wrap: wrap; gap: 0; font-size: clamp(3.5rem, 13vw, 6rem); margin: 1.5rem 0; }
+  .hero h1 .hero-first-name, .hero h1 em { width: 100%; }
+  .hero h1 .hero-art { flex-basis: 160px; width: 160px; height: 170px; }
+  .hero .actions { flex-wrap: wrap; gap: 1.25rem; margin-top: 1.5rem; }
+  .hero-bottom { position: absolute; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1 .orb, .hero h1 .shape, .hero-first-name, .hero h1 em, .hero .eyebrow, .hero .intro { animation: none; }
+}
