@@ -21,7 +21,20 @@ Dots and keyboard navigation scroll to each state's exact position. Scrolling ba
 reverses the same weights. All scene geometry and materials share these weights.
 Entering panel copy fades and rises 14px (700ms, cubic-bezier(.22,1,.36,1), 380ms
 delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph
-and keeps only the opacity fade. The existing mascot float remains unchanged.
+and keeps only the opacity fade.
+
+One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the chick, the
+3D name and the shapes, as render targets of the same scene weights. The chick: `glass`
+blends lavender to crystal pearl, `turn` tilts, `hue` tints, with a 5s float and a slow
+perspective drift (11s yaw, 15s pitch). The name: extruded DM Sans letters placed from the
+hidden DOM letters, each with a staggered 4.8s bob and slow 3D tilt. Shapes (black knot,
+mint torus, black rounded cube) spin slowly around the Introduction position.
+Leaving the Introduction follows the chick down: the name and shapes are left behind,
+rising by depart² × 1.15 stage heights (deeper objects up to 35% faster), while the chick
+dips (sin(π·depart) × 8% of the stage) on its way to About. Later states show only the
+chick; the h1 stays in the DOM, visually hidden. Ambient loops pause off-screen and are
+off under reduced motion (states snap). Until WebGL is ready, or if it fails, the flat
+DOM name and the Blender poster show instead, and the name rises away the same way.
 
 The stage grows with content; when taller than the viewport its sticky offset lets
 the viewer read the entire composition. No milestones or education duplication

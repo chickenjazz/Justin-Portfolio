@@ -13,23 +13,31 @@
   width: 84%; transform: translate(8vw, 20vh);
   will-change: transform; pointer-events: none;
 }
-.scene-identity span:last-child { font-size: .82em; }
+.scene-identity .scene-word:last-child { font-size: .82em; }
+.scene-word { display: inline-flex; }
+/* Letters nearest the mascot sit higher (a shallow arc that flattens as the name becomes a
+   signature, via --arc), and each bobs on its own staggered loop. */
+.scene-letter {
+  display: inline-block;
+  transform: translateY(calc(var(--lift) * var(--arc, 1) * -.16em)) rotate(calc(var(--lift) * var(--arc, 1) * -2deg));
+  animation: letter-float 4.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -.38s);
+}
+.scene-word:last-child .scene-letter { animation-delay: calc(var(--i) * -.38s - 1.6s); }
 .scene-character {
   position: absolute; top: 0; left: 0; width: 180px; height: 180px;
-  --glass: 0; --roundness: 23%; transform-origin: 0 0; z-index: 2;
+  transform-origin: 0 0; z-index: 2;
   transform: translate(45vw, 30vh); will-change: transform; pointer-events: none;
 }
-.scene-mascot { display: block; position: relative; width: 100%; height: 100%; }
-.scene-mascot .orb { width: 100%; top: 0; left: 0; border-radius: var(--roundness); }
-.scene-mascot .shape { top: 50%; left: 50%; right: auto; bottom: auto; margin: -20px; filter: saturate(calc(1 - var(--glass) * .7)); }
-.scene-mascot .cube { font-size: 46px; line-height: 1; }
-.scene-mascot .ring { width: 45px; height: 45px; border-width: 9px; }
-.scene-mascot .square { width: 38px; height: 38px; }
-.scene-mascot .square {
-  background: linear-gradient(135deg, color-mix(in srgb, #4b455c, #fff9 calc(var(--glass) * 100%)), color-mix(in srgb, #141219, #b3cbd944 calc(var(--glass) * 100%)));
-  box-shadow: 5px 7px 0 color-mix(in srgb, #070609, #9bb4c24d calc(var(--glass) * 100%));
-}
-.scene-mascot .ring { border-color: color-mix(in srgb, #c2eddb, #c6dce080 calc(var(--glass) * 100%)); box-shadow: inset 3px 3px 6px #fff8, 5px 7px 0 color-mix(in srgb, #527166, #91abb657 calc(var(--glass) * 100%)); }
+.mascot-poster { display: block; width: 100%; height: 100%; transition: opacity 300ms ease; }
+.scene-canvas { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.scene-canvas canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 300ms ease; }
+/* Once WebGL draws, the 3D layer replaces the poster and the flat name. The h1 stays in the
+   accessibility tree (opacity, not visibility) and keeps its layout for letter measurement. */
+.scene-3d .scene-canvas canvas { opacity: 1; }
+.scene-3d .mascot-poster { opacity: 0; }
+.scene-3d .scene-identity { opacity: 0 !important; letter-spacing: .01em; }
+.scene-3d .scene-letter { animation: none; }
 .scene-panel {
   position: absolute; left: 0; top: 0; width: 40%; max-width: 620px;
   transform-origin: 0 50%; will-change: transform;
@@ -64,7 +72,8 @@
   .scene-actions { flex-wrap: wrap; gap: 0 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .scene-mascot .orb { animation: none; }
+  .scene-canvas canvas, .mascot-poster { transition: none; }
+  .scene-letter { animation: none; }
   .scene-dots button span { transition: none; }
 }
 

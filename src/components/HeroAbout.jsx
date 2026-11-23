@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Mascot from "./Mascot.jsx";
+import SceneCanvas from "./SceneCanvas.jsx";
 import Topography from "./Topography.jsx";
 import { profile, achievements, education, projects } from "../content/site.js";
 
@@ -18,16 +18,44 @@ const SETTLE_MS = 140;
 // Three morph steps plus half a viewport of hold on the final state before release.
 const TRACK_UNITS = 3.5;
 
+// Each letter floats on its own, staggered, along a shallow arc that rises toward the mascot.
+function FloatingWord({ text, towardEnd }) {
+  const last = text.length - 1;
+  return (
+    <span className="scene-word" aria-hidden="true">
+      {[...text].map((letter, i) => (
+        <span className="scene-letter" key={i} style={{ "--i": i, "--lift": towardEnd ? i / last : 1 - i / last }}>{letter}</span>
+      ))}
+    </span>
+  );
+}
+
+// The name and shapes stay behind in the Introduction while the chick travels on.
+const SHAPES = [
+  { kind: "knot", angle: -2.3 },
+  { kind: "torus", angle: -1 },
+  { kind: "cube", angle: 2.3 },
+];
+// Leaving the Introduction lifts what stays behind by this many stage heights; deeper
+// objects (depth 0..1) rise a little faster, for parallax.
+const LEAVE_LIFT = 1.15;
+// Eased in, so what stays behind visibly lingers while the chick starts to travel away.
+const liftOf = (depart, height) => depart * depart * height * LEAVE_LIFT;
+const PARALLAX = .35;
+const depthOf = (i) => ((i * 37) % 7) / 6;
+
 const scenes = [
-  { bg: [10, 9, 14], ink: [245, 242, 255], glass: 0, round: 23, turn: -8, hue: 0, light: 1, x: .51, y: .39, size: .145 },
-  { bg: [255, 255, 255], ink: [0, 0, 0], glass: 1, round: 23, turn: 4, hue: 0, light: 0, x: .77, y: .44, size: .24 },
-  { bg: [16, 37, 43], ink: [225, 250, 246], glass: .35, round: 44, turn: -18, hue: 65, light: .3, x: .27, y: .53, size: .25 },
-  { bg: [234, 241, 244], ink: [15, 29, 37], glass: .85, round: 16, turn: 14, hue: 15, light: .15, x: .73, y: .44, size: .23 },
+  { bg: [10, 9, 14], ink: [245, 242, 255], glass: 0, turn: -8, hue: 0, light: 1, x: .51, y: .41, size: .26 },
+  { bg: [255, 255, 255], ink: [0, 0, 0], glass: 1, turn: 4, hue: 0, light: 0, x: .77, y: .44, size: .24 },
+  { bg: [16, 37, 43], ink: [225, 250, 246], glass: .35, turn: -18, hue: 65, light: .3, x: .27, y: .53, size: .25 },
+  { bg: [234, 241, 244], ink: [15, 29, 37], glass: .85, turn: 14, hue: 15, light: .15, x: .73, y: .44, size: .23 },
 ];
 
 export default function HeroAbout() {
   const trackRef = useRef(null);
   const rootRef = useRef(null);
+  const sceneRef = useRef(null);
+  const repaintRef = useRef(() => {});
   const navigateRef = useRef(() => {});
   const [active, setActive] = useState(0);
   const [backgroundPaused, setBackgroundPaused] = useState(false);
@@ -37,7 +65,8 @@ export default function HeroAbout() {
     const mascot = root.querySelector(".scene-character");
     const identity = root.querySelector(".scene-identity");
     const panels = [...root.querySelectorAll(".scene-panel")];
-    const objects = [...root.querySelectorAll(".scene-character .shape")];
+    const letterNodes = [...root.querySelectorAll(".scene-letter")];
+    let letterLayout = [];
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const weights = [1, 0, 0, 0];
     const track = trackRef.current;
@@ -59,25 +88,67 @@ export default function HeroAbout() {
     const mix = (key) => scenes.reduce((sum, scene, i) => sum + scene[key] * weights[i], 0);
     const color = (key) => `rgb(${[0, 1, 2].map(channel => scenes.reduce((sum, scene, i) => sum + scene[key][channel] * weights[i], 0)).join(" ")})`;
 
+    // Where the chick sits in the Introduction; the name and shapes are laid out around it.
+    function introChick(mobile) {
+      return mobile
+        ? { x: width * .5, y: Math.min(155, height * .25), size: Math.min(width * .32, height * .22, 165) }
+        : { x: width * scenes[0].x, y: height * scenes[0].y, size: Math.min(width * scenes[0].size, 520) };
+    }
+    // Reads the DOM name's letter boxes (minus the current lift) so the 3D letters follow the
+    // responsive CSS layout. Only on resize, font load and readiness, never per frame.
+    function measureLetters() {
+      const origin = root.getBoundingClientRect();
+      const lift = liftOf(1 - weights[0], height);
+      letterLayout = letterNodes.map((node, i) => {
+        const box = node.getBoundingClientRect();
+        return {
+          char: node.textContent,
+          x: box.left - origin.left + box.width / 2,
+          y: box.top - origin.top + box.height / 2 + lift,
+          // Line-height is 1, so the box is the font size; DM Sans caps are ~70% of it.
+          height: box.height * .7,
+          rot: -2 * Number(node.style.getPropertyValue("--lift")),
+          depth: depthOf(i),
+        };
+      });
+    }
+
     function paint() {
       const mobile = width <= 800;
       const first = weights[0];
-      const size = mobile ? Math.min(width * (.24 + (1 - first) * .04), height * .17, 125) : Math.min(width * mix("size"), 360);
+      const depart = 1 - first;
+      const lift = liftOf(depart, height);
+      const size = mobile ? Math.min(width * (.32 + depart * .04), height * .22, 165) : Math.min(width * mix("size"), 520);
       const x = mobile ? width * (.5 + weights[1] * .12 - weights[2] * .1 + weights[3] * .1) : width * mix("x");
-      const y = mobile ? Math.min(155, height * .25) : height * mix("y");
+      // The chick dips as it leaves the Introduction, as if the camera follows it down.
+      const y = (mobile ? Math.min(155, height * .25) : height * mix("y")) + Math.sin(Math.PI * depart) * height * .08;
       root.style.backgroundColor = color("bg");
       root.style.color = color("ink");
       root.style.setProperty("--scene-light", mix("light"));
-      mascot.style.setProperty("--glass", mix("glass"));
-      mascot.style.setProperty("--roundness", `${mix("round")}%`);
-      mascot.style.filter = `hue-rotate(${mix("hue")}deg)`;
-      mascot.style.transform = `translate3d(${x - size / 2}px, ${y - size / 2}px, 0) scale(${size / 180}) rotate(${mix("turn")}deg)`;
-      // The identity remains the same DOM heading, moving from center stage to a signature.
-      const titleX = mobile ? width * .07 : width * (.08 + first * .01);
-      const titleY = mobile ? 24 : height * (.095 + first * .18);
-      identity.style.transform = `translate3d(${titleX}px, ${titleY}px, 0) scale(${mobile ? .53 + first * .17 : .32 + first * .68}) rotate(${weights[2] * -3}deg)`;
+      mascot.style.width = mascot.style.height = `${size}px`;
+      mascot.style.transform = `translate3d(${x - size / 2}px, ${y - size / 2}px, 0)`;
+      // The DOM name stays in its Introduction layout and is left behind, rising away.
+      const titleX = width * (mobile ? .07 : .09);
+      const titleY = mobile ? 24 : height * .275;
+      identity.style.transform = `translate3d(${titleX}px, ${titleY - lift}px, 0) scale(${mobile ? .7 : 1})`;
       identity.style.width = `${mobile ? width * 1.3 : width * .84}px`;
-      identity.style.setProperty("--name-gap", `${first * (mobile ? 0 : width * .21)}px`);
+      identity.style.setProperty("--name-gap", `${mobile ? 0 : width * .21}px`);
+      identity.style.opacity = first;
+      const home = introChick(mobile);
+      const reach = Math.min(home.size / 180, 1.45);
+      sceneRef.current?.update({
+        width,
+        height,
+        chick: { x, y, size, glass: mix("glass"), turn: mix("turn"), hue: mix("hue") },
+        letters: letterLayout.map(l => ({ ...l, y: l.y - lift * (1 + l.depth * PARALLAX) })),
+        shapes: SHAPES.map((shape, i) => ({
+          kind: shape.kind,
+          x: home.x + Math.cos(shape.angle) * 124 * reach,
+          y: home.y + Math.sin(shape.angle) * 124 * reach - lift * (1 + depthOf(i + 3) * PARALLAX),
+          size: 70 * reach,
+          rot: i * .35,
+        })),
+      });
       panels.forEach((panel, i) => {
         const weight = weights[i];
         const displacement = weights.reduce((sum, amount, j) => sum + Math.sign(i - j) * amount, 0);
@@ -88,13 +159,8 @@ export default function HeroAbout() {
         panel.style.transform = `translate3d(${baseX + offset}px, ${baseY}px, 0) rotate(${displacement * 12}deg) scale(${.9 + weight * .1})`;
         panel.style.visibility = weight < .0001 ? "hidden" : "visible";
       });
-      objects.forEach((object, i) => {
-        const orbit = (weights[1] * 35 + weights[2] * 115 + weights[3] * 220) * Math.PI / 180;
-        const angle = [-2.3, -.6, 2.3][i] + orbit;
-        const radius = 124 + weights[2] * 14;
-        object.style.transform = `translate(${Math.cos(angle) * radius}px, ${Math.sin(angle) * radius}px) rotate(${orbit * 180 / Math.PI + i * 20}deg)`;
-      });
     }
+    repaintRef.current = () => { if (!disposed) { measureLetters(); paint(); } };
 
     // Scroll only chooses the destination state; the morph itself is time-based,
     // so the scene never rests between two states, wherever the scroll stops.
@@ -159,11 +225,14 @@ export default function HeroAbout() {
       updateScroll();
       settled = true;
       paint();
+      measureLetters();
+      paint();
     });
     resize.observe(root);
     panels.forEach(panel => resize.observe(panel));
     const visibility = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      sceneRef.current?.setVisible(visible);
       setBackgroundPaused(!visible || preference.matches || (destination === 1 && root.dataset.transitioning !== "true"));
     });
     visibility.observe(root);
@@ -189,7 +258,7 @@ export default function HeroAbout() {
     window.addEventListener("hashchange", followHash);
     document.addEventListener("click", anchorClick);
     preference.addEventListener("change", preferenceChange);
-    document.fonts.ready.then(() => { if (!disposed) paint(); });
+    document.fonts.ready.then(() => repaintRef.current());
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
@@ -202,6 +271,7 @@ export default function HeroAbout() {
       document.removeEventListener("click", anchorClick);
       preference.removeEventListener("change", preferenceChange);
       navigateRef.current = () => {};
+      repaintRef.current = () => {};
     };
   }, []);
 
@@ -215,8 +285,11 @@ export default function HeroAbout() {
       <div className="scene-environment" aria-hidden="true">
         <Topography paused={backgroundPaused} color="#b9a0ff" brightness={0.8} opacity={0.65} speed={0.18} glow={0.4} dpr={1} />
       </div>
-      <h1 className="scene-identity" aria-label="Justin Manuzon"><span>JUSTIN</span><span>MANUZON</span></h1>
-      <div className="scene-character" aria-hidden="true"><Mascot className="scene-mascot" /></div>
+      <h1 className="scene-identity" aria-label="Justin Manuzon"><FloatingWord text="JUSTIN" towardEnd /><FloatingWord text="MANUZON" /></h1>
+      <div className="scene-character" aria-hidden="true">
+        <img className="mascot-poster" src={`${import.meta.env.BASE_URL}mascot/chick.webp`} alt="" width="720" height="720" />
+      </div>
+      <SceneCanvas ref={sceneRef} onReady={(ready) => { rootRef.current?.classList.toggle("scene-3d", ready); if (ready) repaintRef.current(); }} />
       {slides.map((slide, index) => (
         <div className={`scene-panel scene-panel-${index}`} key={slide.label} id={`intro-panel-${index}`} aria-hidden={active !== index}>
           <p className="scene-label">{String(index + 1).padStart(2, "0")} / {index === 0 ? "A PORTFOLIO IN PROGRESS · 2026" : slide.label.toUpperCase()}</p>
