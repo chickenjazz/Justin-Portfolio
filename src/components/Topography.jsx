@@ -677,6 +677,7 @@ const Topography = ({
   detail = 0.35,
   tilt = 32,
   speed = 0.25,
+  paused = false,
   direction = 'forward',
   morph = 0.2,
   glow = 0.6,
@@ -715,6 +716,7 @@ const Topography = ({
     detail: clamp(detail, 0, 1),
     tilt: clamp(tilt, 12, 90),
     speed,
+    paused,
     direction: DIRECTIONS[direction] ?? DIRECTIONS.forward,
     morph: Math.max(0, morph),
     glow: Math.max(0, glow),
@@ -1303,7 +1305,7 @@ const Topography = ({
 
     const frame = now => {
       raf = 0;
-      if (!visible || document.hidden) return;
+      if (!visible || document.hidden || settingsRef.current.paused) return;
       if (!ready) {
         if (gl.isContextLost()) return;
         if (!linked()) {
@@ -1435,7 +1437,7 @@ const Topography = ({
 
     function wake() {
       quiet = 0;
-      if (!raf && visible && !document.hidden) {
+      if (!raf && visible && !document.hidden && !settingsRef.current.paused) {
         last = 0;
         raf = requestAnimationFrame(frame);
       }
