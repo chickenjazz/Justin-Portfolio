@@ -1,0 +1,116 @@
+.hero-about-story { position: relative; }
+.story-paper, .story-mascot, .story-about-anchor { display: none; }
+.reveal-word { display: inline-block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-about-story .hero h1 .hero-name { animation: name-enter 500ms ease-out both; }
+  .hero-about-story .hero h1 em.hero-name { animation-delay: 120ms; }
+  @keyframes name-enter { from { opacity: 0; } to { opacity: 1; } }
+  .words-ready .reveal-word {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
+    transition-delay: calc(min(var(--word-index), 24) * 35ms);
+  }
+  .words-visible .reveal-word { opacity: 1; transform: none; }
+  .story-enhanced { height: calc(var(--stage-height, 100svh) + var(--story-travel, 135svh)); }
+  .story-enhanced .story-stage {
+    position: sticky;
+    top: 0;
+    height: var(--stage-height, 100svh);
+    isolation: isolate;
+    overflow: clip;
+    background: #0a090e;
+  }
+  .story-enhanced .story-about-anchor {
+    display: block;
+    position: absolute;
+    top: var(--story-travel);
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .story-enhanced .story-paper {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: var(--paper-opacity, 0);
+    pointer-events: none;
+  }
+  .story-enhanced .hero {
+    height: calc(100% - 80px);
+    min-height: 0;
+    opacity: var(--hero-opacity, 1);
+    transform: translateY(var(--hero-shift, 0px));
+    overflow: visible;
+  }
+  .story-enhanced .about-slide {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    background: transparent;
+    pointer-events: none;
+  }
+  .story-enhanced .hero .mascot,
+  .story-enhanced .about-mascot { visibility: hidden; }
+  .story-enhanced .hero .mascot *,
+  .story-enhanced .about-mascot * { animation: none; }
+  .story-enhanced .words-scrub .reveal-word {
+    transition: none;
+    opacity: clamp(0, calc((var(--word-progress, 0) - var(--word-index)) / 3), 1);
+    transform: translateY(calc((1 - clamp(0, (var(--word-progress, 0) - var(--word-index)) / 3, 1)) * 10px));
+  }
+  .story-enhanced .story-mascot {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    aspect-ratio: 1;
+    transform-origin: 0 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .morph-mascot { display: block; position: relative; width: 100%; height: 100%; }
+  .morph-mascot .orb {
+    width: 100%;
+    left: 0;
+    top: 0;
+    border-radius: var(--roundness, 23%);
+  }
+  .morph-mascot .shape {
+    opacity: calc(1 - var(--morph, 0) * .6);
+    filter: saturate(calc(1 - var(--morph, 0)));
+  }
+  .morph-mascot .cube {
+    left: -26%; top: -26%; font-size: clamp(2rem, 5vw, 4rem);
+    transform: translate(calc(var(--morph, 0) * -10px), calc(var(--morph, 0) * -12px)) rotate(calc(var(--morph, 0) * 50deg));
+  }
+  .morph-mascot .ring {
+    width: 26%; top: -15%; right: -25%; border-width: clamp(5px, 1vw, 12px);
+    transform: rotate(calc(-25deg + var(--morph, 0) * 100deg));
+  }
+  .morph-mascot .square {
+    width: 23%; left: -25%; bottom: -24%;
+    transform: rotate(calc(20deg + var(--morph, 0) * 70deg));
+  }
+  .story-enhanced[data-state="about"] .hero { visibility: hidden; }
+  .story-enhanced[data-state="hero"] .about-copy { visibility: hidden; }
+}
+
+@media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
+  .story-enhanced .hero { padding-top: 12px; }
+  .story-enhanced .about-slide { padding: 3rem 7vw; gap: 2rem; align-content: center; }
+  .story-enhanced .about-mascot { width: min(55vw, 260px); }
+  .story-enhanced .words-scrub .reveal-word { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-reveal .reveal-word { opacity: 1; transform: none; transition: none; }
+}
+
+@media (max-height: 650px) {
+  .hero-about-story .hero { min-height: calc(100svh - 80px); }
+  .hero-about-story .hero-bottom { position: static; padding-bottom: 1rem; }
+  .hero-about-story .hero { flex-direction: column; }
+}
