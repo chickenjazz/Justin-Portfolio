@@ -10,6 +10,11 @@
 }
 html {
   scroll-behavior: smooth;
+  /* Scrolling stays native; only the visible bar is hidden. */
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
 }
 body {
   margin: 0;

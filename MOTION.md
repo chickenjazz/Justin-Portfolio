@@ -4,38 +4,31 @@ intensity: quiet
 engine: css
 easing_budget: 4
 loop_budget: 4
-signature: "scroll-driven hero-to-About mascot morph"
-duration_scale: [160, 240, 500, 600, 1100, 4800, 5000, 6000, 7000]
+signature: "scroll-driven four-state mascot composition"
 ---
 
 # Motion
 
-Hero and About form one sticky slideshow. Native scrolling drives a reversible
-hero → morphing → About sequence over 135vh on desktop and 100vh on mobile.
-One shared mascot moves and scales between measured positions: purple cube,
-rounded intermediate shape, then clear glass. The dark background crossfades
-to white as the hero exits. The requested morph replaces the former static handoff.
+Native scroll drives Introduction, About, Milestones, and Education & Experience.
+A sticky scene stays within its own scroll track; there are no wheel/touch overrides.
+Scroll position only selects the destination state; the morph itself is time-based
+(1100ms, smoothstep), so the scene never rests between two states. Selection follows
+the direction of travel: passing 18% of a viewport beyond a held state commits to its
+neighbour. When native scrolling rests between held states (140ms idle), the page
+glides to the committed state's scroll position. Interrupted morphs restart from the
+current blend. The final state holds for half a viewport before release.
+Dots and keyboard navigation scroll to each state's exact position. Scrolling back
+reverses the same weights. All scene geometry and materials share these weights.
+Entering panel copy fades and rises 14px (700ms, cubic-bezier(.22,1,.36,1), 380ms
+delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph
+and keeps only the opacity fade. The existing mascot float remains unchanged.
 
-About words follow scroll progress individually from 53–97% of the sequence;
-the label, heading and paragraph reveal in reading order. Hero copy and later
-section headings enter once with IntersectionObserver: 500ms ease-out, 35ms
-word spacing (capped after word 24), and 8px travel. Mobile About words only fade.
-Native scrolling remains uninterrupted; there are no wheel or touch overrides.
-The About anchor points to the completed slide. Hidden hero controls become inert.
+The stage grows with content; when taller than the viewport its sticky offset lets
+the viewer read the entire composition. No milestones or education duplication
+remains below. Timeline dates are supplied academic dates; project experience
+has no invented dates. Header, footer and the project carousel remain intact.
 
-Engine: CSS plus one event-scheduled requestAnimationFrame for scroll values;
-no new library, no React renders on scroll. Geometry is cached and measured
-only on setup, resize, font load and page restoration. Morph uses smoothstep;
-words use ease-out. Existing ambient motion remains subordinate to the morph.
-
-Documented paint exceptions: the small mascot's glass colour mixes, shadows,
-border radius and satellite saturation change with progress to express its
-material and shape states. Position and scale use transforms; the full-screen
-background uses opacity. Layout measurement is confined to resize/setup frames.
-
-Reduced motion and prerendered/no-JavaScript HTML retain normal stacked Hero
-and About sections with all words visible. Reduced motion disables pinning,
-travel and floating loops. Preference changes rebuild the scene live. Mobile
-uses a smaller mascot above the copy and a shorter scroll range. Screens at
-650px tall or shorter use normal stacked sections so content stays reachable;
-word entrances remain enabled there unless reduced motion is requested.
+Viewport containment fix: the sticky track uses explicit content height (stage +
+scroll distance), never padding for scroll travel. The stage is 100svh at top: 0.
+Progress and dot destinations share the same track origin. Short screens keep
+the mascot visible and provide native scrolling inside longer content panels.
