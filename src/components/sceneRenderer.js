@@ -109,12 +109,25 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
   // Shapes -----------------------------------------------------------------------------
   const ink = track(new THREE.MeshPhysicalMaterial({ color: "#16141c", roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.2 }));
   const mint = track(new THREE.MeshPhysicalMaterial({ color: "#bff0da", roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.1 }));
-  const shapes = {
-    knot: new THREE.Mesh(track(new THREE.TorusKnotGeometry(0.32, 0.11, 160, 20)), ink),
-    torus: new THREE.Mesh(track(new THREE.TorusGeometry(0.36, 0.15, 32, 64)), mint),
-    cube: new THREE.Mesh(track(new RoundedBoxGeometry(0.7, 0.7, 0.7, 5, 0.14)), ink),
+  const materials = { ink, mint };
+  const geometries = {
+    knot: track(new THREE.TorusKnotGeometry(0.32, 0.11, 160, 20)),
+    torus: track(new THREE.TorusGeometry(0.36, 0.15, 32, 64)),
+    cube: track(new RoundedBoxGeometry(0.7, 0.7, 0.7, 5, 0.14)),
+    sphere: track(new THREE.SphereGeometry(0.42, 48, 32)),
   };
-  Object.values(shapes).forEach((mesh) => scene.add(mesh));
+  // One mesh per shape entry (geometry and materials shared), rebuilt only if its look changes.
+  const shapes = [];
+  function shapeAt(i, kind, tone) {
+    const key = `${kind}:${tone}`;
+    if (shapes[i]?.key !== key) {
+      if (shapes[i]) scene.remove(shapes[i].mesh);
+      const mesh = new THREE.Mesh(geometries[kind], materials[tone] ?? ink);
+      scene.add(mesh);
+      shapes[i] = { key, mesh };
+    }
+    return shapes[i].mesh;
+  }
 
   // Frame ------------------------------------------------------------------------------
   let current = null;
@@ -152,10 +165,14 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     const wave = (ms, phase = 0) => (reducedMotion ? 0 : Math.sin((now / ms) * Math.PI * 2 + phase));
 
     const c = current.chick;
-    place(chick, c.x, c.y, c.size, CHICK_FRAME);
+    // A zero scale is a degenerate matrix, so hide the chick once it has shrunk away.
+    chick.visible = c.size > 0.5;
+    place(chick, c.x, c.y, Math.max(c.size, 0.5), CHICK_FRAME);
     chick.position.y -= CHICK_CENTER_Y * chick.scale.y - wave(FLOAT.ms) * FLOAT.amount * chick.scale.y;
     const turn = (c.turn * Math.PI) / 180;
-    chickPose.rotation.set(CHICK_BASE.pitch + wave(PITCH.ms) * PITCH.amount, CHICK_BASE.yaw + turn + wave(YAW.ms) * YAW.amount, turn * 0.5);
+    // Per-scene pitch (deg) raises the apparent camera, e.g. About looks down from ~30°.
+    const pitch = ((c.pitch ?? 0) * Math.PI) / 180;
+    chickPose.rotation.set(CHICK_BASE.pitch + pitch + wave(PITCH.ms) * PITCH.amount, CHICK_BASE.yaw + turn + wave(YAW.ms) * YAW.amount, turn * 0.5);
 
     current.letters.forEach((l, i) => {
       const { mesh } = letterAt(i, l.char);
@@ -168,13 +185,16 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     for (let i = current.letters.length; i < letters.length; i++) letters[i].mesh.visible = false;
 
     current.shapes.forEach((s, i) => {
-      const mesh = shapes[s.kind];
+      const mesh = shapeAt(i, s.kind, s.tone);
       mesh.visible = onScreen(s.y, s.size);
       if (!mesh.visible) return;
       place(mesh, s.x, s.y, s.size, 1);
-      const spin = reducedMotion ? 0 : now / 6000;
-      mesh.rotation.set(0.5 + spin * (0.6 + i * 0.2), spin * (0.8 - i * 0.15) + i, s.rot ?? 0);
+      // Each shape bobs and spins at its own pace; alternate directions so they never sync.
+      mesh.position.y += wave(LETTER.bobMs * (1.2 + (i % 3) * 0.25), i * 1.3) * LETTER.bob * 0.6 * mesh.scale.y;
+      const spin = reducedMotion ? 0 : (now / 6000) * (i % 2 ? -1 : 1);
+      mesh.rotation.set(0.5 + spin * (0.5 + (i % 4) * 0.15), spin * (0.7 - (i % 3) * 0.12) + i, s.rot ?? 0);
     });
+    for (let i = current.shapes.length; i < shapes.length; i++) shapes[i].mesh.visible = false;
 
     renderer.render(scene, camera);
     if (visible && !reducedMotion) raf = requestAnimationFrame(draw);
