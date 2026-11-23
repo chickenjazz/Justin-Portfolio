@@ -1,22 +1,21 @@
 import { profile } from "../../content/site.js";
 import Mascot from "../Mascot.jsx";
 import Topography from "../Topography.jsx";
-import WordReveal from "../WordReveal.jsx";
 
-export default function Hero() {
+export default function Hero({ backgroundPaused = false }) {
   return (
     <section className="hero wrap">
       <div className="hero-topography" aria-hidden="true">
-        <Topography color="#b9a0ff" brightness={0.8} opacity={0.65} speed={0.18} glow={0.4} dpr={1} />
+        <Topography paused={backgroundPaused} color="#b9a0ff" brightness={0.8} opacity={0.65} speed={0.18} glow={0.4} dpr={1} />
       </div>
       <div className="hero-copy">
-        <WordReveal className="eyebrow"><span className="dot" /> A PORTFOLIO IN PROGRESS · 2026</WordReveal>
+        <p className="eyebrow"><span className="dot" /> A PORTFOLIO IN PROGRESS · 2026</p>
         <h1 aria-label="Justin Manuzon">
-          <span className="hero-first-name hero-name" aria-hidden="true">{"JUSTIN".split("").map((letter, index) => <span className="hero-letter" style={{ "--letter-index": index, "--letter-curve": Math.pow(index - 2.5, 2) }} key={index}>{letter}</span>)}</span>
+          <span className="hero-first-name hero-name" aria-hidden="true">JUSTIN</span>
           <Mascot />
-          <em className="hero-name" aria-hidden="true">{"MANUZON".split("").map((letter, index) => <span className="hero-letter" style={{ "--letter-index": index, "--letter-curve": Math.pow(index - 3, 2) }} key={index}>{letter}</span>)}</em>
+          <em className="hero-name" aria-hidden="true">MANUZON</em>
         </h1>
-        <WordReveal className="intro">{profile.tagline}</WordReveal>
+        <p className="intro">{profile.tagline}</p>
         <div className="actions">
           <a className="button dark" href="#work">Explore my work <span>↗</span></a>
           <a className="text-link" href="#about">A little about me ↓</a>
