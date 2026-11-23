@@ -1,11 +1,9 @@
 import { useEffect } from "react";
 import Header from "./components/sections/Header.jsx";
 import HeroAbout from "./components/HeroAbout.jsx";
-import Achievements from "./components/sections/Achievements.jsx";
 import Projects from "./components/sections/Projects.jsx";
 import Credentials from "./components/sections/Credentials.jsx";
 import Skills from "./components/sections/Skills.jsx";
-import Education from "./components/sections/Education.jsx";
 import Gallery from "./components/sections/Gallery.jsx";
 import Resume from "./components/sections/Resume.jsx";
 import Footer from "./components/sections/Footer.jsx";
@@ -39,11 +37,9 @@ export default function App() {
       <Header />
       <main id="main">
         <HeroAbout />
-        <Achievements />
-        <Projects />
         <Credentials />
         <Skills />
-        <Education />
+        <Projects />
         <Gallery />
         <Resume />
       </main>
