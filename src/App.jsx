@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Intro from "./components/Intro.jsx";
 import Header from "./components/sections/Header.jsx";
 import HeroAbout from "./components/HeroAbout.jsx";
 import Projects from "./components/sections/Projects.jsx";
@@ -31,6 +32,7 @@ export default function App() {
 
   return (
     <>
+      <Intro />
       <a className="skip" href="#main">
         Skip to content
       </a>

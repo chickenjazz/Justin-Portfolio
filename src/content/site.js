@@ -2,7 +2,7 @@ export const profile = {
   name: "Justin Manuzon",
   tagline: "Computer Science Student | Aspiring AI & Cloud Engineer",
   introduction:
-    "I’m a Computer Science student specializing in Software Engineering at FEU Institute of Technology, with a strong interest in building practical software solutions, artificial intelligence, and cloud technologies.",
+    "I’ve always needed to know why things work. That question brought me to Computer Science at FEU Tech, turned my thesis into Promptee, and keeps pulling me deeper into AI and the cloud.",
   experience:
     "My experience spans web development, AI/ML experimentation, prompt optimization, and automation. I enjoy connecting APIs, developing software systems, and exploring how AI can solve real-world problems.",
   approach:
@@ -26,6 +26,8 @@ export const profile = {
     { label: "Email", href: "mailto:justinmanuzon413@gmail.com" },
   ],
   email: "justinmanuzon413@gmail.com",
+  // Public GitHub username; the Education slide shows its contribution calendar.
+  github: "chickenjazz",
   phone: { label: "+63 915 312 9975", href: "tel:+639153129975" },
   mascot: "Holographic Cube Chick",
 };
@@ -128,18 +130,23 @@ export const credentials = [
     year: "2025",
   },
 ];
+// Placeholder: replace with the quote you want above the Milestones cards (cite is optional).
+export const milestonesQuote = {
+  text: "Every milestone here started as something I didn’t know how to do yet.",
+  cite: "",
+};
 export const achievements = [
   { value: "5", label: "Dean’s List terms", context: "Academic distinction" },
-  { value: "3", label: "Top Performing Student", context: "years" },
+  { value: "3", label: "Years top performer", context: "2024 to 2026" },
   {
     value: String(credentials.length),
     label: "Certifications",
-    context: "PMI · Certiport",
+    context: "PMI and Certiport",
   },
   {
     value: String(projects.length),
-    label: "Selected projects",
-    context: "Thesis system · Client website",
+    label: "Projects built",
+    context: "Thesis system and client website",
   },
 ];
 // Tool experience is grounded in the supplied project descriptions.
