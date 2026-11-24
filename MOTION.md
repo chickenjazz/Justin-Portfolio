@@ -19,9 +19,11 @@ commits to the Description; scrolling up 18% back from it returns to the Hero.
 Interrupted morphs restart from the current blend; scrolling back reverses the same
 weights, and the first placement after load (deep link, mid-page reload) jumps without
 morphing: a first-load `#description` or `#top` is applied instantly once the track is
-measured. Afterwards `#description` and `#top` smooth-scroll to each state's exact
-position. Other section links (`#work`, `#skills`, `#contact`) re-align once after load,
-when the sticky tracks have sized themselves, unless the visitor has already started scrolling. All scene
+measured; on a reload or back/forward the browser's restored position is kept instead.
+Afterwards `#description` and `#top` smooth-scroll to each state's exact position. Both use
+the hero's own path (not the realign below). Other section links (`#work`, `#skills`, `#contact`) re-align once after load,
+when the sticky tracks have sized themselves, unless the visitor has already started
+scrolling or the browser is restoring a position (reload, back/forward). All scene
 geometry and materials share these weights. While the Description holds, a scroll-linked
 drift (0 at the 18% commit, 1 at the track's end, scaled by the Description's weight)
 lifts the chick by 12% of the stage height, each crystal pop shape by 18% + 10%·i, and
@@ -41,9 +43,10 @@ One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the ch
 blends lavender to crystal pearl, `turn` tilts, `hue` tints, with a 5s float and a slow
 perspective drift (11s yaw, 15s pitch). Character life (off under reduced motion): the tuft
 bobs (1.7s stretch + sway), the wings give a double flap every 3s (0.64s), and the eyes blink
-every 4.2s (every third a double blink). The chick is lit by a warm key from above-left, a cool lavender rim
-and a lilac/deep-violet sky/ground fill (so shadows fall to purple, like the reference) over a
-dimmed room environment; its beak is warm apricot, the lavender's complement. The name: extruded DM Sans letters placed from the
+every 4.2s (every third a double blink). The chick is lit by a warm key from above-left, a
+cool lavender rim and a lilac/deep-violet sky/ground fill (so shadows fall to purple, like the
+reference) over a dimmed room environment; its beak is warm apricot, the lavender's
+complement. The name: extruded DM Sans letters placed from the
 hidden DOM letters, each with a staggered 4.8s bob and slow 3D tilt. Shapes (black knot,
 mint torus, black rounded cube) spin slowly around the Introduction position.
 Leaving the Introduction follows the chick down: the name and shapes are left behind,

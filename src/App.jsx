@@ -16,18 +16,24 @@ export default function App() {
   useReveal();
 
   // The sticky tracks size themselves after first paint, so the browser's own hash jump lands short.
-  // Re-align once the layout has settled, unless the visitor has already started scrolling.
+  // Re-align once the layout has settled, unless the visitor has already started scrolling
+  // or the browser is restoring a previous position (reload, back/forward).
   useEffect(() => {
-    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    const navType = performance.getEntriesByType("navigation")[0]?.type;
+    if (navType === "reload" || navType === "back_forward") return;
+    let id = location.hash.slice(1);
+    try { id = decodeURIComponent(id); } catch { /* malformed escape: use the raw hash */ }
+    const target = id && document.getElementById(id);
     if (!target || target.id === "top" || target.id === "description") return;
     let cancelled = false;
-    const cancel = () => { cancelled = true; };
     const events = ["wheel", "touchstart", "keydown"];
-    events.forEach((name) => window.addEventListener(name, cancel, { once: true, passive: true }));
+    const stop = () => events.forEach((name) => window.removeEventListener(name, cancel));
+    function cancel() { cancelled = true; stop(); }
+    events.forEach((name) => window.addEventListener(name, cancel, { passive: true }));
     document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
       if (!cancelled && Math.abs(target.getBoundingClientRect().top) > 2) target.scrollIntoView({ behavior: "instant" });
     })));
-    return () => events.forEach((name) => window.removeEventListener(name, cancel));
+    return stop;
   }, []);
 
   return (

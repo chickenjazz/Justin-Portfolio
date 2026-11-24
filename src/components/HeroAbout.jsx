@@ -96,6 +96,8 @@ export default function HeroAbout() {
     let tweenStart = 0;
     let duration = 0;
     let settled = false;
+    const navType = performance.getEntriesByType("navigation")[0]?.type;
+    const restoredNavigation = navType === "reload" || navType === "back_forward";
     let lastScroll = window.scrollY;
     let width = root.clientWidth;
     let height = root.clientHeight;
@@ -266,7 +268,7 @@ export default function HeroAbout() {
       track.style.setProperty("--scroll-distance", `${unit * TRACK_UNITS}px`);
       trackTop = track.getBoundingClientRect().top + window.scrollY;
       // A deep link on first load lands in place (no scroll animation, so no morph) once the track is measured.
-      if (!settled) followHash(true);
+      if (!settled && !restoredNavigation) followHash(true);
       updateScroll();
       settled = true;
       paint();
