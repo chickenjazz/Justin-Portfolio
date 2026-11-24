@@ -28,8 +28,9 @@ One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the ch
 blends lavender to crystal pearl, `turn` tilts, `hue` tints, with a 5s float and a slow
 perspective drift (11s yaw, 15s pitch). Character life (off under reduced motion): the tuft
 bobs (1.7s stretch + sway), the wings give a double flap every 3s (0.64s), and the eyes blink
-every 4.2s (every third a double blink). The chick is lit by a warm key, a cool lavender rim
-and a dim sky/ground fill on top of the room environment. The name: extruded DM Sans letters placed from the
+every 4.2s (every third a double blink). The chick is lit by a warm key from above-left, a cool lavender rim
+and a lilac/deep-violet sky/ground fill (so shadows fall to purple, like the reference) over a
+dimmed room environment; its beak is warm apricot, the lavender's complement. The name: extruded DM Sans letters placed from the
 hidden DOM letters, each with a staggered 4.8s bob and slow 3D tilt. Shapes (black knot,
 mint torus, black rounded cube) spin slowly around the Introduction position.
 Leaving the Introduction follows the chick down: the name and shapes are left behind,
@@ -60,8 +61,12 @@ Titles, arrows and ←/→ scroll to a card's exact position. Without JS the car
 to a horizontal scroll-snap track. Reduced motion snaps between cards, opacity only.
 
 Entry intro (`Intro.jsx` + `Intro.css`): a full-screen overlay on first paint (prerendered,
-pure CSS, so it plays before JS and always ends by itself). A line drawing of the chick
-hops (760ms loop: squash on landing, stretch on take-off, 38px rise) over a shadow that
-shrinks and fades at the top, and blinks every 1.5s. "JM" draws in stroke by stroke
-(900ms each, 300ms / 650ms delays). At 2.3s the overlay fades out (600ms) and is removed.
+pure CSS, so it plays before JS). A line drawing of the chick hops (760ms loop: squash on
+landing, stretch on take-off, 38px rise) over a shadow that shrinks and fades at the top,
+and blinks every 1.5s. "JM" draws in stroke by stroke (900ms each, 300ms / 650ms delays).
+At 2.3s the exit is a HoloMosaic transition (`HoloMosaic.jsx`, React Bits, WebGL):
+holographic tiles flip in from the centre over the chick (~1.2s, `introSpeed` 2), hold
+250ms, then flip back out from the edges inward (~1.2s) over a now-transparent overlay,
+revealing the landing page. Pointer interaction is off. Without JS the overlay fades out
+by itself at 3.5s (600ms); without WebGL it is removed when the transition would start.
 Reduced motion skips the intro entirely.

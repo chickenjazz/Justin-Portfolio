@@ -1,7 +1,7 @@
 # Builds the chick mascot in Blender and exports chick.glb. Run from Blender's Python (or via MCP):
 #   OUT = r"<repo>/public/mascot/chick.glb"; exec(open(r"<repo>/scripts/blender/chick.py").read())
-# Produces "Body" (body, beak, feet; ChickBody + ChickAccent) plus separately animated parts, each
-# with its origin at its pivot: "Tuft" (base of the feathers), "WingL"/"WingR" (shoulder hinge)
+# Produces "Body" (body + feet; ChickBody + ChickAccent), "Beak" (ChickBeak, warm apricot to
+# complement the lavender) and separately animated parts, each with its origin at its pivot: "Tuft" (base of the feathers), "WingL"/"WingR" (shoulder hinge)
 # and "EyeL"/"EyeR" (eye centre, for blinking). L/R are -X/+X, i.e. screen left/right from the front.
 import bpy, bmesh
 from math import radians
@@ -27,6 +27,7 @@ def material(name, hex_color, roughness, coat=0.0):
 
 body_mat = material("ChickBody", "#b9a8f0", 0.45, 0.3)
 accent_mat = material("ChickAccent", "#8f78d6", 0.4, 0.3)
+beak_mat = material("ChickBeak", "#f4a46a", 0.4, 0.3)
 eye_mat = material("ChickEyes", "#050508", 0.05, 1.0)
 
 
@@ -89,7 +90,7 @@ beak.name = "Beak"
 beak.scale = (1.0, 0.75, 1.0)
 bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 bpy.ops.object.shade_smooth()
-accent.append(beak)
+beak = join([beak], "Beak", (0, -0.95, 0.06), beak_mat)
 # Feet: stubby rounded cups under the body, like the reference.
 for side in (-1, 1):
     f = ellipsoid(f"Foot{side}", (side * 0.32, -0.22, -0.56), (0.22, 0.28, 0.17), segments=32, rings=16)
@@ -127,7 +128,7 @@ eyes = [join([ellipsoid(f"Eye{side}", (side * 0.36, -0.99, 0.3), (0.14, 0.07, 0.
              "EyeL" if side < 0 else "EyeR", (side * 0.36, -0.99, 0.3), eye_mat) for side in (-1, 1)]
 bpy.context.scene.cursor.location = (0, 0, 0)
 
-made = [body, tuft, *wings, *eyes]
+made = [body, beak, tuft, *wings, *eyes]
 bpy.ops.object.select_all(action="DESELECT")
 for o in made:
     o.select_set(True)
