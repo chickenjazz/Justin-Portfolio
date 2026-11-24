@@ -26,7 +26,10 @@ and keeps only the opacity fade.
 One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the chick, the
 3D name and the shapes, as render targets of the same scene weights. The chick: `glass`
 blends lavender to crystal pearl, `turn` tilts, `hue` tints, with a 5s float and a slow
-perspective drift (11s yaw, 15s pitch). The name: extruded DM Sans letters placed from the
+perspective drift (11s yaw, 15s pitch). Character life (off under reduced motion): the tuft
+bobs (1.7s stretch + sway), the wings give a double flap every 3s (0.64s), and the eyes blink
+every 4.2s (every third a double blink). The chick is lit by a warm key, a cool lavender rim
+and a dim sky/ground fill on top of the room environment. The name: extruded DM Sans letters placed from the
 hidden DOM letters, each with a staggered 4.8s bob and slow 3D tilt. Shapes (black knot,
 mint torus, black rounded cube) spin slowly around the Introduction position.
 Leaving the Introduction follows the chick down: the name and shapes are left behind,
@@ -45,3 +48,20 @@ Viewport containment fix: the sticky track uses explicit content height (stage +
 scroll distance), never padding for scroll travel. The stage is 100svh at top: 0.
 Progress and dot destinations share the same track origin. Short screens keep
 the mascot visible and provide native scrolling inside longer content panels.
+
+Project carousel (arc): a sticky 100svh stage inside an explicit-height track
+(`useHeldScroll`, the same held-state model as the hero: commit at 18% in the direction
+of travel, 1100ms smoothstep, 140ms idle glide to the committed card, half-viewport hold
+on the last card before release). Native page scroll only. Each card gets an offset d
+from that time-based progress and swings around a pivot 200vw below centre (30° per
+step, scale −12%, fading out by one step, corners rounding to 28px). An arc list of
+titles (right edge; horizontal above the controls on mobile) follows the same d.
+Titles, arrows and ←/→ scroll to a card's exact position. Without JS the cards fall back
+to a horizontal scroll-snap track. Reduced motion snaps between cards, opacity only.
+
+Entry intro (`Intro.jsx` + `Intro.css`): a full-screen overlay on first paint (prerendered,
+pure CSS, so it plays before JS and always ends by itself). A line drawing of the chick
+hops (760ms loop: squash on landing, stretch on take-off, 38px rise) over a shadow that
+shrinks and fades at the top, and blinks every 1.5s. "JM" draws in stroke by stroke
+(900ms each, 300ms / 650ms delays). At 2.3s the overlay fades out (600ms) and is removed.
+Reduced motion skips the intro entirely.

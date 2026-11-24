@@ -1,6 +1,8 @@
-# Builds the chick mascot in Blender. Run from Blender's Python (or via MCP):
-#   exec(open(r"<repo>/scripts/blender/chick.py").read())
-# Produces mesh objects "Body" (materials ChickBody + ChickAccent) and "Eyes" (ChickEyes).
+# Builds the chick mascot in Blender and exports chick.glb. Run from Blender's Python (or via MCP):
+#   OUT = r"<repo>/public/mascot/chick.glb"; exec(open(r"<repo>/scripts/blender/chick.py").read())
+# Produces "Body" (body, beak, feet; ChickBody + ChickAccent) plus separately animated parts, each
+# with its origin at its pivot: "Tuft" (base of the feathers), "WingL"/"WingR" (shoulder hinge)
+# and "EyeL"/"EyeR" (eye centre, for blinking). L/R are -X/+X, i.e. screen left/right from the front.
 import bpy, bmesh
 from math import radians
 
@@ -52,12 +54,32 @@ body.data.materials.append(body_mat)
 body.data.materials.append(accent_mat)
 
 parts = [body]
-# Feather tuft on top, leaning back.
-for i, (x, tilt, h) in enumerate([(-0.13, -18, 0.42), (0.0, 0, 0.5), (0.13, 18, 0.4)]):
-    parts.append(ellipsoid(f"Tuft{i}", (x, 0.2, 1.12 + h * 0.45), (0.11, 0.08, h * 0.62), rot=(-28, tilt, 0), segments=24, rings=12))
-# Wing nubs.
-for side in (-1, 1):
-    parts.append(ellipsoid(f"Wing{side}", (side * 1.16, 0.12, 0.02), (0.12, 0.38, 0.27), rot=(0, side * -20, side * 12), segments=32, rings=16))
+
+
+def join(objs, name, pivot, mat):
+    """Join objs into one object named name, with its origin at pivot."""
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    if len(objs) > 1:
+        bpy.ops.object.join()
+    o = bpy.context.active_object
+    o.name = name
+    bpy.context.scene.cursor.location = pivot
+    bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
+    o.data.materials.clear()
+    o.data.materials.append(mat)
+    return o
+
+
+# Feather tuft on top, leaning back. Pivots at its base so it can bob and sway.
+tuft = join([ellipsoid(f"Tuft{i}", (x, 0.2, 1.12 + h * 0.45), (0.11, 0.08, h * 0.62), rot=(-28, tilt, 0), segments=24, rings=12)
+             for i, (x, tilt, h) in enumerate([(-0.13, -18, 0.42), (0.0, 0, 0.5), (0.13, 18, 0.4)])],
+            "Tuft", (0, 0.16, 1.02), body_mat)
+# Wing nubs, hinged at the shoulder (top inner edge) so they flap outward.
+wings = [join([ellipsoid(f"Wing{side}", (side * 1.16, 0.12, 0.02), (0.12, 0.38, 0.27), rot=(0, side * -20, side * 12), segments=32, rings=16)],
+              "WingL" if side < 0 else "WingR", (side * 1.08, 0.12, 0.2), body_mat) for side in (-1, 1)]
 
 accent = []
 # Beak: a short rounded cone between and below the eyes, pointing forward (-Y).
@@ -100,18 +122,16 @@ while len(body.data.materials) > 2:
 body.data.materials[0] = body_mat
 body.data.materials[1] = accent_mat
 
-# Eyes: glossy black tall ovals on the front of the dome.
-eyes = []
-for side in (-1, 1):
-    eyes.append(ellipsoid(f"Eye{side}", (side * 0.36, -0.99, 0.3), (0.14, 0.07, 0.21), rot=(-12, 0, side * -14), segments=32, rings=16))
-bpy.ops.object.select_all(action="DESELECT")
-for o in eyes:
-    o.select_set(True)
-bpy.context.view_layer.objects.active = eyes[0]
-bpy.ops.object.join()
-eye_obj = bpy.context.active_object
-eye_obj.name = "Eyes"
-eye_obj.data.materials.clear()
-eye_obj.data.materials.append(eye_mat)
+# Eyes: glossy black tall ovals on the front of the dome, centred on their origins for blinking.
+eyes = [join([ellipsoid(f"Eye{side}", (side * 0.36, -0.99, 0.3), (0.14, 0.07, 0.21), rot=(-12, 0, side * -14), segments=32, rings=16)],
+             "EyeL" if side < 0 else "EyeR", (side * 0.36, -0.99, 0.3), eye_mat) for side in (-1, 1)]
+bpy.context.scene.cursor.location = (0, 0, 0)
 
-print("built", body.name, len(body.data.polygons), eye_obj.name, len(eye_obj.data.polygons), names)
+made = [body, tuft, *wings, *eyes]
+bpy.ops.object.select_all(action="DESELECT")
+for o in made:
+    o.select_set(True)
+if "OUT" in globals():
+    bpy.ops.export_scene.gltf(filepath=OUT, export_format="GLB", use_selection=True, export_yup=True,
+                              export_texcoords=False, export_cameras=False, export_lights=False)
+print("built", {o.name: len(o.data.polygons) for o in made}, names)
