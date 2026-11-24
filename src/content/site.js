@@ -135,56 +135,126 @@ export const milestonesQuote = {
   text: "Every milestone here started as something I didn’t know how to do yet.",
   cite: "",
 };
-export const achievements = [
-  { value: "5", label: "Dean’s List terms", context: "Academic distinction" },
-  { value: "3", label: "Years top performer", context: "2024 to 2026" },
+export const honors = [
   {
-    value: String(credentials.length),
-    label: "Certifications",
-    context: "PMI and Certiport",
+    title: "Top Performing Student",
+    issuer: "FEU Institute of Technology",
+    year: "2024–2026",
+    kind: "Honor",
   },
   {
-    value: String(projects.length),
-    label: "Projects built",
-    context: "Thesis system and client website",
+    title: "Dean’s Lister (5 Terms)",
+    issuer: "FEU Institute of Technology",
+    year: "2024–2026",
+    kind: "Honor",
   },
+  ...credentials.map((c) => ({
+    title: c.title,
+    issuer: c.issuer,
+    year: c.year,
+    kind: "Certification",
+  })),
 ];
-// Tool experience is grounded in the supplied project descriptions.
-// Interests and target roles are kept separate from demonstrated experience.
-export const skills = [
-  { category: "Programming languages", items: ["Python", "JavaScript"] },
+export const description = {
+  tagline: "Curious by nature. Builder by habit.",
+  copy: "I chase the why behind how things work, then turn what I find into software that solves real problems for real people.",
+};
+export const stats = [
+  { value: 5, title: "Dean’s List" },
+  { value: 3, title: "Top-Performer Years" },
   {
-    category: "Frontend development",
-    items: ["React", "HTML", "CSS", "Responsive layouts", "UI/UX design"],
+    value: honors.filter((h) => h.kind === "Certification").length,
+    title: "Certifications",
   },
-  { category: "Backend development", items: ["FastAPI", "API integration"] },
+  { value: projects.length, title: "Projects Shipped" },
+];
+// Temporary shim for the current scene; removed in Task 3.
+export const achievements = stats.map((s) => ({
+  value: s.value,
+  label: s.title,
+}));
+export const aboutStory =
+  "I’m fascinated by the little problems people learn to live with. The repetitive tasks, the unnecessary complexity, the things that could simply work better. I enjoy finding ways to make those things easier through thoughtful solutions.";
+export const skills = [
   {
-    category: "AI & machine learning",
+    category: "Programming Languages",
+    items: ["Python", "JavaScript", "HTML", "CSS"],
+  },
+  {
+    category: "Frontend Development",
     items: [
+      "Responsive Layouts",
+      "UI/UX Design",
+      "Reusable Components",
+      "SEO Metadata",
+    ],
+  },
+  {
+    category: "Backend Development",
+    items: ["REST APIs", "API Integration", "Prompt Evaluation Pipelines"],
+  },
+  {
+    category: "AI & Machine Learning",
+    items: [
+      "QLoRA / LoRA",
+      "Supervised Fine-Tuning",
+      "DPO",
+      "Prompt Optimization",
+      "Heuristic Evaluation",
+    ],
+  },
+  {
+    category: "Frameworks & Libraries",
+    items: [
+      "React",
+      "FastAPI",
       "PyTorch",
       "Hugging Face Transformers",
-      "QLoRA / LoRA",
-      "DPO",
       "PEFT",
       "TRL",
       "spaCy",
       "SentenceTransformers",
-      "Prompt optimization",
     ],
   },
   {
-    category: "Cloud computing & DevOps",
+    category: "Tools & Platforms",
     items: [
-      "Vercel deployment",
+      "Vercel",
       "RunPod",
       "CUDA",
-      "DNS and domain configuration",
-      "Automation",
+      "Google Search Console",
+      "DNS & Domains",
+      "GitHub",
     ],
   },
-  {
-    category: "Databases & developer tools",
-    items: ["Google Search Console"],
-    note: "Database technologies to be provided.",
-  },
+];
+export const skillIcons = [
+  { name: "Python", icon: "python" },
+  { name: "JavaScript", icon: "javascript" },
+  { name: "React", icon: "react" },
+  { name: "FastAPI", icon: "fastapi" },
+  { name: "PyTorch", icon: "pytorch" },
+  { name: "Hugging Face", icon: "huggingface" },
+  { name: "spaCy", icon: "spacy" },
+  { name: "HTML", icon: "html5" },
+  { name: "Vercel", icon: "vercel" },
+  { name: "CUDA", icon: "nvidia" },
+  { name: "GitHub", icon: "github" },
+];
+export const cta = {
+  quote:
+    "The best problems hide in plain sight. I like finding them — and building what fixes them.",
+  resumeLabel: "View my résumé",
+};
+export const gallery = [];
+export const navSections = [
+  { id: "top", label: "Home", inHeader: false },
+  { id: "description", label: "Intro", inHeader: false },
+  { id: "stats", label: "Highlights", inHeader: false },
+  { id: "about", label: "About", inHeader: true },
+  { id: "work", label: "Work", inHeader: true },
+  { id: "skills", label: "Skills", inHeader: true },
+  { id: "honors", label: "Honors", inHeader: true },
+  { id: "milestones", label: "Milestones", inHeader: false },
+  { id: "contact", label: "Contact", inHeader: true },
 ];
