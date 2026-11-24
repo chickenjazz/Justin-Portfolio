@@ -3,8 +3,9 @@
 // position via update(frame), in CSS px; this module only maps px to world space and adds
 // the ambient motion (float, bob, tilt, drift), so motion keeps a single source.
 
-const LAVENDER = { body: "#b9a8f0", accent: "#8f78d6" };
-const CRYSTAL = { body: "#f4f6ff", accent: "#e8ecff" };
+// The beak is warm apricot, the complement of the lavender; in crystal it keeps a pale warm tint.
+const LAVENDER = { body: "#b9a8f0", accent: "#8f78d6", beak: "#f4a46a" };
+const CRYSTAL = { body: "#f4f6ff", accent: "#e8ecff", beak: "#ffe6d2" };
 const FOV = 20;
 const CAMERA_Z = 20;
 // World height the old per-mascot camera framed; keeps the chick filling its px box the same way.
@@ -43,11 +44,13 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
   // The room environment alone lights everything evenly and flattens the lavender chick.
   // A warm key from upper-left, a cool lavender rim from behind-right and a soft sky/ground
   // fill give it form: a lit crown, shaded belly and a bright edge against the dark page.
+  // The fill's ground colour is a deep violet, so shadows fall to purple (like the reference)
+  // rather than grey.
   const key = new THREE.DirectionalLight("#fff3ea", 2.6);
-  key.position.set(-5, 7, 8);
+  key.position.set(-5, 9, 3.5);
   const rim = new THREE.DirectionalLight("#cfc4ff", 2.2);
   rim.position.set(6, 3, -7);
-  scene.add(key, rim, new THREE.HemisphereLight("#ffffff", "#221a40", 0.2));
+  scene.add(key, rim, new THREE.HemisphereLight("#cfc2ff", "#3a2088", 1.1));
   const pmrem = new THREE.PMREMGenerator(renderer);
   const room = new RoomEnvironment();
   const envTarget = pmrem.fromScene(room, 0.04);
@@ -82,9 +85,11 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     track(new THREE.MeshPhysicalMaterial({ color: hex, iridescenceIOR: 1.9, iridescenceThicknessMinimum: 250, iridescenceThicknessMaximum: 900, sheenColor: "#efe9ff", sheenRoughness: 0.45 }));
   const body = physical(LAVENDER.body);
   const accent = physical(LAVENDER.accent);
+  const beak = physical(LAVENDER.beak);
   const tints = [
     [body, new THREE.Color(LAVENDER.body), new THREE.Color(CRYSTAL.body)],
     [accent, new THREE.Color(LAVENDER.accent), new THREE.Color(CRYSTAL.accent)],
+    [beak, new THREE.Color(LAVENDER.beak), new THREE.Color(CRYSTAL.beak)],
   ];
   const parts = {};
   chickGltf.scene.traverse((node) => {
@@ -94,6 +99,7 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     track(node.material);
     if (node.material.name === "ChickBody") node.material = body;
     else if (node.material.name === "ChickAccent") node.material = accent;
+    else if (node.material.name === "ChickBeak") node.material = beak;
   });
   const chickPose = new THREE.Group();
   chickPose.add(chickGltf.scene);
@@ -146,6 +152,10 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     return shapes[i].mesh;
   }
 
+  // three.js ignores material.envMapIntensity when the map comes from scene.environment (it
+  // uses scene.environmentIntensity instead), so give our materials the map directly.
+  for (const material of [body, accent, beak, letterMaterial, ink, mint, crystal]) material.envMap = envTarget.texture;
+
   // Frame ------------------------------------------------------------------------------
   let current = null;
   let size = { width: 0, height: 0 };
@@ -171,10 +181,10 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
       // Never exactly 0: crossing 0 toggles a shader define and recompiles mid-morph.
       material.iridescence = Math.max(c.glass, 0.001);
       // Soft velvet sheen on the lavender (pale lilac glow at grazing angles), gone in crystal.
-      material.sheen = Math.max(1 - c.glass, 0.001) * 0.45;
+      material.sheen = Math.max(1 - c.glass, 0.001) * 0.25;
       material.clearcoat = lerp(0.25, 1, c.glass);
       material.clearcoatRoughness = lerp(0.35, 0.03, c.glass);
-      material.envMapIntensity = lerp(0.3, 1.4, c.glass);
+      material.envMapIntensity = lerp(0.4, 1.4, c.glass);
     }
   }
 

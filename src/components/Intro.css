@@ -1,0 +1,142 @@
+/* Entry intro: chick hop (~2.3s) → HoloMosaic flip in (~1.2s), hold, flip out (~1.2s).
+   See MOTION.md. */
+.site-intro {
+  --site-intro-ink: #d9ccff;
+  --site-intro-bg: #0a090e;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--site-intro-bg);
+  /* Fallback when JS never takes over: fade the overlay away. */
+  animation: site-intro-out 600ms cubic-bezier(0.65, 0, 0.35, 1) 3500ms forwards;
+}
+/* JS took over: the mosaic ends the intro instead. */
+.site-intro.site-intro--live {
+  animation: none;
+}
+/* Tiles fully cover the chick: drop it, then (on flip-out) the backdrop so the page shows. */
+.site-intro.is-covered .site-intro-content {
+  visibility: hidden;
+}
+.site-intro.is-out {
+  background: transparent;
+  pointer-events: none;
+}
+.site-intro-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.site-intro-mosaic {
+  position: absolute;
+  inset: 0;
+}
+.site-intro-chick {
+  width: 120px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--site-intro-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-intro-foot,
+.site-intro-body {
+  fill: var(--site-intro-bg);
+}
+.site-intro-hop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: site-intro-hop 760ms cubic-bezier(0.33, 0, 0.67, 1) infinite;
+}
+.site-intro-eyes {
+  fill: var(--site-intro-ink);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: site-intro-blink 1500ms linear 200ms infinite;
+}
+.site-intro-shadow {
+  width: 78px;
+  height: 9px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: #2b2735;
+  animation: site-intro-shadow 760ms cubic-bezier(0.33, 0, 0.67, 1) infinite;
+}
+.site-intro-mark {
+  width: 64px;
+  margin-top: 34px;
+  fill: none;
+  stroke: var(--site-intro-ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-intro-mark path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: site-intro-draw 900ms cubic-bezier(0.65, 0, 0.35, 1) 300ms forwards;
+}
+.site-intro-mark path + path {
+  animation-delay: 650ms;
+}
+
+/* Squash on landing, stretch on take-off, float at the top. */
+@keyframes site-intro-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.1, 0.88);
+  }
+  18% {
+    transform: translateY(-6px) scale(0.93, 1.08);
+  }
+  50% {
+    transform: translateY(-38px) scale(1, 1);
+  }
+  82% {
+    transform: translateY(-4px) scale(0.97, 1.04);
+  }
+}
+@keyframes site-intro-shadow {
+  0%,
+  100% {
+    transform: scaleX(1.05);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleX(0.6);
+    opacity: 0.45;
+  }
+}
+@keyframes site-intro-blink {
+  0%,
+  40%,
+  48%,
+  100% {
+    transform: scaleY(1);
+  }
+  44% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes site-intro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes site-intro-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-intro {
+    display: none;
+  }
+}
