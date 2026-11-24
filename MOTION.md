@@ -27,6 +27,12 @@ Entering panel copy fades and rises 14px (700ms, cubic-bezier(.22,1,.36,1), 380m
 delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph,
 drops the hold drift and keeps only the opacity fade.
 
+The Stats section follows the hero and overlaps the last 40svh of the scene track, so its
+cards rise over the still-pinned chick on the white Description background instead of
+sliding in under a hard edge. Cards rise with a 90ms stagger (reveal `rise`), drift at
+parallax depths .15 / .3 / .2 / .35, and their numbers count up over 1000ms (smoothstep)
+as the grid enters view. Reduced motion shows static numbers and no rise.
+
 One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the chick, the
 3D name and the shapes, as render targets of the same scene weights. The chick: `glass`
 blends lavender to crystal pearl, `turn` tilts, `hue` tints, with a 5s float and a slow
