@@ -315,36 +315,6 @@ h2 em {
 .mini-grid h3 {
   font-size: 1rem;
 }
-.stats {
-  background: #28332b;
-  color: #f5f3e9;
-}
-.stats .light > p:last-child {
-  color: #b9c4af;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin-top: 100px;
-}
-.stats-grid > div {
-  border-top: 1px solid #727e71;
-  padding: 30px 20px 0 0;
-}
-.stat-num {
-  font-size: 5rem;
-  letter-spacing: -0.1em;
-}
-.stat-num small {
-  font-size: 0.6rem;
-  letter-spacing: 0;
-  vertical-align: top;
-  margin-left: 20px;
-}
-.stats-grid h3 {
-  font-size: 0.9rem;
-}
-.stats-grid p,
 .skill-grid p {
   font-size: 0.75rem;
   color: #a7aea0;
@@ -619,11 +589,6 @@ h2 em {
   .big-number {
     font-size: 7rem;
   }
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 60px;
-  }
   .project {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -687,12 +652,6 @@ h2 em {
   }
   .gallery-grid div:last-child {
     grid-column: span 2;
-  }
-  .stats-grid {
-    gap: 20px;
-  }
-  .stat-num {
-    font-size: 4rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -850,9 +809,6 @@ h2 em {
   }
   .stat-range {
     font-size: 1.7rem;
-  }
-  .stat-num small {
-    margin-left: 7px;
   }
 }
 

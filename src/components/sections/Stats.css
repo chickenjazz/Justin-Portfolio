@@ -7,7 +7,7 @@
   background: linear-gradient(transparent, var(--paper) 40svh);
   pointer-events: none;
 }
-.stats-grid {
+.stat-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2vw, 1.75rem);
@@ -43,7 +43,7 @@
   }
 }
 @media (max-width: 900px) {
-  .stats-grid {
+  .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

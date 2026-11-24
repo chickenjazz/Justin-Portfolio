@@ -175,19 +175,6 @@ body {
 .big-number {
   color: #c8b6ff;
 }
-.stats {
-  background: #111017;
-}
-.stats-grid p,
-.stats .light > p:last-child {
-  color: #b4a9c4;
-}
-.stats-grid > div {
-  border-color: var(--line);
-}
-.stats .stat-num {
-  color: #c4affb;
-}
 .skills {
   background: #100e17;
 }

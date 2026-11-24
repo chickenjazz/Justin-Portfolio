@@ -13,7 +13,7 @@ export default function Stats() {
       <h2 id="stats-title" className="visually-hidden">
         Highlights
       </h2>
-      <div className="stats-grid" ref={gridRef}>
+      <div className="stat-grid" ref={gridRef}>
         {stats.map((stat, i) => (
           <article
             key={stat.title}
