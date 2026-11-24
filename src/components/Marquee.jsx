@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-
 export default function Marquee({
   label,
   speed = 40,
@@ -10,8 +8,13 @@ export default function Marquee({
   className = "",
   children,
 }) {
-  const copy = () =>
-    Array.from({ length: repeat }, (_, i) => <Fragment key={i}>{children}</Fragment>);
+  // First copy: one accessible set; extra sets are hidden and inert. Second copy: all hidden.
+  const extras = (n) =>
+    Array.from({ length: n }, (_, i) => (
+      <li key={i} className="marquee-extra" aria-hidden="true" inert>
+        <ul role="presentation">{children}</ul>
+      </li>
+    ));
   const rootProps = decorative
     ? { "aria-hidden": "true" }
     : { role: "region", "aria-label": label };
@@ -23,9 +26,13 @@ export default function Marquee({
       {...rootProps}
     >
       <div className="marquee-track">
-        <ul className="marquee-copy">{copy()}</ul>
+        <ul className="marquee-copy" role="list">
+          {children}
+          {extras(repeat - 1)}
+        </ul>
         <ul className="marquee-copy" aria-hidden="true" inert>
-          {copy()}
+          {children}
+          {extras(repeat - 1)}
         </ul>
       </div>
     </div>

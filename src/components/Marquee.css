@@ -10,6 +10,10 @@
 .marquee-reverse .marquee-track {
   animation-direction: reverse;
 }
+.marquee-extra,
+.marquee-extra ul {
+  display: contents;
+}
 .marquee-copy {
   display: flex;
   flex-shrink: 0;
@@ -31,10 +35,20 @@
     animation: none;
     width: auto;
   }
-  .marquee-copy:first-child {
-    flex-wrap: wrap;
+  .marquee {
+    overflow: visible;
   }
-  .marquee-copy[aria-hidden="true"] {
+  .marquee-copy:first-child {
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+  }
+  .marquee-copy:first-child > * {
+    flex-shrink: 1;
+  }
+  .marquee-copy[aria-hidden="true"],
+  .marquee-extra {
     display: none;
   }
 }

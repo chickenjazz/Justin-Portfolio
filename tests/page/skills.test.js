@@ -14,3 +14,25 @@ test("skills: giant heading, icon row, six categories in a looping band", () => 
 test("marquee stops under reduced motion", () => {
   assert.match(builtCss(), /prefers-reduced-motion:\s*reduce\)[^{]*\{[^@]*\.marquee-track\{[^}]*animation:\s*none/);
 });
+
+const stripHidden = (html) => {
+  const re = /<(\/?)(\w+)([^>]*)>/g;
+  let out = "", last = 0, m, skip = null, depth = 0;
+  while ((m = re.exec(html))) {
+    if (skip === null) {
+      out += html.slice(last, m.index);
+      if (!m[1] && /aria-hidden="true"/.test(m[3]) && !/\/$/.test(m[3])) { skip = m[2]; depth = 1; }
+      else out += m[0];
+    } else if (m[2] === skip && !/\/$/.test(m[3])) {
+      depth += m[1] ? -1 : 1;
+      if (depth === 0) skip = null;
+    }
+    last = re.lastIndex;
+  }
+  return out;
+};
+
+test("skills: each category is announced exactly once outside aria-hidden subtrees", () => {
+  const visible = text(stripHidden(section("skills")));
+  for (const c of skills) assert.equal(visible.split(c.category).length - 1, 1, c.category);
+});
