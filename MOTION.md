@@ -60,15 +60,18 @@ scroll distance), never padding for scroll travel. The stage is 100svh at top: 0
 Progress and anchor destinations share the same track origin. Short screens keep
 the mascot visible and provide native scrolling inside the Description panel.
 
-Project carousel (arc): a sticky 100svh stage inside an explicit-height track
-(`useHeldScroll`, the same held-state model as the hero: commit at 18% in the direction
-of travel, 1100ms smoothstep, 140ms idle glide to the committed card, half-viewport hold
-on the last card before release). Native page scroll only. Each card gets an offset d
-from that time-based progress and swings around a pivot 200vw below centre (30° per
-step, scale −12%, fading out by one step, corners rounding to 28px). An arc list of
-titles (right edge; horizontal above the controls on mobile) follows the same d.
-Titles, arrows and ←/→ scroll to a card's exact position. Without JS the cards fall back
-to a horizontal scroll-snap track. Reduced motion snaps between cards, opacity only.
+Project stack: a sticky 100svh stage inside an explicit-height track (`useHeldScroll`:
+held states, commit at 18% in the direction of travel, 140ms idle glide to the committed
+card, half-viewport hold on the last card before release). Native page scroll only. The
+tween between cards is 900ms easeOutBack (overshoot 1.2, peaking under 6% past the
+target): that overshoot is the snap. Each card gets an offset d from the time-based
+progress (`stackLayer` in `stackMath.js`). The incoming card rises from 100svh below
+with a lifted shadow that fades out as it lands on top; meanwhile the card it covers
+recedes up 4svh and scales down 5% per step (at most two steps) under a 45% black dim. Cards are inset dark panels (28px corners) on the white page. The
+title list (a right-hand column on desktop, a row above the controls on mobile) marks
+the current card. Titles, arrows and ←/→ scroll to a card's exact position. Without JS
+the cards fall back to a horizontal scroll-snap track. Reduced motion snaps between
+cards with no rise, recede or scale: only the current card is shown (opacity).
 
 Entry intro (`Intro.jsx` + `Intro.css`): a full-screen overlay on first paint (prerendered,
 pure CSS, so it plays before JS). A line drawing of the chick hops (760ms loop: squash on

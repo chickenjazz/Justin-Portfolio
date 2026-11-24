@@ -214,8 +214,11 @@ body {
   border-top: 1px solid var(--line);
 }
 .project-showcase {
+  /* Width of the title column beside the stacked cards on desktop. */
+  --list-column: clamp(150px, 15vw, 240px);
   position: relative;
-  background: #07060b;
+  background: var(--paper);
+  color: var(--ink);
   isolation: isolate;
   padding: 0;
   margin: 0;
@@ -239,7 +242,7 @@ body {
   text-transform: uppercase;
 }
 .showcase-heading h2 span {
-  color: #998cae;
+  color: var(--muted);
 }
 .showcase-heading a {
   font-size: 0.7rem;
@@ -259,7 +262,7 @@ body {
   display: none;
 }
 .project-track:focus-visible {
-  outline: 2px solid #d9c8ff;
+  outline: 2px solid var(--accent-ink);
   outline-offset: -3px;
 }
 .project-slide {
@@ -273,6 +276,7 @@ body {
   padding: 120px 8vw 130px;
   isolation: isolate;
   overflow: hidden;
+  color: #f3eefa;
   background: radial-gradient(
     ellipse at 74% 42%,
     #39245b,
@@ -280,39 +284,72 @@ body {
     #0b090f 95%
   );
 }
-/* Arc mode (JS): page scroll steps through the cards inside a sticky stage.
+/* Stack mode (JS): page scroll steps through the cards inside a sticky stage;
+   each incoming card rises from the bottom and settles on top of the last.
    Without JS the horizontal scroll-snap track above stays as the fallback. */
 .project-stage {
   position: relative;
 }
-.project-showcase.arc-ready {
+.project-showcase.stack-ready {
   height: calc(100svh + var(--scroll-distance, 150svh));
 }
-.arc-ready .project-stage {
+.stack-ready .project-stage {
   position: sticky;
   top: 0;
   height: 100svh;
   overflow: hidden;
 }
-.arc-ready .project-track {
+.stack-ready .project-track {
   position: absolute;
   inset: 0;
   display: block;
   overflow: hidden;
   scroll-snap-type: none;
 }
-.arc-ready .project-slide {
+/* --y (svh), --s, --dim and --lift come from stackLayer() every frame. */
+.stack-ready .project-slide {
+  position: absolute;
+  inset: 11svh 4vw 9svh;
+  /* Desktop keeps a white column on the right for the title list. */
+  right: calc(4vw + var(--list-column));
+  max-width: 1280px;
+  margin-inline: auto;
+  min-height: 0;
+  padding: clamp(28px, 5vw, 72px);
+  border-radius: 28px;
+  /* The art layer clips itself, so the lifted shadow can spill outside. */
+  overflow: visible;
+  box-shadow: var(--shadow-float);
+  transform: translateY(calc(var(--y, 0) * 1svh)) scale(var(--s, 1));
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+/* Lifted shadow: fades in with --lift while the card is in flight. */
+.stack-ready .project-slide::before {
+  content: "";
   position: absolute;
   inset: 0;
-  min-height: 0;
-  /* Cards swing around a pivot 200vw below centre: one step of d travels one
-     viewport width along the arc. */
-  transform-origin: 50% calc(50% + 200vw);
-  rotate: calc(var(--d, 0) * 30deg);
-  scale: calc(1 - min(var(--ad, 0), 1) * 0.12);
-  opacity: clamp(0, 1.15 - var(--ad, 0) * 1.15, 1);
-  border-radius: calc(min(var(--ad, 0), 1) * 28px);
-  will-change: rotate, opacity;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    0 60px 120px -40px rgb(20 10 50 / 0.5),
+    0 24px 48px -24px rgb(20 10 50 / 0.35);
+  opacity: var(--lift, 0);
+  pointer-events: none;
+}
+/* Dim: darkens a card as later cards cover it. */
+.stack-ready .project-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: #000;
+  opacity: var(--dim, 0);
+  pointer-events: none;
+}
+.stack-ready .slide-art {
+  border-radius: inherit;
 }
 .project-slide-1 {
   background: radial-gradient(
@@ -461,16 +498,16 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .carousel-controls p span {
-  color: #91859f;
+  color: var(--muted);
 }
 .carousel-arrows {
   display: flex;
   gap: 10px;
 }
 .carousel-controls button {
-  color: #eee7f6;
+  color: var(--ink);
   background: transparent;
-  border: 1px solid #ffffff45;
+  border: 1px solid #0d0c1233;
   cursor: pointer;
   min-width: 48px;
   min-height: 48px;
@@ -479,39 +516,35 @@ body {
   transition: background 160ms ease;
 }
 .carousel-controls button:hover:not(:disabled) {
-  background: #ffffff1a;
+  background: #0d0c120f;
 }
 .carousel-controls button:disabled {
   opacity: 0.3;
   cursor: default;
 }
-/* Arc list: project titles bent along the same wheel as the cards. */
-.arc-list {
+/* Stack list: project titles in the right-hand column; the current one is ink. */
+.stack-list {
   position: absolute;
   top: 50%;
   right: 4vw;
+  width: calc(var(--list-column) - 24px);
+  transform: translateY(-50%);
   z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.arc-list li {
-  position: absolute;
-  right: 0;
-  transform: translateY(-50%);
-  transform-origin: 100% 50%;
-  translate: calc(var(--ad, 0) * var(--ad, 0) * 44px) calc(var(--d, 0) * 64px);
-  rotate: calc(var(--d, 0) * 9deg);
-  scale: calc(1 - min(var(--ad, 0), 3) * 0.1);
-  opacity: clamp(0, 1 - var(--ad, 0) * 0.45, 1);
-}
-.arc-list button {
-  white-space: nowrap;
+.stack-list button {
   font: inherit;
-  font-size: clamp(1.2rem, 2vw, 1.75rem);
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: #8c819c;
+  text-align: right;
+  color: var(--muted);
   background: none;
   border: 0;
   min-height: 48px;
@@ -519,12 +552,12 @@ body {
   cursor: pointer;
   transition: color 240ms ease;
 }
-.arc-list button:hover,
-.arc-list button[aria-current] {
-  color: #ece2ff;
+.stack-list button:hover,
+.stack-list button[aria-current] {
+  color: var(--ink);
 }
-.arc-list button:focus-visible {
-  outline: 2px solid #d9c8ff;
+.stack-list button:focus-visible {
+  outline: 2px solid var(--accent-ink);
   outline-offset: 4px;
 }
 .project-dialog {
@@ -668,22 +701,27 @@ body {
   .carousel-controls {
     bottom: 18px;
   }
-  .arc-list {
+  /* Cards span the width; the title row and controls sit below them. */
+  .stack-ready .project-slide {
+    right: 4vw;
+    bottom: 132px;
+    padding: 24px 6vw;
+  }
+  .stack-ready .slide-content {
+    padding-top: 0;
+  }
+  .stack-list {
     top: auto;
-    right: auto;
-    bottom: 104px;
-    left: 50%;
+    left: 4vw;
+    bottom: 76px;
+    width: auto;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
   }
-  .arc-list li {
-    right: auto;
-    left: 0;
-    transform: translate(-50%, -50%);
-    transform-origin: 50% 100%;
-    translate: calc(var(--d, 0) * 112px)
-      calc(var(--ad, 0) * var(--ad, 0) * 10px);
-    rotate: calc(var(--d, 0) * 7deg);
-  }
-  .arc-list button {
+  .stack-list button {
+    font-size: 1.05rem;
     padding: 0 8px;
   }
   .showcase-heading {
@@ -709,10 +747,12 @@ body {
   .project-track {
     scroll-behavior: auto;
   }
-  .arc-ready .project-slide {
-    rotate: none;
-    scale: none;
-    border-radius: 0;
+  /* Cards cross-fade in place: no rise, recede or scale. */
+  .stack-ready .project-slide {
+    transform: none;
+  }
+  .stack-ready .project-slide[inert] {
+    opacity: 0;
   }
   .project-dialog[open] {
     animation: none;

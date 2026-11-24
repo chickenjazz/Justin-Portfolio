@@ -2,12 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { projects } from "../../content/site.js";
 import ProjectDetails from "../ProjectDetails.jsx";
 import useHeldScroll from "../useHeldScroll.js";
+import { easeOutBack } from "../motion.js";
+import { stackLayer } from "../stackMath.js";
+
+// CSS custom properties for one card's place in the stack.
+const layerStyle = (layer) => ({
+  "--y": layer.yVh,
+  "--s": layer.scale,
+  "--dim": layer.dim,
+  "--lift": layer.lift,
+});
 
 export default function Projects() {
   const track = useRef(null);
   const dialog = useRef(null);
   const trigger = useRef(null);
-  const arcList = useRef(null);
   const showcase = useRef(null);
   const [selected, setSelected] = useState(null);
   const [ready, setReady] = useState(false);
@@ -15,22 +24,25 @@ export default function Projects() {
   useEffect(() => {
     setReady(true);
   }, []);
-  // Places every card and title on the arc for a progress p (0 … count - 1).
+  // Stacks every card for a progress p (0 … count - 1): later cards rise from
+  // the bottom and cover earlier ones.
   const place = (p) => {
-    const lay = (elements, depth) =>
-      Array.from(elements ?? [], (element, index) => {
-        const d = index - p;
-        element.style.setProperty("--d", d.toFixed(4));
-        element.style.setProperty("--ad", Math.abs(d).toFixed(4));
-        if (!depth) return;
-        element.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
-        element.inert = Math.abs(d) > 0.5;
-      });
-    lay(track.current?.children, true);
-    lay(arcList.current?.children, false);
+    Array.from(track.current?.children ?? [], (card, index) => {
+      const d = index - p;
+      const layer = stackLayer(d);
+      for (const [name, value] of Object.entries(layerStyle(layer)))
+        card.style.setProperty(name, String(value));
+      card.style.zIndex = String(index + 1);
+      card.style.visibility = layer.hidden ? "hidden" : "";
+      card.inert = Math.abs(d) > 0.5;
+    });
   };
   // Page scroll steps through the projects, then releases after the last.
-  const [active, goTo] = useHeldScroll(showcase, projects.length, place, ready);
+  // easeOutBack overshoots slightly, so each card snaps into place.
+  const [active, goTo] = useHeldScroll(showcase, projects.length, place, ready, {
+    ease: easeOutBack,
+    duration: 900,
+  });
   useEffect(() => {
     if (!selected) return;
     const panel = dialog.current;
@@ -53,7 +65,7 @@ export default function Projects() {
 
   return (
     <section
-      className={`project-showcase${ready ? " arc-ready" : ""}`}
+      className={`project-showcase${ready ? " stack-ready" : ""}`}
       ref={showcase}
       id="work"
       aria-label="Selected projects"
@@ -64,7 +76,7 @@ export default function Projects() {
             Selected work
             <span> / {String(projects.length).padStart(2, "0")}</span>
           </h2>
-          <a href="#credentials">Skip projects ↓</a>
+          <a href="#skills">Skip projects ↓</a>
         </div>
         <div
           className="project-track"
@@ -86,7 +98,7 @@ export default function Projects() {
               className={`project-slide project-slide-${index}`}
               id={project.id}
               key={project.id}
-              style={{ "--d": index, "--ad": index }}
+              style={layerStyle(stackLayer(index))}
               aria-roledescription="slide"
               aria-label={`${index + 1} of ${projects.length}: ${project.shortTitle}`}
             >
@@ -120,9 +132,9 @@ export default function Projects() {
           ))}
         </div>
         {ready && (
-          <ol className="arc-list" ref={arcList} aria-label="Projects">
+          <ol className="stack-list" aria-label="Projects">
             {projects.map((project, index) => (
-              <li key={project.id} style={{ "--d": index, "--ad": index }}>
+              <li key={project.id}>
                 <button
                   aria-current={active === index ? "true" : undefined}
                   onClick={() => goTo(index)}

@@ -320,85 +320,8 @@ h2 em {
   display: inline-block;
   margin: 2rem 0;
 }
-.project {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 7%;
-  padding: 45px 0 100px;
-  position: relative;
-  min-height: 75vh;
-  align-items: center;
-  border-top: 1px solid var(--line);
-  scroll-margin-top: 20px;
-}
-.project-visual {
-  aspect-ratio: 1.15;
-  background: #d4ddc3;
-  position: relative;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-.visual-1 {
-  background: #eed3bc;
-}
-.visual-2 {
-  background: #d7d7c9;
-}
-.visual-mark {
-  font-size: clamp(8rem, 20vw, 18rem);
-  color: #82987a;
-  line-height: 1;
-}
-.visual-1 .visual-mark {
-  color: #e07b5d;
-}
-.visual-2 .visual-mark {
-  color: #879083;
-}
-.visual-top,
-.visual-bottom {
-  position: absolute;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  left: 25px;
-}
-.visual-top {
-  top: 25px;
-}
-.visual-bottom {
-  bottom: 25px;
-}
-.project-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-}
 .progress {
   color: #75816c;
-}
-.project-info h3 {
-  font-size: clamp(3rem, 5vw, 5rem);
-  letter-spacing: -0.06em;
-  margin: 2rem 0;
-}
-.project-tech {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: 1.2rem 0;
-  margin: 2rem 0;
-  font-size: 0.8rem;
-}
-.project-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 4rem;
-  font-size: 0.75rem;
-  font-weight: 700;
 }
 .checkpoint {
   position: absolute;
@@ -578,15 +501,6 @@ h2 em {
   .big-number {
     font-size: 7rem;
   }
-  .project {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    min-height: auto;
-    padding-bottom: 65px;
-  }
-  .project-info h3 {
-    margin: 1.5rem 0;
-  }
   .skill-grid {
     grid-template-columns: 1fr 1fr;
     margin-top: 50px;
@@ -669,7 +583,6 @@ h2 em {
   font-size: 0.65rem;
 }
 .mini-grid ul,
-.project-details ul,
 .skill-grid ul,
 .timeline ul {
   padding-left: 1.2rem;
@@ -682,73 +595,6 @@ h2 em {
 .stat-range {
   font-size: clamp(1.8rem, 3vw, 3rem);
   letter-spacing: -0.06em;
-}
-.project-info {
-  min-width: 0;
-}
-.project-info h3 {
-  font-size: clamp(2rem, 3.5vw, 3.8rem);
-  overflow-wrap: anywhere;
-  line-height: 1.1;
-}
-.project-meta {
-  gap: 1rem;
-  line-height: 1.6;
-  flex-wrap: wrap;
-}
-.project-tech ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.project-tech li {
-  border: 1px solid var(--line);
-  padding: 0.4rem 0.6rem;
-  font-size: 0.75rem;
-}
-.project-details summary {
-  cursor: pointer;
-  padding: 1rem 0;
-  min-height: 44px;
-  font-weight: 600;
-}
-.project-details summary:focus-visible {
-  outline: 3px solid #db6547;
-  outline-offset: 4px;
-}
-.project-details li {
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-.project-results {
-  margin: 1.5rem 0;
-  padding: 1.2rem;
-  background: #e7eadc;
-}
-.project-results h4 {
-  margin: 0 0 1rem;
-}
-.project-results dl {
-  margin: 0;
-}
-.project-results dl > div {
-  margin-bottom: 1rem;
-}
-.project-results dt {
-  font-size: 0.75rem;
-}
-.project-results dd {
-  margin: 0.3rem 0 0;
-  font-size: 1.7rem;
-  font-weight: 600;
-}
-.project-results p {
-  font-size: 0.8rem;
-  line-height: 1.6;
-  margin-bottom: 0;
 }
 .skill-grid li {
   font-size: 0.85rem;

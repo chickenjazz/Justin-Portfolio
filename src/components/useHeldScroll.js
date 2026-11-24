@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { smoothstep } from "./motion.js";
 
-const MORPH_MS = 1100;
 // A short scroll past a held state commits to its neighbour, as in a slideshow.
 const COMMIT = 0.18;
 const SETTLE_MS = 140;
@@ -10,15 +10,24 @@ const FINAL_HOLD = 0.5;
 /**
  * Native vertical scroll through `count` held states inside a sticky track.
  * Scroll only selects the destination; the visual progress is time-based
- * (smoothstep), so it never rests between states. When scrolling rests between
- * states the page glides to the committed one. `onProgress(p)` gets a float
- * from 0 to count - 1 every frame.
+ * (`ease` over `duration` ms; smoothstep over 1100ms by default), so it never
+ * rests between states. When scrolling rests between states the page glides to
+ * the committed one. `onProgress(p)` gets a float from 0 to count - 1 every
+ * frame (beyond that range while an overshooting ease settles).
  */
-export default function useHeldScroll(trackRef, count, onProgress, enabled) {
+export default function useHeldScroll(
+  trackRef,
+  count,
+  onProgress,
+  enabled,
+  { ease = smoothstep, duration: morphMs = 1100 } = {},
+) {
   const [active, setActive] = useState(0);
   const navigateRef = useRef(() => {});
   const progressRef = useRef(onProgress);
   progressRef.current = onProgress;
+  const easeRef = useRef(ease);
+  easeRef.current = ease;
 
   useEffect(() => {
     if (!enabled) return;
@@ -42,7 +51,7 @@ export default function useHeldScroll(trackRef, count, onProgress, enabled) {
     function tween(now) {
       frame = 0;
       const t = duration ? Math.min(1, (now - tweenStart) / duration) : 1;
-      progress = from + (destination - from) * (t * t * (3 - 2 * t));
+      progress = from + (destination - from) * easeRef.current(t);
       track.dataset.transitioning = t < 1 ? "true" : "false";
       progressRef.current(progress);
       if (t < 1) frame = requestAnimationFrame(tween);
@@ -53,7 +62,7 @@ export default function useHeldScroll(trackRef, count, onProgress, enabled) {
       from = progress;
       tweenStart = performance.now();
       // The first placement (e.g. reload mid-track) jumps instead of replaying.
-      duration = preference.matches || !settled ? 0 : MORPH_MS;
+      duration = preference.matches || !settled ? 0 : morphMs;
       destination = index;
       setActive(index);
       if (!frame) frame = requestAnimationFrame(tween);
@@ -120,7 +129,7 @@ export default function useHeldScroll(trackRef, count, onProgress, enabled) {
       track.style.removeProperty("--scroll-distance");
       navigateRef.current = () => {};
     };
-  }, [trackRef, count, enabled]);
+  }, [trackRef, count, enabled, morphMs]);
 
   return [active, (index) => navigateRef.current(index)];
 }
