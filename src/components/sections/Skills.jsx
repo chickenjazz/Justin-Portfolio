@@ -1,33 +1,39 @@
-import WordReveal from "../WordReveal.jsx";
-import { projects, skills } from "../../content/site.js";
+import Marquee from "../Marquee.jsx";
+import { skills, skillIcons } from "../../content/site.js";
+import { icons } from "../../content/icons.js";
 
 export default function Skills() {
   return (
-    <section className="skills section" id="skills">
-      <div className="wrap">
-        <div className="section-head">
-          <p className="eyebrow">05 / THE TOOLKIT</p>
-          <WordReveal as="h2">
-            Skills, in
-            <br />
-            <em>context.</em>
-          </WordReveal>
-          <p>Tools and technologies used across my projects.</p>
-        </div>
-        <div className="skill-grid">
-          {skills.map((s, i) => (
-            <div key={s.category}>
-              <span>0{i + 1} /</span>
+    <section className="skills" id="skills">
+      <div className="skills-head parallax" data-reveal="rise" style={{ "--depth": 0.2 }}>
+        <h2 className="skills-title">SKILLS</h2>
+      </div>
+      <ul className="skill-icons">
+        {skillIcons.map(({ name, icon }, i) => (
+          <li key={name} className="skill-icon" title={name} data-reveal="scale" style={{ "--i": i }}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d={icons[icon]} fill="currentColor" />
+            </svg>
+            <span className="visually-hidden">{name}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="skills-bands">
+        <Marquee label="Skills by category" slant={-4} speed={45} className="skills-front">
+          {skills.map((s) => (
+            <li key={s.category} className="skill-block">
               <h3>{s.category}</h3>
-              <ul>
-                {s.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              {s.note && <p>{s.note}</p>}
-            </div>
+              <p>{s.items.join(" · ")}</p>
+            </li>
           ))}
-        </div>
+        </Marquee>
+        <Marquee decorative slant={3} reverse speed={60} className="skills-back">
+          {skills.map((s) => (
+            <li key={s.category} className="skill-word">
+              {s.category}
+            </li>
+          ))}
+        </Marquee>
       </div>
     </section>
   );

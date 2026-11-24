@@ -1,0 +1,40 @@
+.marquee {
+  overflow: hidden;
+  transform: rotate(var(--marquee-slant, 0deg));
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-speed, 40s) linear infinite;
+}
+.marquee-reverse .marquee-track {
+  animation-direction: reverse;
+}
+.marquee-copy {
+  display: flex;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    width: auto;
+  }
+  .marquee-copy:first-child {
+    flex-wrap: wrap;
+  }
+  .marquee-copy[aria-hidden="true"] {
+    display: none;
+  }
+}

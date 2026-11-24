@@ -88,3 +88,5 @@ by itself at 3.5s (600ms); without WebGL it is removed when the transition would
 Reduced motion skips the intro entirely.
 
 About (`About.jsx` + `About.css`): two columns on white, portrait first when stacked. The portrait drifts with parallax depth .25 over a lavender disc at depth -.15; the eyebrow fades in and the story and education line rise in sequence. Reduced motion: static.
+
+Skills (`Skills.jsx` + `Skills.css`, `Marquee.jsx`): a giant Anton SKILLS heading rises in with parallax depth .2, then the icon row pops in with a scale stagger. Below, two slanted bands cross on white: the front black band (-4deg, 45s loop) carries the six categories with their items, the back decorative outline band (+3deg, reverse, 60s) repeats the category names in lavender. Bands pause on hover and focus-within. Reduced motion: no scrolling; the front band is a static wrapped list and the back band is hidden.

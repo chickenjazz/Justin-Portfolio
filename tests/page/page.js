@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 
 export const html = readFileSync(new URL("../../dist/index.html", import.meta.url), "utf8");
 
@@ -22,3 +22,9 @@ export const section = (id) => {
 };
 
 export const count = (haystack, needle) => haystack.split(needle).length - 1;
+
+export const builtCss = () =>
+  readdirSync(new URL("../../dist/assets/", import.meta.url))
+    .filter((f) => f.endsWith(".css"))
+    .map((f) => readFileSync(new URL(`../../dist/assets/${f}`, import.meta.url), "utf8"))
+    .join("\n");

@@ -175,19 +175,6 @@ body {
 .big-number {
   color: #c8b6ff;
 }
-.skills {
-  background: #100e17;
-}
-.skill-grid {
-  background: var(--line);
-}
-.skill-grid > div {
-  background: #100e17;
-}
-.skill-grid span,
-.skill-grid p {
-  color: #b9accb;
-}
 .timeline p:last-child {
   color: #bab0c8;
 }

@@ -2,7 +2,7 @@ import test from "node:test";
 import { readdirSync, readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { stats } from "../../src/content/site.js";
-import { html, text, section, count } from "./page.js";
+import { html, text, section, count, builtCss } from "./page.js";
 
 test("stats section shows four cards with prerendered numbers and titles", () => {
   const s = section("stats");

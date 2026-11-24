@@ -7,6 +7,8 @@ import "./components/HeroAbout.css";
 import "./components/Intro.css";
 import "./components/sections/Stats.css";
 import "./components/sections/About.css";
+import "./components/Marquee.css";
+import "./components/sections/Skills.css";
 import "./motion.css";
 
 const container = document.getElementById("root");

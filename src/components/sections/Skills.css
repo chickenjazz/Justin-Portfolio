@@ -1,0 +1,101 @@
+.skills {
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(4rem, 10vw, 9rem) 0 0;
+  overflow-x: clip;
+}
+.skills-head {
+  padding-inline: clamp(1rem, 4vw, 3rem);
+}
+.skills-title {
+  margin: 0;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(6rem, 22vw, 22rem);
+  line-height: 0.85;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.skill-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.8rem, 2vw, 1.6rem);
+  margin: clamp(1.5rem, 4vw, 3rem) 0 0;
+  padding: 0 clamp(1rem, 4vw, 3rem);
+  list-style: none;
+}
+.skill-icon {
+  display: grid;
+  place-items: center;
+  width: clamp(2.6rem, 4.5vw, 3.6rem);
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--ink);
+}
+.skill-icon svg {
+  width: 52%;
+  height: 52%;
+}
+.skills-bands {
+  position: relative;
+  padding-block: clamp(5rem, 14vw, 13rem);
+  overflow-x: clip;
+}
+.skills-bands .marquee {
+  width: 120vw;
+  margin-inline: -10vw;
+}
+.skills-front {
+  position: relative;
+  z-index: 2;
+  background: var(--ink);
+  color: #fff;
+}
+.skills-back {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 1;
+  color: var(--accent);
+  font-family: "Anton", sans-serif;
+  font-size: clamp(3rem, 9vw, 8rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.skill-word {
+  padding-inline-end: 0.6em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--accent);
+}
+.skill-block {
+  flex-shrink: 0;
+  width: clamp(16rem, 28vw, 24rem);
+  padding: clamp(1.2rem, 2vw, 2rem) clamp(1.5rem, 3vw, 3rem) clamp(1.2rem, 2vw, 2rem) 0;
+  margin-inline-end: clamp(1.5rem, 3vw, 3rem);
+  border-inline-end: 1px solid #ffffff33;
+}
+.skill-block h3 {
+  margin: 0 0 0.6rem;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.skill-block p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #ffffffcc;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skills-back {
+    display: none;
+  }
+  .skills-bands {
+    padding-block: 3rem;
+  }
+}
