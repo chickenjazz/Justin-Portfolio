@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import "./styles.css";
 import "./theme.css";
 import "./components/HeroAbout.css";
+import "./components/Intro.css";
 
 const container = document.getElementById("root");
 const app = (
