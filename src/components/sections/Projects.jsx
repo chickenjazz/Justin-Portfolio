@@ -25,11 +25,12 @@ export default function Projects() {
     setReady(true);
   }, []);
   // Stacks every card for a progress p (0 … count - 1): later cards rise from
-  // the bottom and cover earlier ones.
-  const place = (p) => {
+  // the bottom and cover earlier ones. Only the destination card settles, so
+  // the overshoot snaps it up on forward moves and never dips it on backward ones.
+  const place = (p, { destination, direction } = {}) => {
     Array.from(track.current?.children ?? [], (card, index) => {
       const d = index - p;
-      const layer = stackLayer(d);
+      const layer = stackLayer(d, index === destination ? direction : 0);
       for (const [name, value] of Object.entries(layerStyle(layer)))
         card.style.setProperty(name, String(value));
       card.style.zIndex = String(index + 1);

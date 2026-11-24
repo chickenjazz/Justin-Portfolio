@@ -64,14 +64,17 @@ Project stack: a sticky 100svh stage inside an explicit-height track (`useHeldSc
 held states, commit at 18% in the direction of travel, 140ms idle glide to the committed
 card, half-viewport hold on the last card before release). Native page scroll only. The
 tween between cards is 900ms easeOutBack (overshoot 1.2, peaking under 6% past the
-target): that overshoot is the snap. Each card gets an offset d from the time-based
-progress (`stackLayer` in `stackMath.js`). The incoming card rises from 100svh below
-with a lifted shadow that fades out as it lands on top; meanwhile the card it covers
-recedes up 4svh and scales down 5% per step (at most two steps) under a 45% black dim. Cards are inset dark panels (28px corners) on the white page. The
-title list (a right-hand column on desktop, a row above the controls on mobile) marks
-the current card. Titles, arrows and ←/→ scroll to a card's exact position. Without JS
-the cards fall back to a horizontal scroll-snap track. Reduced motion snaps between
-cards with no rise, recede or scale: only the current card is shown (opacity).
+target). Each card gets an offset d from the time-based progress (`stackLayer` in
+`stackMath.js`). The incoming card rises from 100svh below with a lifted shadow that
+fades out as it lands on top; meanwhile the card it covers recedes up 4svh and scales
+down 5% per step (at most two steps) under a 45% black dim. The snap: on a forward move
+the destination card overshoots its rest by up to ~3svh upward before settling; a
+backward move settles the revealed card without any dip below rest. Cards are inset dark
+panels (28px corners) on the white page. The title list (a right-hand column on desktop,
+a row above the controls on mobile) marks the current card. Titles, arrows and ←/→
+scroll to a card's exact position. Without JS the cards fall back to a horizontal
+scroll-snap track. Reduced motion snaps between cards with no rise, recede or scale:
+only the current card is shown (opacity).
 
 Entry intro (`Intro.jsx` + `Intro.css`): a full-screen overlay on first paint (prerendered,
 pure CSS, so it plays before JS). A line drawing of the chick hops (760ms loop: squash on

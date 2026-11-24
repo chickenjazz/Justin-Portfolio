@@ -1,11 +1,18 @@
 // Layout of one project card in the bottom-up stack (see MOTION.md, "Project stack").
 // d is the card's offset from the visual progress: > 0 still to come, 0 current,
-// < 0 already covered by later cards.
+// < 0 already covered by later cards. settling is +1 while the card is the
+// destination of a forward move, -1 of a backward move, 0 otherwise.
 
 // Rounds to 4 decimals; "+ 0" turns -0 into 0.
 const round = (value) => Math.round(value * 1e4) / 1e4 + 0;
 
-export function stackLayer(d) {
+const REST = { yVh: 0, scale: 1, dim: 0, lift: 0, hidden: false };
+
+export function stackLayer(d, settling = 0) {
+  // Backward destination: the overshoot would dip it below rest, so it stays flat.
+  if (settling < 0 && d > 0) return { ...REST };
+  // Forward destination: the overshoot carries it up past rest (about 3svh), then back.
+  if (settling > 0 && d < 0) return { ...REST, yVh: round(d * 60) };
   if (d > 0) {
     // Incoming: rises from one viewport below, lifted while in flight.
     return { yVh: round(d * 100), scale: 1, dim: 0, lift: round(Math.min(d, 1)), hidden: d >= 1 };

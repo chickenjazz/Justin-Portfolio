@@ -12,8 +12,10 @@ const FINAL_HOLD = 0.5;
  * Scroll only selects the destination; the visual progress is time-based
  * (`ease` over `duration` ms; smoothstep over 1100ms by default), so it never
  * rests between states. When scrolling rests between states the page glides to
- * the committed one. `onProgress(p)` gets a float from 0 to count - 1 every
- * frame (beyond that range while an overshooting ease settles).
+ * the committed one. `onProgress(p, { destination, direction })` gets a float
+ * from 0 to count - 1 every frame (beyond that range while an overshooting ease
+ * settles), the target state and the tween's direction (+1, -1, or 0 when the
+ * placement is instant).
  */
 export default function useHeldScroll(
   trackRef,
@@ -41,6 +43,7 @@ export default function useHeldScroll(
     let from = 0;
     let tweenStart = 0;
     let duration = 0;
+    let tweenDirection = 0;
     let frame = 0;
     let scrollFrame = 0;
     let settleTimer = 0;
@@ -53,7 +56,7 @@ export default function useHeldScroll(
       const t = duration ? Math.min(1, (now - tweenStart) / duration) : 1;
       progress = from + (destination - from) * easeRef.current(t);
       track.dataset.transitioning = t < 1 ? "true" : "false";
-      progressRef.current(progress);
+      progressRef.current(progress, { destination, direction: tweenDirection });
       if (t < 1) frame = requestAnimationFrame(tween);
     }
     function goToState(index) {
@@ -64,6 +67,7 @@ export default function useHeldScroll(
       // The first placement (e.g. reload mid-track) jumps instead of replaying.
       duration = preference.matches || !settled ? 0 : morphMs;
       destination = index;
+      tweenDirection = duration ? Math.sign(destination - from) : 0;
       setActive(index);
       if (!frame) frame = requestAnimationFrame(tween);
     }
@@ -119,7 +123,7 @@ export default function useHeldScroll(
     const resize = new ResizeObserver(measure);
     resize.observe(document.body);
     window.addEventListener("scroll", schedule, { passive: true });
-    progressRef.current(0);
+    progressRef.current(0, { destination: 0, direction: 0 });
     return () => {
       cancelAnimationFrame(frame);
       cancelAnimationFrame(scrollFrame);

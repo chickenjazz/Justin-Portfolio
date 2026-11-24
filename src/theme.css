@@ -747,7 +747,7 @@ body {
   .project-track {
     scroll-behavior: auto;
   }
-  /* Cards cross-fade in place: no rise, recede or scale. */
+  /* No rise, recede or scale: only the current card is shown. */
   .stack-ready .project-slide {
     transform: none;
   }
