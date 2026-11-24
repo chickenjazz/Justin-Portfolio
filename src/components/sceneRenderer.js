@@ -3,8 +3,9 @@
 // position via update(frame), in CSS px; this module only maps px to world space and adds
 // the ambient motion (float, bob, tilt, drift), so motion keeps a single source.
 
-const LAVENDER = { body: "#b9a8f0", accent: "#8f78d6" };
-const CRYSTAL = { body: "#f4f6ff", accent: "#e8ecff" };
+// The beak is warm apricot, the complement of the lavender; in crystal it keeps a pale warm tint.
+const LAVENDER = { body: "#b9a8f0", accent: "#8f78d6", beak: "#f4a46a" };
+const CRYSTAL = { body: "#f4f6ff", accent: "#e8ecff", beak: "#ffe6d2" };
 const FOV = 20;
 const CAMERA_Z = 20;
 // World height the old per-mascot camera framed; keeps the chick filling its px box the same way.
@@ -17,6 +18,11 @@ const FLOAT = { ms: 5000, amount: 0.04 };
 const YAW = { ms: 11000, amount: 0.38 };
 const PITCH = { ms: 15000, amount: 0.12 };
 const LETTER = { bobMs: 4800, bob: 0.06, tiltMs: 7000, tilt: 0.32 };
+// Character life: the tuft bobs, the wings give a double flap every 3s, the eyes blink.
+const TUFT = { ms: 1700, stretch: 0.1, sway: 0.12 };
+const FLAP = { everyMs: 3000, ms: 640, angle: 1.25 };
+// A blink every 4.2s; every third one is a double blink so it never feels mechanical.
+const BLINK = { everyMs: 4200, ms: 170, gapMs: 110 };
 const MAX_DPR = 1.5;
 
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -35,6 +41,16 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
   renderer.toneMapping = THREE.NeutralToneMapping;
 
   const scene = new THREE.Scene();
+  // The room environment alone lights everything evenly and flattens the lavender chick.
+  // A warm key from upper-left, a cool lavender rim from behind-right and a soft sky/ground
+  // fill give it form: a lit crown, shaded belly and a bright edge against the dark page.
+  // The fill's ground colour is a deep violet, so shadows fall to purple (like the reference)
+  // rather than grey.
+  const key = new THREE.DirectionalLight("#fff3ea", 2.6);
+  key.position.set(-5, 9, 3.5);
+  const rim = new THREE.DirectionalLight("#cfc4ff", 2.2);
+  rim.position.set(6, 3, -7);
+  scene.add(key, rim, new THREE.HemisphereLight("#cfc2ff", "#3a2088", 1.1));
   const pmrem = new THREE.PMREMGenerator(renderer);
   const room = new RoomEnvironment();
   const envTarget = pmrem.fromScene(room, 0.04);
@@ -66,19 +82,24 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
 
   // Chick ------------------------------------------------------------------------------
   const physical = (hex) =>
-    track(new THREE.MeshPhysicalMaterial({ color: hex, iridescenceIOR: 1.9, iridescenceThicknessMinimum: 250, iridescenceThicknessMaximum: 900 }));
+    track(new THREE.MeshPhysicalMaterial({ color: hex, iridescenceIOR: 1.9, iridescenceThicknessMinimum: 250, iridescenceThicknessMaximum: 900, sheenColor: "#efe9ff", sheenRoughness: 0.45 }));
   const body = physical(LAVENDER.body);
   const accent = physical(LAVENDER.accent);
+  const beak = physical(LAVENDER.beak);
   const tints = [
     [body, new THREE.Color(LAVENDER.body), new THREE.Color(CRYSTAL.body)],
     [accent, new THREE.Color(LAVENDER.accent), new THREE.Color(CRYSTAL.accent)],
+    [beak, new THREE.Color(LAVENDER.beak), new THREE.Color(CRYSTAL.beak)],
   ];
+  const parts = {};
   chickGltf.scene.traverse((node) => {
+    if (/^(Tuft|Wing[LR]|Eye[LR])$/.test(node.name)) parts[node.name] = node;
     if (!node.isMesh) return;
     track(node.geometry);
     track(node.material);
     if (node.material.name === "ChickBody") node.material = body;
     else if (node.material.name === "ChickAccent") node.material = accent;
+    else if (node.material.name === "ChickBeak") node.material = beak;
   });
   const chickPose = new THREE.Group();
   chickPose.add(chickGltf.scene);
@@ -109,7 +130,9 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
   // Shapes -----------------------------------------------------------------------------
   const ink = track(new THREE.MeshPhysicalMaterial({ color: "#16141c", roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.2 }));
   const mint = track(new THREE.MeshPhysicalMaterial({ color: "#bff0da", roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.1 }));
-  const materials = { ink, mint };
+  // Matches the chick's fully glassy look in the second slide.
+  const crystal = track(new THREE.MeshPhysicalMaterial({ color: CRYSTAL.body, roughness: 0.04, metalness: 0.75, iridescence: 1, iridescenceIOR: 1.9, iridescenceThicknessMinimum: 250, iridescenceThicknessMaximum: 900, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.4 }));
+  const materials = { ink, mint, crystal };
   const geometries = {
     knot: track(new THREE.TorusKnotGeometry(0.32, 0.11, 160, 20)),
     torus: track(new THREE.TorusGeometry(0.36, 0.15, 32, 64)),
@@ -128,6 +151,10 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     }
     return shapes[i].mesh;
   }
+
+  // three.js ignores material.envMapIntensity when the map comes from scene.environment (it
+  // uses scene.environmentIntensity instead), so give our materials the map directly.
+  for (const material of [body, accent, beak, letterMaterial, ink, mint, crystal]) material.envMap = envTarget.texture;
 
   // Frame ------------------------------------------------------------------------------
   let current = null;
@@ -149,14 +176,38 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
       material.color.copy(from).lerp(to, c.glass).offsetHSL(c.hue / 360, 0, 0);
       // A transparent canvas leaves real transmission nothing to refract, so the crystal is
       // polished, mirror-like pearl: metallic reflections plus a rainbow iridescent film.
-      material.roughness = lerp(0.45, 0.04, c.glass);
+      material.roughness = lerp(0.5, 0.04, c.glass);
       material.metalness = lerp(0, 0.75, c.glass);
       // Never exactly 0: crossing 0 toggles a shader define and recompiles mid-morph.
       material.iridescence = Math.max(c.glass, 0.001);
-      material.clearcoat = lerp(0.3, 1, c.glass);
-      material.clearcoatRoughness = lerp(0.3, 0.03, c.glass);
-      material.envMapIntensity = lerp(0.6, 1.4, c.glass);
+      // Soft velvet sheen on the lavender (pale lilac glow at grazing angles), gone in crystal.
+      material.sheen = Math.max(1 - c.glass, 0.001) * 0.25;
+      material.clearcoat = lerp(0.25, 1, c.glass);
+      material.clearcoatRoughness = lerp(0.35, 0.03, c.glass);
+      material.envMapIntensity = lerp(0.4, 1.4, c.glass);
     }
+  }
+
+  // 0→1→0 over d ms starting at t0, eased (sin²), else 0.
+  const pulse = (t, t0, d) => (t < t0 || t > t0 + d ? 0 : Math.sin(((t - t0) / d) * Math.PI) ** 2);
+
+  // Each part pivots at its own origin (set in Blender), so plain rotation/scale reads right.
+  function animateChick(now) {
+    const { Tuft, WingL, WingR, EyeL, EyeR } = parts;
+    if (Tuft) {
+      const bob = Math.sin((now / TUFT.ms) * Math.PI * 2);
+      Tuft.scale.set(1 - bob * TUFT.stretch * 0.4, 1 + bob * TUFT.stretch, 1);
+      Tuft.rotation.x = Math.sin((now / TUFT.ms) * Math.PI * 2 - 0.9) * TUFT.sway;
+    }
+    // Two quick beats at the start of every 3s cycle, raised outward from the shoulder.
+    const t = now % FLAP.everyMs;
+    const flap = t < FLAP.ms ? Math.sin((t / FLAP.ms) * Math.PI * 2) ** 2 * FLAP.angle : 0;
+    if (WingL) WingL.rotation.z = -flap;
+    if (WingR) WingR.rotation.z = flap;
+    const cycle = Math.floor(now / BLINK.everyMs);
+    const b = now % BLINK.everyMs;
+    const shut = Math.max(pulse(b, 0, BLINK.ms), cycle % 3 === 2 ? pulse(b, BLINK.ms + BLINK.gapMs, BLINK.ms) : 0);
+    for (const eye of [EyeL, EyeR]) if (eye) eye.scale.y = 1 - shut * 0.9;
   }
 
   function draw(now) {
@@ -173,6 +224,7 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
     // Per-scene pitch (deg) raises the apparent camera, e.g. About looks down from ~30°.
     const pitch = ((c.pitch ?? 0) * Math.PI) / 180;
     chickPose.rotation.set(CHICK_BASE.pitch + pitch + wave(PITCH.ms) * PITCH.amount, CHICK_BASE.yaw + turn + wave(YAW.ms) * YAW.amount, turn * 0.5);
+    if (!reducedMotion) animateChick(now);
 
     current.letters.forEach((l, i) => {
       const { mesh } = letterAt(i, l.char);
@@ -186,7 +238,7 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
 
     current.shapes.forEach((s, i) => {
       const mesh = shapeAt(i, s.kind, s.tone);
-      mesh.visible = onScreen(s.y, s.size);
+      mesh.visible = s.size > 0 && onScreen(s.y, s.size);
       if (!mesh.visible) return;
       place(mesh, s.x, s.y, s.size, 1);
       // Each shape bobs and spins at its own pace; alternate directions so they never sync.

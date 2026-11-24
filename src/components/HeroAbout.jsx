@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import SceneCanvas from "./SceneCanvas.jsx";
 import Topography from "./Topography.jsx";
-import { profile, achievements, education, projects } from "../content/site.js";
+import GitHubActivity from "./GitHubActivity.jsx";
+import { profile, achievements, milestonesQuote, education, projects } from "../content/site.js";
 
 const slides = [
   { label: "Introduction", title: "", copy: profile.tagline },
@@ -17,6 +18,10 @@ const COMMIT = .18;
 const SETTLE_MS = 140;
 // Three morph steps plus half a viewport of hold on the final state before release.
 const TRACK_UNITS = 3.5;
+// Space kept between the bottom of the chick and the Introduction's copy, in px.
+const INTRO_GAP = 16;
+// Highest the Milestones copy may rise, in px, so it stays clear of the site header.
+const MILESTONES_TOP = 84;
 
 // Fixed, hand-picked offsets (em, deg) so letters sit unevenly but stay readable.
 const LETTER_JITTER = [[.06, 4], [-.1, -5], [.12, 3], [-.04, -6], [.09, 5], [-.12, -3], [.05, 6]];
@@ -37,6 +42,15 @@ function FloatingWord({ text, towardEnd }) {
 // Positions are fractions of the stage; size is a fraction of the stage's short side.
 // Big pieces bleed off the edges, small ones fill the gaps around the name and chick.
 // Depth (0..1) sets parallax: larger, nearer pieces rise faster when the scene leaves.
+// Introduction shapes that pop back in, crystal like the chick, on the second slide (desktop).
+const POP_SHAPES = [
+  { kind: "knot", x: .58, y: .2, size: .12 },
+  { kind: "torus", x: .93, y: .3, size: .11 },
+  { kind: "cube", x: .88, y: .82, size: .14 },
+];
+// Back-out easing: scales from 0 past 1 and settles, a small pop.
+const popScale = (t) => t <= 0 ? 0 : 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
+
 const SHAPES = {
   desktop: [
     { kind: "torus", tone: "mint", x: .11, y: .22, size: .2, depth: .7 },
@@ -103,6 +117,8 @@ export default function HeroAbout() {
     let width = root.clientWidth;
     let height = root.clientHeight;
     let visible = true;
+    let introHeight = 0;
+    let milestonesHeight = 0;
     let disposed = false;
     const mix = (key) => scenes.reduce((sum, scene, i) => sum + scene[key] * weights[i], 0);
     const color = (key) => `rgb(${[0, 1, 2].map(channel => scenes.reduce((sum, scene, i) => sum + scene[key][channel] * weights[i], 0)).join(" ")})`;
@@ -135,6 +151,11 @@ export default function HeroAbout() {
       });
     }
 
+    // Pop shapes enter late and staggered; heading back to the Introduction they leave early.
+    function popProgress(i) {
+      const t = destination === 0 ? (weights[1] - .7) / .3 : (weights[1] - .5) / .5 * 1.4 - i * .2;
+      return Math.min(1, Math.max(0, t));
+    }
     function paint() {
       const mobile = width <= 800;
       const first = weights[0];
@@ -142,10 +163,24 @@ export default function HeroAbout() {
       const lift = liftOf(depart, height);
       // The chick shrinks into nothing on the way to Milestones and stays gone after it.
       const presence = weights[0] + weights[1];
-      const size = presence * (mobile ? Math.min(width * (.32 + depart * .04), height * .22, 165) : Math.min(width * mix("size"), 520));
-      const x = mobile ? width * (.5 + weights[1] * .12 - weights[2] * .1 + weights[3] * .1) : width * mix("x");
+      let size = mobile ? Math.min(width * (.32 + depart * .04), height * .22, 165) : Math.min(width * mix("size"), 520);
+      // While shrinking away it holds its place, so position blends only the scenes it is present in.
+      const held = (key) => presence > 0 ? (scenes[0][key] * weights[0] + scenes[1][key] * weights[1]) / presence : scenes[1][key];
+      const x = mobile ? width * (.5 + weights[1] * .12 - weights[2] * .1 + weights[3] * .1) : width * held("x");
       // The chick dips as it leaves the Introduction, as if the camera follows it down.
-      const y = (mobile ? Math.min(155, height * .25) : height * mix("y")) + Math.sin(Math.PI * depart) * height * .08;
+      let y = (mobile ? Math.min(155, height * .25) : height * held("y")) + Math.sin(Math.PI * depart) * height * .08;
+      // The Introduction's copy never scrolls: it sits fully above the bottom bar, and the chick
+      // rises (or, on short stages, shrinks) to stay clear of it.
+      const introY = Math.min(mobile ? Math.min(255, height * .43) : height * .66, height - introHeight - (mobile ? 125 : 95));
+      const clearance = introY - INTRO_GAP - (y + size / 2);
+      if (clearance < 0) {
+        const minTop = height * (mobile ? .12 : .08);
+        const fitSize = Math.max(0, Math.min(size, introY - INTRO_GAP - minTop));
+        const fitY = introY - INTRO_GAP - fitSize / 2;
+        size += (fitSize - size) * first;
+        y += (fitY - y) * first;
+      }
+      size *= presence;
       root.style.backgroundColor = color("bg");
       root.style.color = color("ink");
       root.style.setProperty("--scene-light", mix("light"));
@@ -172,17 +207,35 @@ export default function HeroAbout() {
           y: height * shape.y - lift * (1 + shape.depth * PARALLAX * 2),
           size: shapeUnit * shape.size,
           rot: i * .35,
-        })),
+        })).concat(mobile ? [] : POP_SHAPES.map((shape, i) => ({
+          kind: shape.kind,
+          tone: "crystal",
+          x: width * shape.x,
+          y: height * shape.y,
+          // Staggered so the three pop one after another.
+          size: shapeUnit * shape.size * popScale(popProgress(i)),
+          rot: i * .6,
+        }))),
       });
       panels.forEach((panel, i) => {
         const weight = weights[i];
         const displacement = weights.reduce((sum, amount, j) => sum + Math.sign(i - j) * amount, 0);
         // The Introduction's copy and CTAs sit centred under the mascot (panel width matches CSS).
-        const baseX = mobile ? width * .07 : i === 0 ? (width - Math.min(width * .4, 620)) / 2 : width * (i === 2 ? .53 : .08);
-        const baseY = mobile ? Math.min(255, height * .43) : height * (i === 0 ? .66 : i >= 2 ? .23 : .34);
-        panel.style.maxHeight = `${Math.max(100, height - baseY - (mobile ? 125 : 95))}px`;
+        const baseX = mobile ? width * .07 : i === 0 ? (width - Math.min(width * .4, 620)) / 2 : width * .08;
+        const reserve = mobile ? 125 : 95;
+        let baseY = i === 0 ? introY : mobile ? Math.min(255, height * .43) : height * (i >= 2 ? .23 : .34);
+        // Milestones never scrolls either: it rises until it clears the bottom bar, but stays under the header.
+        if (i === 2) baseY = Math.max(MILESTONES_TOP, Math.min(baseY, height - milestonesHeight - reserve));
+        // On phones the chick has left by Education, so its copy starts under the header to fit the GitHub graph.
+        if (i === 3 && mobile) baseY = MILESTONES_TOP;
+        if (i === 1 || i === 3) panel.style.maxHeight = `${Math.max(100, height - baseY - reserve)}px`;
+        // Later slides float up: they rise from below into place and leave upward.
+        const vertical = i > 0;
         const offset = displacement * (width + 80);
-        panel.style.transform = `translate3d(${baseX + offset}px, ${baseY}px, 0) rotate(${displacement * 12}deg) scale(${.9 + weight * .1})`;
+        panel.style.transform = vertical
+          ? `translate3d(${baseX}px, ${baseY + displacement * height * .6}px, 0) scale(${.9 + weight * .1})`
+          : `translate3d(${baseX + offset}px, ${baseY}px, 0) rotate(${displacement * 12}deg) scale(${.9 + weight * .1})`;
+        if (vertical) panel.style.opacity = weight;
         panel.style.visibility = weight < .0001 ? "hidden" : "visible";
       });
     }
@@ -243,6 +296,8 @@ export default function HeroAbout() {
     const resize = new ResizeObserver(() => {
       width = root.clientWidth;
       height = root.clientHeight;
+      introHeight = panels[0].offsetHeight;
+      milestonesHeight = panels[2].offsetHeight;
       unit = Math.max(window.innerHeight, height);
       // Sticky positioning needs scroll room in the parent's content box, not padding.
       track.style.setProperty("--stage-height", `${height}px`);
@@ -321,12 +376,14 @@ export default function HeroAbout() {
           <p className="scene-label">{String(index + 1).padStart(2, "0")} / {index === 0 ? "A PORTFOLIO IN PROGRESS · 2026" : slide.label.toUpperCase()}</p>
           {slide.title && <h2>{slide.title}</h2>}
           {slide.copy && <p className="scene-description">{slide.copy}</p>}
-          {index === 2 && <dl className="scene-milestones">{achievements.map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd><p>{item.context}</p></div>)}</dl>}
+          {index === 2 && <blockquote className="scene-quote"><p>“{milestonesQuote.text}”</p>{milestonesQuote.cite && <cite>{milestonesQuote.cite}</cite>}</blockquote>}
+          {index === 2 && <dl className="scene-milestones">{achievements.map(item => <div key={item.label}><dt>{item.label}</dt><dd className="milestone-value">{String(item.value).padStart(2, "0")}</dd></div>)}</dl>}
           {index === 3 && <ol className="scene-timeline">
             <li><span>2024–2026 · ACADEMIC DISTINCTION</span><h3>Top Performing Student</h3><p>Five Dean’s List terms · {education.institution}</p></li>
             <li><span>PROJECT EXPERIENCE</span><h3>{projects.map(project => project.shortTitle).join(" · ")}</h3><p>Thesis AI system and client website development.</p></li>
             <li><span>EXPECTED · {education.graduation.toUpperCase()}</span><h3>{education.degree}</h3><p>{education.institution} · {education.specialization}</p></li>
           </ol>}
+          {index === 3 && <GitHubActivity user={profile.github} href={`https://github.com/${profile.github}`} />}
           {index === 0 && <div className="scene-actions"><a className="button dark" href="#work">Explore my work <span aria-hidden="true">↗</span></a><a className="button scene-button-ghost" href="#about">A little about me</a></div>}
         </div>
       ))}
