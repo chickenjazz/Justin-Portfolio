@@ -8,7 +8,7 @@ import Projects from "./components/sections/Projects.jsx";
 import Skills from "./components/sections/Skills.jsx";
 import Honors from "./components/sections/Honors.jsx";
 import Gallery from "./components/sections/Gallery.jsx";
-import Resume from "./components/sections/Resume.jsx";
+import Cta from "./components/sections/Cta.jsx";
 import Footer from "./components/sections/Footer.jsx";
 
 export default function App() {
@@ -29,7 +29,7 @@ export default function App() {
         <Skills />
         <Honors />
         <Gallery />
-        <Resume />
+        <Cta />
       </main>
       <Footer />
     </>

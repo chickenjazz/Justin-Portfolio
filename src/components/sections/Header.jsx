@@ -1,3 +1,5 @@
+import { navSections } from "../../content/site.js";
+
 export default function Header() {
   return (
     <header className="header">
@@ -5,10 +7,16 @@ export default function Header() {
         JM<span>✳</span>
       </a>
       <nav aria-label="Main navigation">
-        <a href="#about">About</a>
-        <a href="#work">Work</a>
-        <a href="#honors">Honors</a>
-        <a href="#resume">Resume ↗</a>
+        {navSections
+          .filter((s) => s.inHeader)
+          .map((s) => (
+            <a key={s.id} href={`#${s.id}`}>
+              {s.label}
+            </a>
+          ))}
+        <a href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" rel="noopener">
+          Résumé ↗
+        </a>
       </nav>
     </header>
   );

@@ -178,28 +178,6 @@ body {
 .timeline p:last-child {
   color: #bab0c8;
 }
-.gallery-grid div {
-  background: #211b2f;
-  color: #c0b0d3;
-}
-.gallery-grid div:nth-child(2) {
-  background: #29233a;
-}
-.gallery-grid div:nth-child(3) {
-  background: #191d25;
-}
-.resume {
-  background: radial-gradient(ellipse at 80% 80%, #342247, #110d1c 75%);
-}
-.outline {
-  border-color: #9484a8;
-}
-.footer span {
-  color: #b9a8cd;
-}
-.footer {
-  border-top: 1px solid var(--line);
-}
 .project-showcase {
   /* Width of the title column beside the stacked cards on desktop. */
   --list-column: clamp(150px, 15vw, 240px);

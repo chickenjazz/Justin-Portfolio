@@ -10,6 +10,7 @@ import "./components/sections/About.css";
 import "./components/Marquee.css";
 import "./components/sections/Skills.css";
 import "./components/sections/Honors.css";
+import "./components/sections/Closing.css";
 import "./motion.css";
 
 const container = document.getElementById("root");
