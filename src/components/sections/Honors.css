@@ -1,0 +1,93 @@
+.honors {
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(4rem, 9vw, 8rem) 0;
+  overflow: hidden;
+}
+.honors-title {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(3.5rem, 11vw, 11rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 0 0 clamp(2rem, 5vw, 4rem);
+  padding: 0 clamp(1.25rem, 5vw, 4rem);
+}
+.honors-title span {
+  display: block;
+}
+.honors-title .honors-title-accent {
+  color: var(--accent-ink);
+}
+.honors-band {
+  padding: 2rem 0;
+}
+.honor-item {
+  flex-shrink: 0;
+  margin-right: 2rem;
+}
+.honor-card {
+  position: relative;
+  width: min(340px, 78vw);
+  aspect-ratio: 4 / 3;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.6rem;
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+  transition: scale 240ms var(--ease-snap), box-shadow 240ms var(--ease-out);
+}
+.honor-card:not(.honor-card-image)::before {
+  content: "";
+  position: absolute;
+  inset: 0.6rem;
+  border: 3px double var(--line);
+  pointer-events: none;
+}
+.honor-card:hover,
+.honor-card:focus-visible {
+  scale: 1.05;
+  z-index: 2;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.22);
+}
+.honor-card:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 4px;
+}
+.honor-card-image {
+  padding: 0;
+}
+.honor-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.honor-kind {
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin: 0;
+}
+.honor-card h3 {
+  font-size: 1.3rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.honor-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .honors-band {
+    padding: 2rem clamp(1.25rem, 5vw, 4rem);
+  }
+  .honor-card {
+    transition: none;
+  }
+}

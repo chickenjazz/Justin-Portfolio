@@ -5,8 +5,8 @@ import HeroAbout from "./components/HeroAbout.jsx";
 import Stats from "./components/sections/Stats.jsx";
 import About from "./components/sections/About.jsx";
 import Projects from "./components/sections/Projects.jsx";
-import Credentials from "./components/sections/Credentials.jsx";
 import Skills from "./components/sections/Skills.jsx";
+import Honors from "./components/sections/Honors.jsx";
 import Gallery from "./components/sections/Gallery.jsx";
 import Resume from "./components/sections/Resume.jsx";
 import Footer from "./components/sections/Footer.jsx";
@@ -27,7 +27,7 @@ export default function App() {
         <About />
         <Projects />
         <Skills />
-        <Credentials />
+        <Honors />
         <Gallery />
         <Resume />
       </main>

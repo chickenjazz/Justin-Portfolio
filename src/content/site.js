@@ -118,18 +118,6 @@ export const projects = [
       "Live website, screenshots, and GitHub repository (if publicly shareable) to be provided.",
   },
 ];
-export const credentials = [
-  {
-    title: "PMI Project Management Ready®",
-    issuer: "Project Management Institute",
-    year: "2026",
-  },
-  {
-    title: "Information Technology Specialist: Python",
-    issuer: "Certiport",
-    year: "2025",
-  },
-];
 export const honors = [
   {
     title: "Top Performing Student",
@@ -143,12 +131,18 @@ export const honors = [
     year: "2024–2026",
     kind: "Honor",
   },
-  ...credentials.map((c) => ({
-    title: c.title,
-    issuer: c.issuer,
-    year: c.year,
+  {
+    title: "PMI Project Management Ready®",
+    issuer: "Project Management Institute",
+    year: "2026",
     kind: "Certification",
-  })),
+  },
+  {
+    title: "Information Technology Specialist: Python",
+    issuer: "Certiport",
+    year: "2025",
+    kind: "Certification",
+  },
 ];
 export const description = {
   tagline: "Curious by nature. Builder by habit.",
