@@ -253,8 +253,8 @@ export default function HeroAbout() {
     function schedule() {
       if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; updateScroll(); });
     }
-    function navigate(index) {
-      window.scrollTo({ top: trackTop + index * unit, behavior: preference.matches ? "instant" : "smooth" });
+    function navigate(index, instant = false) {
+      window.scrollTo({ top: trackTop + index * unit, behavior: instant || preference.matches ? "instant" : "smooth" });
     }
     const resize = new ResizeObserver(() => {
       width = root.clientWidth;
@@ -265,6 +265,8 @@ export default function HeroAbout() {
       track.style.setProperty("--stage-height", `${height}px`);
       track.style.setProperty("--scroll-distance", `${unit * TRACK_UNITS}px`);
       trackTop = track.getBoundingClientRect().top + window.scrollY;
+      // A deep link on first load lands in place (no scroll animation, so no morph) once the track is measured.
+      if (!settled) followHash(true);
       updateScroll();
       settled = true;
       paint();
@@ -280,10 +282,11 @@ export default function HeroAbout() {
     });
     visibility.observe(root);
     window.addEventListener("scroll", schedule, { passive: true });
-    function followHash() {
-      if (location.hash === "#description") navigate(1);
-      else if (location.hash === "#top") navigate(0);
+    function followHash(instant = false) {
+      if (location.hash === "#description") navigate(1, instant);
+      else if (location.hash === "#top") navigate(0, instant);
     }
+    const hashChange = () => followHash();
     function anchorClick(event) {
       const link = event.target.closest('a[href="#description"], a[href="#top"]');
       if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -295,8 +298,7 @@ export default function HeroAbout() {
     root.classList.add("scene-ready");
     paint();
     panels.forEach((panel, i) => { panel.inert = i !== 0; });
-    requestAnimationFrame(() => { if (!disposed) followHash(); });
-    window.addEventListener("hashchange", followHash);
+    window.addEventListener("hashchange", hashChange);
     document.addEventListener("click", anchorClick);
     preference.addEventListener("change", preferenceChange);
     document.fonts.ready.then(() => repaintRef.current());
@@ -306,7 +308,7 @@ export default function HeroAbout() {
       cancelAnimationFrame(scrollFrame);
       resize.disconnect();
       visibility.disconnect();
-      window.removeEventListener("hashchange", followHash);
+      window.removeEventListener("hashchange", hashChange);
       window.removeEventListener("scroll", schedule);
       document.removeEventListener("click", anchorClick);
       preference.removeEventListener("change", preferenceChange);

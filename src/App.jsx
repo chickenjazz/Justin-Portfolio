@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import useReveal from "./components/useReveal.js";
 import Intro from "./components/Intro.jsx";
 import Header from "./components/sections/Header.jsx";
@@ -13,6 +14,21 @@ import Footer from "./components/sections/Footer.jsx";
 
 export default function App() {
   useReveal();
+
+  // The sticky tracks size themselves after first paint, so the browser's own hash jump lands short.
+  // Re-align once the layout has settled, unless the visitor has already started scrolling.
+  useEffect(() => {
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!target || target.id === "top" || target.id === "description") return;
+    let cancelled = false;
+    const cancel = () => { cancelled = true; };
+    const events = ["wheel", "touchstart", "keydown"];
+    events.forEach((name) => window.addEventListener(name, cancel, { once: true, passive: true }));
+    document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!cancelled && Math.abs(target.getBoundingClientRect().top) > 2) target.scrollIntoView({ behavior: "instant" });
+    })));
+    return () => events.forEach((name) => window.removeEventListener(name, cancel));
+  }, []);
 
   return (
     <>

@@ -15,8 +15,9 @@ body {
 }
 .header {
   background: #070609;
+  color: #f5f3e9;
   border-color: #25222e;
-  height: 80px;
+  min-height: 80px;
 }
 .brand span {
   color: #bba6fa;

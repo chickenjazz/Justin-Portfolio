@@ -18,7 +18,10 @@ Selection follows the direction of travel: scrolling down 18% of a viewport past
 commits to the Description; scrolling up 18% back from it returns to the Hero.
 Interrupted morphs restart from the current blend; scrolling back reverses the same
 weights, and the first placement after load (deep link, mid-page reload) jumps without
-morphing. `#description` and `#top` scroll to each state's exact position. All scene
+morphing: a first-load `#description` or `#top` is applied instantly once the track is
+measured. Afterwards `#description` and `#top` smooth-scroll to each state's exact
+position. Other section links (`#work`, `#skills`, `#contact`) re-align once after load,
+when the sticky tracks have sized themselves, unless the visitor has already started scrolling. All scene
 geometry and materials share these weights. While the Description holds, a scroll-linked
 drift (0 at the 18% commit, 1 at the track's end, scaled by the Description's weight)
 lifts the chick by 12% of the stage height, each crystal pop shape by 18% + 10%·i, and
@@ -52,12 +55,12 @@ off under reduced motion (states snap). Until WebGL is ready, or if it fails, th
 DOM name and the Blender poster show instead, and the name rises away the same way.
 
 The stage grows with content; when taller than the viewport its sticky offset lets
-the viewer read the entire composition. Header, footer and the project carousel
-remain intact.
+the viewer read the entire composition. The header nav wraps onto a second line on
+narrow screens instead of scrolling sideways.
 
 Viewport containment fix: the sticky track uses explicit content height (stage +
 scroll distance), never padding for scroll travel. The stage is 100svh at top: 0.
-Progress and anchor destinations share the same track origin. Short screens keep
+Anchor destinations share the same track origin. Short screens keep
 the mascot visible and provide native scrolling inside the Description panel.
 
 Project stack: a sticky 100svh stage inside an explicit-height track (`useHeldScroll`:
