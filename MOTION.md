@@ -80,3 +80,5 @@ holographic tiles flip in from the centre over the chick (~1.2s, `introSpeed` 2)
 revealing the landing page. Pointer interaction is off. Without JS the overlay fades out
 by itself at 3.5s (600ms); without WebGL it is removed when the transition would start.
 Reduced motion skips the intro entirely.
+
+About (`About.jsx` + `About.css`): two columns on white, portrait first when stacked. The portrait drifts with parallax depth .25 over a lavender disc at depth -.15; the eyebrow fades in and the story and education line rise in sequence. Reduced motion: static.

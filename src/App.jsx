@@ -3,6 +3,7 @@ import Intro from "./components/Intro.jsx";
 import Header from "./components/sections/Header.jsx";
 import HeroAbout from "./components/HeroAbout.jsx";
 import Stats from "./components/sections/Stats.jsx";
+import About from "./components/sections/About.jsx";
 import Projects from "./components/sections/Projects.jsx";
 import Credentials from "./components/sections/Credentials.jsx";
 import Skills from "./components/sections/Skills.jsx";
@@ -23,6 +24,7 @@ export default function App() {
       <main id="main">
         <HeroAbout />
         <Stats />
+        <About />
         <Credentials />
         <Skills />
         <Projects />

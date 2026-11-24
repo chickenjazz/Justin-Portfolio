@@ -277,12 +277,6 @@ h2 em {
   line-height: 1.6;
   max-width: 230px;
 }
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 4rem;
-  margin: 100px 0 0 25%;
-}
 .big-number {
   font-size: 10rem;
   color: #e88968;
@@ -577,14 +571,9 @@ h2 em {
   .section-head h2 {
     margin: 30px 0;
   }
-  .about-grid,
   .credential-list,
   .timeline {
     margin: 60px 0 0;
-  }
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
   .big-number {
     font-size: 7rem;
