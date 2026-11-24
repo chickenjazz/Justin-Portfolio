@@ -1,8 +1,16 @@
 import { aboutStory, education } from "../../content/site.js";
+import BackdropShapes from "../BackdropShapes.jsx";
+
+const SHAPES = [
+  { sprite: "knot-b", x: "96%", y: "19%", size: "clamp(120px, 16vw, 260px)", depth: 0.6, turn: 8 },
+  { sprite: "sphere", x: "3%", y: "88%", size: "clamp(54px, 6vw, 104px)", depth: 0.25, fade: 0.85 },
+  { sprite: "cube-b", x: "46%", y: "6%", size: "clamp(40px, 4vw, 70px)", depth: 0.12, fade: 0.7, mobile: false },
+];
 
 export default function About() {
   return (
-    <section className="about" id="about" aria-labelledby="about-label">
+    <section className="about has-backdrop" id="about" aria-labelledby="about-label">
+      <BackdropShapes shapes={SHAPES} />
       <div className="about-grid">
         <div className="about-portrait">
           <div className="about-disc parallax" style={{ "--depth": -0.15 }} aria-hidden="true" />

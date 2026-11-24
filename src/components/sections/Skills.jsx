@@ -1,10 +1,18 @@
 import Marquee from "../Marquee.jsx";
 import { skills, skillIcons } from "../../content/site.js";
 import { icons } from "../../content/icons.js";
+import BackdropShapes from "../BackdropShapes.jsx";
+
+const SHAPES = [
+  { sprite: "torus-b", x: "92%", y: "15%", size: "clamp(120px, 17vw, 280px)", depth: 0.55, turn: -6 },
+  { sprite: "knot-a", x: "76%", y: "36%", size: "clamp(70px, 9vw, 150px)", depth: 0.35, fade: 0.9, mobile: false },
+  { sprite: "cube-a", x: "91%", y: "54%", size: "clamp(40px, 4vw, 72px)", depth: 0.15, fade: 0.7, mobile: false },
+];
 
 export default function Skills() {
   return (
-    <section className="skills" id="skills">
+    <section className="skills has-backdrop" id="skills">
+      <BackdropShapes shapes={SHAPES} />
       <div className="skills-head parallax" data-reveal="rise" style={{ "--depth": 0.2 }}>
         <h2 className="skills-title">SKILLS</h2>
       </div>

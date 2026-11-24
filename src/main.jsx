@@ -5,6 +5,7 @@ import "./styles.css";
 import "./theme.css";
 import "./components/HeroAbout.css";
 import "./components/Intro.css";
+import "./components/BackdropShapes.css";
 import "./components/sections/Stats.css";
 import "./components/sections/About.css";
 import "./components/Marquee.css";

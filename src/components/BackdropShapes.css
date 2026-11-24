@@ -1,0 +1,35 @@
+/* The host section becomes a stacking context so the shapes (z-index -1) paint above its
+   background but below all of its content. */
+.has-backdrop {
+  position: relative;
+  isolation: isolate;
+}
+.backdrop-shapes {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Centred on (--x, --y) with negative margins, because .parallax owns the translate property. */
+.backdrop-shape {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  rotate: var(--turn);
+  opacity: var(--fade);
+  user-select: none;
+}
+/* On narrow screens shapes may move (mx/my) or drop out, where they would crowd the copy. */
+@media (max-width: 700px) {
+  .backdrop-shape {
+    left: var(--xm, var(--x));
+    top: var(--ym, var(--y));
+  }
+  .backdrop-shape-wide {
+    display: none;
+  }
+}
