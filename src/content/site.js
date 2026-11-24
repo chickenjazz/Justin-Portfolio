@@ -130,11 +130,6 @@ export const credentials = [
     year: "2025",
   },
 ];
-// Placeholder: replace with the quote you want above the Milestones cards (cite is optional).
-export const milestonesQuote = {
-  text: "Every milestone here started as something I didn’t know how to do yet.",
-  cite: "",
-};
 export const honors = [
   {
     title: "Top Performing Student",
@@ -168,11 +163,6 @@ export const stats = [
   },
   { value: projects.length, title: "Projects Shipped" },
 ];
-// Temporary shim for the current scene; removed in Task 3.
-export const achievements = stats.map((s) => ({
-  value: s.value,
-  label: s.title,
-}));
 export const aboutStory =
   "I’m fascinated by the little problems people learn to live with. The repetitive tasks, the unnecessary complexity, the things that could simply work better. I enjoy finding ways to make those things easier through thoughtful solutions.";
 export const skills = [

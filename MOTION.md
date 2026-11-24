@@ -4,24 +4,28 @@ intensity: quiet
 engine: css
 easing_budget: 4
 loop_budget: 4
-signature: "scroll-driven four-state mascot composition"
+signature: "scroll-driven two-state mascot composition"
 ---
 
 # Motion
 
-Native scroll drives Introduction, About, Milestones, and Education & Experience.
-A sticky scene stays within its own scroll track; there are no wheel/touch overrides.
-Scroll position only selects the destination state; the morph itself is time-based
-(1100ms, smoothstep), so the scene never rests between two states. Selection follows
-the direction of travel: passing 18% of a viewport beyond a held state commits to its
-neighbour. When native scrolling rests between held states (140ms idle), the page
-glides to the committed state's scroll position. Interrupted morphs restart from the
-current blend. The final state holds for half a viewport before release.
-Dots and keyboard navigation scroll to each state's exact position. Scrolling back
-reverses the same weights. All scene geometry and materials share these weights.
+Native scroll drives two states of one scene: the Hero (Introduction) and the
+Description. A sticky scene stays within its own scroll track (1.6 viewports of travel);
+there are no wheel/touch overrides and the page never snaps or glides: wherever native
+scrolling rests, it stays. Scroll position only selects the destination state; the morph
+itself is time-based (1100ms, smoothstep), so the scene never rests between the two.
+Selection follows the direction of travel: scrolling down 18% of a viewport past the Hero
+commits to the Description; scrolling up 18% back from it returns to the Hero.
+Interrupted morphs restart from the current blend; scrolling back reverses the same
+weights, and the first placement after load (deep link, mid-page reload) jumps without
+morphing. `#description` and `#top` scroll to each state's exact position. All scene
+geometry and materials share these weights. While the Description holds, a scroll-linked
+drift (0 at the 18% commit, 1 at the track's end, scaled by the Description's weight)
+lifts the chick by 12% of the stage height, each crystal pop shape by 18% + 10%·i, and
+the Description copy by 5%, so the hold reads as parallax rather than a frozen slide.
 Entering panel copy fades and rises 14px (700ms, cubic-bezier(.22,1,.36,1), 380ms
-delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph
-and keeps only the opacity fade.
+delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph,
+drops the hold drift and keeps only the opacity fade.
 
 One full-stage WebGL layer (`SceneCanvas.jsx` + `sceneRenderer.js`) draws the chick, the
 3D name and the shapes, as render targets of the same scene weights. The chick: `glass`
@@ -35,20 +39,20 @@ hidden DOM letters, each with a staggered 4.8s bob and slow 3D tilt. Shapes (bla
 mint torus, black rounded cube) spin slowly around the Introduction position.
 Leaving the Introduction follows the chick down: the name and shapes are left behind,
 rising by depart² × 1.15 stage heights (deeper objects up to 35% faster), while the chick
-dips (sin(π·depart) × 8% of the stage) on its way to About. Later states show only the
-chick; the h1 stays in the DOM, visually hidden. Ambient loops pause off-screen and are
+dips (sin(π·depart) × 8% of the stage) on its way to the Description. There only the
+chick remains, joined on desktop by three crystal shapes that pop in one after another;
+the h1 stays in the DOM, visually hidden. Ambient loops pause off-screen and are
 off under reduced motion (states snap). Until WebGL is ready, or if it fails, the flat
 DOM name and the Blender poster show instead, and the name rises away the same way.
 
 The stage grows with content; when taller than the viewport its sticky offset lets
-the viewer read the entire composition. No milestones or education duplication
-remains below. Timeline dates are supplied academic dates; project experience
-has no invented dates. Header, footer and the project carousel remain intact.
+the viewer read the entire composition. Header, footer and the project carousel
+remain intact.
 
 Viewport containment fix: the sticky track uses explicit content height (stage +
 scroll distance), never padding for scroll travel. The stage is 100svh at top: 0.
-Progress and dot destinations share the same track origin. Short screens keep
-the mascot visible and provide native scrolling inside longer content panels.
+Progress and anchor destinations share the same track origin. Short screens keep
+the mascot visible and provide native scrolling inside the Description panel.
 
 Project carousel (arc): a sticky 100svh stage inside an explicit-height track
 (`useHeldScroll`, the same held-state model as the hero: commit at 18% in the direction
