@@ -1,13 +1,15 @@
 ---
 archetype: scenic
-intensity: quiet
+intensity: moderate
 engine: css
-easing_budget: 4
-loop_budget: 4
+easing_budget: 7
+loop_budget: 6
 signature: "scroll-driven two-state mascot composition"
 ---
 
 # Motion
+
+Budgets as built: easings are smoothstep, ease-out `(.22,1,.36,1)`, snap `(.34,1.56,.64,1)`, easeOutBack, ease-in-out, `ease` and linear; loops are counted by family: the hero scene (chick, 3D name, shapes and background, which pause together off-screen), three marquee bands, the CTA float and the entry-intro hop.
 
 Native scroll drives two states of one scene: the Hero (Introduction) and the
 Description. A sticky scene stays within its own scroll track (1.6 viewports of travel);
@@ -20,7 +22,8 @@ Interrupted morphs restart from the current blend; scrolling back reverses the s
 weights, and the first placement after load (deep link, mid-page reload) jumps without
 morphing: a first-load `#description` or `#top` is applied instantly once the track is
 measured; on a reload or back/forward the browser's restored position is kept instead.
-Afterwards `#description` and `#top` smooth-scroll to each state's exact position. Both use
+Afterwards `#description` smooth-scrolls to its state's exact position and `#top` (brand,
+"Back to top") to the very top of the page, header included. Both use
 the hero's own path (not the realign below). Other section links (`#work`, `#skills`, `#contact`) re-align once after load,
 when the sticky tracks have sized themselves, unless the visitor has already started
 scrolling or the browser is restoring a position (reload, back/forward). All scene
@@ -32,9 +35,12 @@ Entering panel copy fades and rises 14px (700ms, cubic-bezier(.22,1,.36,1), 380m
 delay, 80ms stagger); leaving copy fades in 260ms. Reduced motion snaps the morph,
 drops the hold drift and keeps only the opacity fade.
 
-The Stats section follows the hero and overlaps the last 40svh of the scene track, so its
-cards rise over the still-pinned chick on the white Description background instead of
-sliding in under a hard edge. Cards rise with a 90ms stagger (reveal `rise`), drift at
+The Stats section follows the hero and its white gradient overlaps the last 40svh of the
+scene track (opaque only at the track's end); the cards themselves start min(15svh, 5.5rem)
+before the track ends (2rem on the two-column layout, ≤900px), so they rise over the
+still-pinned chick on the white Description background instead of sliding in under a hard
+edge. The overlap is capped so no card covers the Description copy or the hero's social
+links, with or without the parallax and reveal offsets. Cards rise with a 90ms stagger (reveal `rise`), drift at
 parallax depths .15 / .3 / .2 / .35, and their numbers count up over 1000ms (smoothstep)
 as the grid enters view. Reduced motion shows static numbers and no rise.
 
@@ -57,8 +63,7 @@ the h1 stays in the DOM, visually hidden. Ambient loops pause off-screen and are
 off under reduced motion (states snap). Until WebGL is ready, or if it fails, the flat
 DOM name and the Blender poster show instead, and the name rises away the same way.
 
-The stage grows with content; when taller than the viewport its sticky offset lets
-the viewer read the entire composition. The header nav wraps onto a second line on
+The header nav wraps onto a second line on
 narrow screens instead of scrolling sideways.
 
 Viewport containment fix: the sticky track uses explicit content height (stage +
@@ -95,8 +100,10 @@ Reduced motion skips the intro entirely.
 
 About (`About.jsx` + `About.css`): two columns on white, portrait first when stacked. The portrait drifts with parallax depth .25 over a lavender disc at depth -.15; the eyebrow fades in and the story and education line rise in sequence. Reduced motion: static.
 
-Skills (`Skills.jsx` + `Skills.css`, `Marquee.jsx`): a giant Anton SKILLS heading rises in with parallax depth .2, then the icon row pops in with a scale stagger. Below, two slanted bands cross on white: the front black band (-4deg, 45s loop) carries the six categories with their items, the back decorative outline band (+3deg, reverse, 60s) repeats the category names in lavender. Bands pause on hover and focus-within. Reduced motion: no scrolling; the front band is a static wrapped list and the back band is hidden.
+Skills (`Skills.jsx` + `Skills.css`, `Marquee.jsx`): a giant Anton SKILLS heading rises in with parallax depth .2, then the icon row pops in with a scale stagger. Below, two slanted bands cross on white: the front black band (-4deg, 45s loop) carries the six categories with their items, the back decorative outline band (+3deg, reverse, 60s) repeats the category names in lavender. Bands pause on hover; keyboard focus inside a band stops its loop at the start, so the focused item is in view. Reduced motion: no scrolling; the front band is a static wrapped list and the back band is hidden.
 
-Honors (`Honors.jsx` + `Honors.css`, `Marquee.jsx`): an oversized Anton "HONORS & CERTIFICATIONS" heading rises in (second line in accent ink), above a certificate-card band that loops right-to-left (50s, repeat 3) and pauses on hover and focus-within. Cards scale to 1.05 on hover/focus with the snap easing (240ms) and a raised shadow; an optional `image` swaps in a certificate picture. Reduced motion: no scrolling; the band is a static wrapped list.
+Honors (`Honors.jsx` + `Honors.css`, `Marquee.jsx`): an oversized Anton "HONORS & CERTIFICATIONS" heading rises in (second line in accent ink), above a certificate-card band that loops right-to-left (50s, repeat 3) and pauses on hover; keyboard focus inside stops the loop at its start so the focused card is in view. Cards scale to 1.05 on hover/focus with the snap easing (240ms) and a raised shadow; an optional `image` swaps in a certificate picture. Reduced motion: no scrolling; the band is a static wrapped list.
 
-Closing sections (`Gallery.jsx` milestones, `Cta.jsx`, `Footer.jsx`, `Closing.css`): the milestones heading and sub-line rise in, then five empty dashed frames fade in tilted via `rotate` (-4/3/-2/5/-3deg) and drift with varied parallax depths. The CTA chick scales in and floats on a 5s ease-in-out loop (animating `translate` on a wrapper so the reveal keeps `transform`), the quote rises, then the buttons rise in sequence. Reduced motion: static, no float.
+Closing sections (`Gallery.jsx` milestones, `Cta.jsx`, `Footer.jsx`, `Closing.css`): the milestones heading and sub-line rise in, then five empty dashed frames (three on narrow screens) fade in tilted via `rotate` (-4/3/-2/5/-3deg) and drift with varied parallax depths. The CTA chick scales in and floats on a 5s ease-in-out loop (animating `translate` on a wrapper so the reveal keeps `transform`), the quote rises, then the buttons rise in sequence. Reduced motion: static, no float.
+
+Hover rule: hover effects never target an element carrying `data-reveal`, because the revealed state sets `transform`; put the hover on a child or wrapper instead (as the CTA buttons sit inside the revealed `.cta-actions`).

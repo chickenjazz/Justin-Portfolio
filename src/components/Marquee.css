@@ -21,9 +21,13 @@
   padding: 0;
   list-style: none;
 }
-.marquee:hover .marquee-track,
-.marquee:focus-within .marquee-track {
+.marquee:hover .marquee-track {
   animation-play-state: paused;
+}
+/* Keyboard focus stops the loop at its start, so the focusable first set is in view and
+   native focus scrolling can reach later items (a paused mid-loop band hides them). */
+.marquee:focus-within .marquee-track {
+  animation: none;
 }
 @keyframes marquee-scroll {
   to {

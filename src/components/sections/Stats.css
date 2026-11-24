@@ -1,9 +1,15 @@
-/* Overlaps the last 40svh of the scene track so cards rise over the pinned chick. */
+/* Overlaps the last 40svh of the scene track: the gradient fades in over that span (opaque
+   only where the track ends) and the cards start --stats-overlap before the track ends, so
+   they rise over the pinned chick.
+   The overlap is capped so no card ever covers the hero's social links in the bottom bar
+   (checked with and without parallax/reveal offsets): 5.5rem on desktop, where the links sit
+   under the fourth, lower-set card; 2rem on the two-column layout, where they sit under the first. */
 .stats {
+  --stats-overlap: min(15svh, 5.5rem);
   position: relative;
   z-index: 3;
   margin-top: -40svh;
-  padding: 40svh clamp(1rem, 4vw, 3rem) clamp(4rem, 10vw, 8rem);
+  padding: calc(40svh - var(--stats-overlap)) clamp(1rem, 4vw, 3rem) clamp(4rem, 10vw, 8rem);
   background: linear-gradient(transparent, var(--paper) 40svh);
   pointer-events: none;
 }
@@ -36,6 +42,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 @media (min-width: 901px) {
   .stat-card:nth-child(even) {
@@ -43,6 +50,9 @@
   }
 }
 @media (max-width: 900px) {
+  .stats {
+    --stats-overlap: 2rem;
+  }
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

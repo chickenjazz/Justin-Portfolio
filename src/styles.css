@@ -1,10 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500&display=swap");
-:root {
-  --ink: #242921;
-  --paper: #f5f3e9;
-  --orange: #ed805e;
-  --line: #c9cbbf;
-}
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&display=swap");
 * {
   box-sizing: border-box;
 }
@@ -27,7 +21,7 @@ a {
 }
 a:focus-visible,
 button:focus-visible {
-  outline: 3px solid #db6547;
+  outline: 3px solid var(--accent-ink);
   outline-offset: 5px;
 }
 .skip {
@@ -82,10 +76,6 @@ button:focus-visible {
   letter-spacing: 0.16em;
   font-weight: 700;
 }
-h2 em {
-  font-family: "Playfair Display", serif;
-  font-weight: 500;
-}
 .placeholder {
   font-size: 0.82rem;
   color: #76796d;
@@ -105,12 +95,6 @@ h2 em {
   background: var(--ink);
   color: white;
 }
-.section {
-  padding: 130px 0;
-}
-.work {
-  padding: 130px 0;
-}
 @media (max-width: 800px) {
   .header {
     min-height: 70px;
@@ -119,10 +103,6 @@ h2 em {
   .header nav {
     gap: 0.5rem 0.9rem;
     font-size: 0.7rem;
-  }
-  .section,
-  .work {
-    padding: 80px 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {

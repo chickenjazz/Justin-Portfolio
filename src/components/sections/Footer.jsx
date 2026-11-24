@@ -3,6 +3,7 @@ import { navSections, profile } from "../../content/site.js";
 export default function Footer() {
   return (
     <footer className="site-footer">
+      <h2 className="visually-hidden">Site footer</h2>
       <div className="site-footer-grid">
         <div className="site-footer-brand">
           <a href="#top" className="brand">

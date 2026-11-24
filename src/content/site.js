@@ -26,7 +26,7 @@ export const profile = {
     { label: "Email", href: "mailto:justinmanuzon413@gmail.com" },
   ],
   email: "justinmanuzon413@gmail.com",
-  // Public GitHub username; the Education slide shows its contribution calendar.
+  // Public GitHub username (not rendered on the page at the moment).
   github: "chickenjazz",
   phone: { label: "+63 915 312 9975", href: "tel:+639153129975" },
   mascot: "Holographic Cube Chick",

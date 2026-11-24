@@ -86,6 +86,30 @@
   gap: 1rem;
   justify-content: center;
 }
+/* Ink buttons on the white page (the global .dark style is tuned for the dark stage). */
+.cta-actions .button {
+  border: 1px solid var(--ink);
+  border-radius: 50px;
+}
+.cta-primary {
+  background: var(--ink);
+  color: #fff;
+}
+.cta-primary:hover {
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+}
+.cta-secondary {
+  background: transparent;
+  color: var(--ink);
+}
+.cta-secondary:hover {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.cta-actions .button:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 4px;
+}
 @media (prefers-reduced-motion: no-preference) {
   .cta-float {
     animation: cta-float 5s ease-in-out infinite;

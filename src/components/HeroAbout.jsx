@@ -213,8 +213,10 @@ export default function HeroAbout() {
         panel.style.transform = i === 1
           ? `translate3d(${baseX}px, ${baseY + displacement * height * .6 - drift * height * .05}px, 0) scale(${.9 + weight * .1})`
           : `translate3d(${baseX + offset}px, ${baseY}px, 0) rotate(${displacement * 12}deg) scale(${.9 + weight * .1})`;
+        // The Description stays in the accessibility tree while hidden (opacity only, no focusable
+        // content); the Introduction, which holds links, is hidden once it has swung away.
         if (i === 1) panel.style.opacity = weight;
-        panel.style.visibility = weight < .0001 ? "hidden" : "visible";
+        panel.style.visibility = i === 1 || weight >= .0001 ? "visible" : "hidden";
       });
     }
     repaintRef.current = () => { if (!disposed) { measureLetters(); paint(); } };
@@ -240,7 +242,6 @@ export default function HeroAbout() {
       duration = preference.matches || !settled ? 0 : MORPH_MS;
       destination = index;
       setActive(index);
-      panels.forEach((panel, i) => { panel.inert = i !== index; });
       if (!frame) frame = requestAnimationFrame(settle);
     }
     // Native scroll is never corrected: wherever it rests, the scene holds the committed state.
@@ -255,8 +256,9 @@ export default function HeroAbout() {
     function schedule() {
       if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; updateScroll(); });
     }
+    // #top goes to the very top of the page so the in-flow header shows; #description to its state.
     function navigate(index, instant = false) {
-      window.scrollTo({ top: trackTop + index * unit, behavior: instant || preference.matches ? "instant" : "smooth" });
+      window.scrollTo({ top: index === 0 ? 0 : trackTop + index * unit, behavior: instant || preference.matches ? "instant" : "smooth" });
     }
     const resize = new ResizeObserver(() => {
       width = root.clientWidth;
@@ -299,7 +301,6 @@ export default function HeroAbout() {
     const preferenceChange = () => updateScroll();
     root.classList.add("scene-ready");
     paint();
-    panels.forEach((panel, i) => { panel.inert = i !== 0; });
     window.addEventListener("hashchange", hashChange);
     document.addEventListener("click", anchorClick);
     preference.addEventListener("change", preferenceChange);
@@ -320,7 +321,7 @@ export default function HeroAbout() {
 
   return (
     <div className="scene-scroll-track" ref={trackRef}>
-    <section className="morph-scene" id="top" ref={rootRef} aria-label="About Justin">
+    <section className="morph-scene" id="top" ref={rootRef} aria-label="Introduction">
       <span id="description" className="scene-anchor" aria-hidden="true" />
       <div className="scene-environment" aria-hidden="true">
         <Topography paused={backgroundPaused} color="#b9a0ff" brightness={0.8} opacity={0.65} speed={0.18} glow={0.4} dpr={1} />
@@ -330,12 +331,12 @@ export default function HeroAbout() {
         <img className="mascot-poster" src={`${import.meta.env.BASE_URL}mascot/chick.webp`} alt="" width="720" height="720" />
       </div>
       <SceneCanvas ref={sceneRef} onReady={(ready) => { rootRef.current?.classList.toggle("scene-3d", ready); if (ready) repaintRef.current(); }} />
-      <div className="scene-panel scene-panel-0" aria-hidden={active !== 0}>
+      <div className="scene-panel scene-panel-0" data-active={active === 0}>
         <p className="scene-label">01 / A PORTFOLIO IN PROGRESS · 2026</p>
         <p className="scene-description">{profile.tagline}</p>
         <div className="scene-actions"><a className="button dark" href="#work">Explore my work <span aria-hidden="true">↗</span></a><a className="button scene-button-ghost" href="#about">A little about me</a></div>
       </div>
-      <div className="scene-panel scene-panel-1" aria-hidden={active !== 1}>
+      <div className="scene-panel scene-panel-1" data-active={active === 1}>
         <p className="scene-label">02 / IN SHORT</p>
         <h2>{description.tagline}</h2>
         <p className="scene-description">{description.copy}</p>

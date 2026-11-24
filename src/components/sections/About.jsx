@@ -17,7 +17,7 @@ export default function About() {
           </div>
         </div>
         <div className="about-copy">
-          <p className="eyebrow" id="about-label" data-reveal="fade">ABOUT</p>
+          <h2 className="eyebrow" id="about-label" data-reveal="fade">ABOUT</h2>
           <p className="about-story" data-reveal="rise" style={{ "--i": 1 }}>{aboutStory}</p>
           <p className="about-education" data-reveal="rise" style={{ "--i": 2 }}>
             {education.degree} · {education.institution} · Expected {education.graduation}

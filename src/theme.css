@@ -9,10 +9,6 @@
   --orange: #b9a0ff;
   --shadow-float: 0 30px 60px -20px rgb(40 20 90 / 0.22), 0 8px 18px -8px rgb(40 20 90 / 0.12);
 }
-body {
-  background: var(--paper);
-  color: var(--ink);
-}
 .header {
   background: #070609;
   color: #f5f3e9;
@@ -74,6 +70,13 @@ body {
 }
 .showcase-heading h2 span {
   color: var(--muted);
+}
+/* Without JS the heading sits over the dark scroll-snap slides. */
+.project-showcase:not(.stack-ready) .showcase-heading {
+  color: #f3eefa;
+}
+.project-showcase:not(.stack-ready) .showcase-heading h2 span {
+  color: #ada4b9;
 }
 .showcase-heading a {
   font-size: 0.7rem;

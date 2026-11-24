@@ -4,7 +4,10 @@ const base = import.meta.env.BASE_URL;
 
 export default function Cta() {
   return (
-    <section className="cta" id="contact">
+    <section className="cta" id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title" className="visually-hidden">
+        Get in touch
+      </h2>
       <div className="cta-inner">
         <div className="cta-mascot" data-reveal="scale">
           <div className="cta-float">
@@ -15,10 +18,10 @@ export default function Cta() {
           {cta.quote}
         </blockquote>
         <div className="cta-actions" data-reveal="rise" style={{ "--i": 2 }}>
-          <a className="button dark" href={`${base}resume.pdf`} target="_blank" rel="noopener">
+          <a className="button cta-primary" href={`${base}resume.pdf`} target="_blank" rel="noopener">
             {cta.resumeLabel} ↗
           </a>
-          <a className="button" href={`mailto:${profile.email}`}>
+          <a className="button cta-secondary" href={`mailto:${profile.email}`}>
             Get in touch
           </a>
         </div>

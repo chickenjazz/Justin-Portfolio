@@ -88,13 +88,17 @@
 
 /* Entering copy rises in after the morph begins; leaving copy fades at once. */
 .scene-ready .scene-panel > * { opacity: 0; transform: translateY(14px); transition: opacity 260ms ease, transform 260ms ease; }
-.scene-ready .scene-panel[aria-hidden="false"] > * {
+.scene-ready .scene-panel[data-active="true"] > * {
   opacity: 1; transform: none;
   transition: opacity 700ms cubic-bezier(.22, 1, .36, 1), transform 700ms cubic-bezier(.22, 1, .36, 1);
   transition-delay: calc(380ms + var(--reveal-index, 0) * 80ms);
 }
+/* An inactive panel never catches the pointer. The inactive Description stays readable to
+   screen readers but must not become a keyboard-focusable scroller while it is invisible. */
+.scene-ready .scene-panel[data-active="false"] { pointer-events: none; }
+.scene-ready .scene-panel-1[data-active="false"] { overflow-y: hidden; }
 .scene-panel > :nth-child(2) { --reveal-index: 1; }
 .scene-panel > :nth-child(3) { --reveal-index: 2; }
 @media (prefers-reduced-motion: reduce) {
-  .scene-ready .scene-panel > *, .scene-ready .scene-panel[aria-hidden="false"] > * { transform: none; transition: opacity 200ms ease; transition-delay: 0ms; }
+  .scene-ready .scene-panel > *, .scene-ready .scene-panel[data-active="true"] > * { transform: none; transition: opacity 200ms ease; transition-delay: 0ms; }
 }

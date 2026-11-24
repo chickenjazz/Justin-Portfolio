@@ -15,9 +15,15 @@ export default function Marquee({
         <ul role="presentation">{children}</ul>
       </li>
     ));
+  // Focus stops the loop at its start (Marquee.css). Native focus scrolling skips an item that
+  // is only partly in view, so bring the focused item fully into the band.
   const rootProps = decorative
     ? { "aria-hidden": "true" }
-    : { role: "region", "aria-label": label };
+    : {
+        role: "region",
+        "aria-label": label,
+        onFocus: (event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" }),
+      };
 
   return (
     <div

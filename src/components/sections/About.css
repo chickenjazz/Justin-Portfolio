@@ -32,6 +32,10 @@
 .about-copy {
   min-width: 0;
 }
+/* The eyebrow is the section's h2; keep the paragraph spacing it had as a <p>. */
+.about-copy .eyebrow {
+  margin: 1em 0;
+}
 .about-story {
   margin: 1.5rem 0 2rem;
   max-width: 24ch;
