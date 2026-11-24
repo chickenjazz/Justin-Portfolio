@@ -68,8 +68,9 @@ narrow screens instead of scrolling sideways.
 
 Viewport containment fix: the sticky track uses explicit content height (stage +
 scroll distance), never padding for scroll travel. The stage is 100svh at top: 0.
-Anchor destinations share the same track origin. Short screens keep
-the mascot visible and provide native scrolling inside the Description panel.
+Anchor destinations share the same track origin. The Description panel never
+scrolls: its tagline is sized by width and height (min(4.6vw, 8svh)), and on short
+stages the panel rises until it clears the bottom bar, staying below the header.
 
 Project stack: a sticky 100svh stage inside an explicit-height track (`useHeldScroll`:
 held states, commit at 18% in the direction of travel, 140ms idle glide to the committed

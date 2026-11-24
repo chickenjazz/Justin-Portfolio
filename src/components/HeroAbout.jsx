@@ -8,6 +8,8 @@ import { profile, description } from "../content/site.js";
 const MORPH_MS = 1100;
 // Space kept between the bottom of the chick and the Introduction's copy, in px.
 const INTRO_GAP = 16;
+// Highest the Description may rise, in px, so it stays clear of the site header.
+const DESCRIPTION_TOP = 84;
 
 // Fixed, hand-picked offsets (em, deg) so letters sit unevenly but stay readable.
 const LETTER_JITTER = [[.06, 4], [-.1, -5], [.12, 3], [-.04, -6], [.09, 5], [-.12, -3], [.05, 6]];
@@ -103,6 +105,7 @@ export default function HeroAbout() {
     let height = root.clientHeight;
     let visible = true;
     let introHeight = 0;
+    let descriptionHeight = 0;
     let disposed = false;
     const mix = (key) => scenes.reduce((sum, scene, i) => sum + scene[key] * weights[i], 0);
     const color = (key) => `rgb(${[0, 1, 2].map(channel => scenes.reduce((sum, scene, i) => sum + scene[key][channel] * weights[i], 0)).join(" ")})`;
@@ -205,9 +208,10 @@ export default function HeroAbout() {
         const displacement = weights.reduce((sum, amount, j) => sum + Math.sign(i - j) * amount, 0);
         // The Introduction's copy and CTAs sit centred under the mascot (panel width matches CSS).
         const baseX = mobile ? width * .07 : i === 0 ? (width - Math.min(width * .4, 620)) / 2 : width * .08;
-        const baseY = i === 0 ? introY : mobile ? Math.min(255, height * .43) : height * .34;
-        // The Description scrolls inside its panel if it ever outgrows the space above the bottom bar.
-        if (i === 1) panel.style.maxHeight = `${Math.max(100, height - baseY - (mobile ? 125 : 95))}px`;
+        let baseY = i === 0 ? introY : mobile ? Math.min(255, height * .43) : height * .34;
+        // The Description never scrolls: on short stages it rises until it clears the bottom bar,
+        // but stays under the site header.
+        if (i === 1) baseY = Math.max(DESCRIPTION_TOP, Math.min(baseY, height - descriptionHeight - (mobile ? 125 : 95)));
         // The Introduction swings out sideways; the Description floats up from below into place.
         const offset = displacement * (width + 80);
         panel.style.transform = i === 1
@@ -264,6 +268,7 @@ export default function HeroAbout() {
       width = root.clientWidth;
       height = root.clientHeight;
       introHeight = panels[0].offsetHeight;
+      descriptionHeight = panels[1].offsetHeight;
       unit = Math.max(window.innerHeight, height);
       // Sticky positioning needs scroll room in the parent's content box, not padding.
       track.style.setProperty("--stage-height", `${height}px`);
