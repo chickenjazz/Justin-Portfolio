@@ -156,6 +156,18 @@ export async function createSceneRenderer(canvas, { reducedMotion }) {
   // uses scene.environmentIntensity instead), so give our materials the map directly.
   for (const material of [body, accent, beak, letterMaterial, ink, mint, crystal]) material.envMap = envTarget.texture;
 
+  // Compile the chick's shaders before the first frame, off the main thread where the browser
+  // supports parallel compilation, so the first draw never freezes the page (a freeze during a
+  // section's entrance swallows its CSS transitions). Materials get their real flags first:
+  // iridescence and sheen are never exactly 0, so any later glass value uses this same program.
+  // Shapes are added to the scene lazily and compile on first use.
+  applyChickMaterials({ glass: 0, hue: 0 });
+  try {
+    await renderer.compileAsync(scene, camera);
+  } catch {
+    // Falls back to compiling on the first draw.
+  }
+
   // Frame ------------------------------------------------------------------------------
   let current = null;
   let size = { width: 0, height: 0 };

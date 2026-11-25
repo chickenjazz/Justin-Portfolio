@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import SceneCanvas from "./SceneCanvas.jsx";
 import Topography from "./Topography.jsx";
-import { TRACK_UNITS, nextScene, holdDrift } from "./sceneMath.js";
+import { TRACK_UNITS, STEP_SCREENS, nextScene, holdDrift } from "./sceneMath.js";
 import { hurryTiming, caughtUp } from "./motion.js";
 import { profile, description } from "../content/site.js";
 import { Arrow } from "./Glyph.jsx";
@@ -305,7 +305,7 @@ export default function HeroAbout() {
       introHeight = panels[0].offsetHeight;
       descriptionHeight = panels[1].offsetHeight;
       wordHeights = words.map(word => word.offsetHeight);
-      unit = Math.max(window.innerHeight, height);
+      unit = Math.max(window.innerHeight, height) * STEP_SCREENS;
       // Sticky positioning needs scroll room in the parent's content box, not padding.
       track.style.setProperty("--stage-height", `${height}px`);
       track.style.setProperty("--scroll-distance", `${unit * TRACK_UNITS}px`);

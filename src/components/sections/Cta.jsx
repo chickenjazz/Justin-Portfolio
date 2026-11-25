@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { cta, profile } from "../../content/site.js";
 import BackdropShapes from "../BackdropShapes.jsx";
 import CtaChick from "../CtaChick.jsx";
-import { nextScene } from "../sceneMath.js";
+import { nextScene, STEP_SCREENS } from "../sceneMath.js";
 import { smoothstep, hurryTiming, caughtUp } from "../motion.js";
 import { Arrow } from "../Glyph.jsx";
 import { icons } from "../../content/icons.js";
@@ -13,8 +13,8 @@ import { icons } from "../../content/icons.js";
 // gradient's fade is time-based (same duration and smoothstep as the hero), and the chick,
 // bands, shapes and buttons enter after it in CSS (Closing.css).
 const MORPH_MS = 1100;
-// One morph step plus half a viewport of hold before the footer.
-const TRACK_UNITS = 1.5;
+// One morph step plus 0.4 of a step of hold before the footer (a step is STEP_SCREENS of a screen).
+const TRACK_UNITS = 1.4;
 
 // Crystal shapes float over the dark stage like the reference's stray props.
 const SHAPES = [
@@ -149,7 +149,7 @@ export default function Cta() {
       window.scrollTo({ top: trackTop + unit, behavior: instant || preference.matches ? "instant" : "smooth" });
     }
     const resize = new ResizeObserver(() => {
-      unit = Math.max(window.innerHeight, root.clientHeight);
+      unit = Math.max(window.innerHeight, root.clientHeight) * STEP_SCREENS;
       track.style.setProperty("--cta-stage-height", `${root.clientHeight}px`);
       track.style.setProperty("--cta-scroll-distance", `${unit * TRACK_UNITS}px`);
       measureTop();

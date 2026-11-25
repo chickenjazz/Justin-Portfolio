@@ -15,16 +15,18 @@ export default function CtaChick({ src }) {
   const [near, setNear] = useState(false);
   const [ready, setReady] = useState(false);
 
-  // Mount the WebGL layer a screen ahead of the CTA, so it is loaded by the time it shows.
+  // Mount the WebGL layer well ahead of the CTA (three screens), in an idle moment, so it has
+  // loaded and compiled before the entrance plays.
   useEffect(() => {
     const box = boxRef.current;
     if (!("IntersectionObserver" in window)) return setNear(true);
+    const idle = window.requestIdleCallback ?? ((fn) => setTimeout(fn, 1));
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setNear(true);
         observer.disconnect();
+        idle(() => setNear(true), { timeout: 600 });
       }
-    }, { rootMargin: "100% 0px" });
+    }, { rootMargin: "300% 0px" });
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
@@ -36,18 +38,24 @@ export default function CtaChick({ src }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     let frame = 0;
+    // Measured on resize only, never inside an animation frame.
+    let width = 0;
+    let height = 0;
+    let size = 0;
+    const measure = () => {
+      const canvasBox = box.querySelector(".scene-canvas");
+      width = canvasBox?.clientWidth ?? 0;
+      height = canvasBox?.clientHeight ?? 0;
+      size = box.clientWidth;
+    };
 
     const paint = () => {
-      const canvasBox = box.querySelector(".scene-canvas");
-      if (!canvasBox) return;
-      const width = canvasBox.clientWidth;
-      const height = canvasBox.clientHeight;
       if (!width || !height) return;
       const { turn, pitch } = pose.current;
       sceneRef.current?.update({
         width,
         height,
-        chick: { x: width / 2, y: height / 2, size: box.clientWidth, glass: 1, turn, hue: 0, pitch },
+        chick: { x: width / 2, y: height / 2, size, glass: 1, turn, hue: 0, pitch },
         letters: [],
         shapes: [],
       });
@@ -75,7 +83,10 @@ export default function CtaChick({ src }) {
       if (!frame) frame = requestAnimationFrame(follow);
     };
 
-    const resize = new ResizeObserver(paint);
+    const resize = new ResizeObserver(() => {
+      measure();
+      paint();
+    });
     resize.observe(box);
     const onScreen = new IntersectionObserver(([entry]) => sceneRef.current?.setVisible(entry.isIntersecting));
     onScreen.observe(stage);
@@ -83,6 +94,7 @@ export default function CtaChick({ src }) {
       stage.addEventListener("pointermove", aim, { passive: true });
       stage.addEventListener("pointerleave", center);
     }
+    measure();
     paint();
     return () => {
       cancelAnimationFrame(frame);
