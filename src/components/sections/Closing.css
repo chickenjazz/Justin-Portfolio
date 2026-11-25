@@ -109,7 +109,9 @@
   margin-top: calc(-1 * var(--cta-overlap));
 }
 .cta-track {
-  --cta-overlap: 65svh;
+  /* 65svh minus the 9svh the half-screen step moved the commit point up, so the colour change
+     still commits at the same place under Milestones. */
+  --cta-overlap: 56svh;
 }
 /* While white, the stage lets the pointer through to the Milestones underneath. */
 .cta-ready .cta[data-state="0"] {

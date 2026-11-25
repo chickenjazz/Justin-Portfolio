@@ -1,7 +1,10 @@
 // Pure scroll math for the hero scene (HeroAbout.jsx), kept separate so it can be unit tested.
 
-// One morph step (Hero → Description) plus 0.6 of a viewport of hold before release.
-export const TRACK_UNITS = 1.6;
+// One state step spans half a screen of scroll, so pinned scenes release quickly instead of
+// holding the page for screens at a time (shared by the hero and the CTA).
+export const STEP_SCREENS = 0.5;
+// One morph step (Hero → Description) plus 0.4 of a step of hold before release.
+export const TRACK_UNITS = 1.4;
 // A short scroll past a held state commits to its neighbour.
 export const COMMIT = .18;
 
