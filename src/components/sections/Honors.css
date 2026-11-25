@@ -1,0 +1,291 @@
+/* Honors: a prism coverflow. The active certificate sits centred in full colour; its
+   neighbours are narrower, smaller, monochrome crops. Each newly active card takes its colour
+   through a spectral sweep, and the cards split into a faint spectrum while they move.
+   Sized so heading, carousel, caption and controls fit one viewport. */
+.honors {
+  --card-w: min(80vw, calc(46svh * 1.3), 700px);
+  --card-h: calc(var(--card-w) / 1.3);
+  --gap: 16px;
+  --radius: 18px;
+  background: transparent;
+  color: var(--ink);
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* The margin opens a clear white gap after the Skills tile wall; the padding then keeps the
+     heading off the section's own top edge. The section itself still fits one viewport. */
+  margin-top: clamp(5rem, 16svh, 12rem);
+  padding: clamp(6rem, 15svh, 11rem) 0 clamp(4rem, 9svh, 7rem);
+  overflow-x: clip;
+}
+.honors-title {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.75rem, min(7.5vw, 11svh), 8rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+  margin: 0 0 clamp(1.75rem, 5svh, 3.5rem);
+  padding: 0 clamp(1.25rem, 5vw, 4rem);
+}
+.honors-title .honors-title-accent {
+  color: var(--accent-ink);
+}
+
+.honors-prism {
+  position: relative;
+  z-index: 1;
+}
+.prism-stage {
+  position: relative;
+  height: var(--card-h);
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+.honors-prism.is-dragging .prism-stage {
+  cursor: grabbing;
+}
+
+/* Every slide is an active-sized box at the centre; transform moves and shrinks it and the
+   face's clip-path crops it narrower, so the whole layout animates without layout work. */
+.prism-slide {
+  position: absolute;
+  top: 0;
+  left: calc(50% - var(--card-w) / 2);
+  width: var(--card-w);
+  height: var(--card-h);
+  transform: translateX(calc(var(--xw) * var(--card-w) + var(--xg) * var(--gap) + var(--drag, 0px)))
+    scale(var(--s));
+  filter: drop-shadow(0 22px 28px rgb(40 20 90 / 0.16)) drop-shadow(0 0 0 rgb(255 60 140 / 0))
+    drop-shadow(0 0 0 rgb(60 190 255 / 0));
+  transition:
+    transform 760ms var(--ease-out),
+    opacity 500ms var(--ease-out),
+    filter 600ms var(--ease-out);
+  cursor: pointer;
+}
+.prism-slide.is-active {
+  cursor: inherit;
+}
+.prism-slide.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.honors-prism.is-dragging .prism-slide {
+  transition:
+    opacity 500ms var(--ease-out),
+    filter 600ms var(--ease-out);
+}
+/* Dispersion: while the carousel moves, the showcased card splits into a magenta and a cyan
+   ghost; neighbours stay clean. */
+.honors-prism.is-moving .prism-slide.is-active,
+.honors-prism.is-dragging .prism-slide.is-active {
+  filter: drop-shadow(0 22px 28px rgb(40 20 90 / 0.16)) drop-shadow(-6px 0 0 rgb(255 60 140 / 0.38))
+    drop-shadow(6px 0 0 rgb(60 190 255 / 0.38));
+}
+
+.prism-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+  clip-path: inset(0 var(--crop) round var(--radius));
+  transition: clip-path 760ms var(--ease-out);
+}
+.prism-face img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+/* Neighbours: monochrome and dimmed; hovering one lets a little colour in. */
+.prism-mono {
+  filter: grayscale(1) brightness(0.8);
+  transition: filter 400ms var(--ease-out);
+}
+.prism-slide:not(.is-active):hover .prism-mono {
+  filter: grayscale(0.45) brightness(0.92);
+}
+.prism-slide.is-active .prism-mono {
+  filter: grayscale(1);
+}
+/* Colour arrives left to right behind a soft edge. */
+.prism-color {
+  opacity: 0;
+  transition: opacity 360ms var(--ease-out);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-size: 300% 100%;
+  mask-repeat: no-repeat;
+  mask-position: 0 0;
+}
+.prism-slide.is-active .prism-color {
+  opacity: 1;
+  animation: prism-colour 1100ms var(--ease-out) both;
+}
+/* A spectrum band rides the colour edge (the mask edge travels from -0.5 to 1.5 card widths). */
+.prism-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ff4d9a 20%,
+    #ffb347 35%,
+    #f6ef5a 50%,
+    #4de8b0 65%,
+    #4db8ff 80%,
+    transparent
+  );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  pointer-events: none;
+}
+.prism-slide.is-active .prism-sweep {
+  animation: prism-sweep 1100ms var(--ease-out) both;
+}
+@keyframes prism-colour {
+  from {
+    mask-position: 100% 0;
+  }
+  to {
+    mask-position: 0 0;
+  }
+}
+@keyframes prism-sweep {
+  0% {
+    transform: translateX(-175%);
+    opacity: 0.7;
+  }
+  85% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(325%);
+    opacity: 0;
+  }
+}
+
+/* Captions share one cell; the active one rises in. */
+.prism-captions {
+  display: grid;
+  text-align: center;
+  margin-top: clamp(1.25rem, 3.5svh, 2.25rem);
+  padding: 0 clamp(1.25rem, 5vw, 4rem);
+}
+.prism-caption {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  opacity: 0;
+  translate: 0 10px;
+  visibility: hidden;
+  transition:
+    opacity 260ms var(--ease-out),
+    translate 260ms var(--ease-out),
+    visibility 0s 260ms;
+}
+.prism-caption.is-active {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+  transition:
+    opacity 600ms var(--ease-out) 220ms,
+    translate 600ms var(--ease-out) 220ms,
+    visibility 0s;
+}
+.honor-kind {
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin: 0;
+}
+.prism-caption h3 {
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  line-height: 1.2;
+  margin: 0;
+}
+.honor-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.prism-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: clamp(1rem, 2.5svh, 1.75rem);
+}
+.prism-arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 200ms var(--ease-out),
+    color 200ms var(--ease-out),
+    scale 200ms var(--ease-snap);
+}
+.prism-arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  scale: 1.06;
+}
+.prism-arrow:active {
+  scale: 0.96;
+}
+.prism-arrow:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+.prism-count {
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0;
+  min-width: 5.5ch;
+  text-align: center;
+}
+.prism-count span {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prism-slide,
+  .prism-face,
+  .prism-mono,
+  .prism-caption,
+  .prism-caption.is-active {
+    transition: none;
+  }
+  .honors-prism.is-moving .prism-slide.is-active,
+  .honors-prism.is-dragging .prism-slide.is-active {
+    filter: drop-shadow(0 22px 28px rgb(40 20 90 / 0.16));
+  }
+  .prism-slide.is-active .prism-color {
+    animation: none;
+  }
+  .prism-slide.is-active .prism-sweep {
+    animation: none;
+  }
+}

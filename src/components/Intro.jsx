@@ -1,18 +1,28 @@
-import { useEffect, useRef, useState } from "react";
-import HoloMosaic from "./HoloMosaic.jsx";
+import { useEffect, useState } from "react";
+import { sceneReady } from "./sceneReady.js";
 
-const CHICK_MS = 2300; // chick hop + "JM" draw, measured from first paint
-const HOLD_MS = 250; // pause on the full mosaic before it flips out
-const FALLBACK_MS = 3500; // CSS fade when JS/WebGL never takes over (Intro.css)
+const CHICK_MS = 2300; // minimum hop: "JM" has drawn in and the chick has landed a few times
+const MAX_MS = 7000; // never hold the page back longer than this, loaded or not
+const FADE_MS = 700; // overlay fade-out (Intro.css .is-out)
+const FALLBACK_MS = 3500; // CSS fade when JS never takes over (Intro.css)
 
-// Entry intro: the chick (line drawing) hops and blinks while "JM" draws in. Then
-// HoloMosaic tiles flip in over it from the centre, and flip back out (edges first)
-// to reveal the landing page. The chick part is pure CSS and prerendered, so it plays
-// before JS; without JS or WebGL the overlay fades out by itself.
+const wait = (ms) =>
+  new Promise((resolve) => setTimeout(resolve, Math.max(0, ms)));
+const pageLoaded = () =>
+  document.readyState === "complete"
+    ? Promise.resolve()
+    : new Promise((resolve) =>
+        window.addEventListener("load", resolve, { once: true }),
+      );
+
+// Entry intro: the chick (line drawing) hops and blinks while "JM" draws in. It keeps
+// hopping until the landing page is ready (fonts, images, the hero's 3D scene), for at
+// least CHICK_MS and at most MAX_MS, then the overlay fades away to reveal the page.
+// The chick part is pure CSS and prerendered, so it plays before JS; without JS the
+// overlay fades out by itself.
 export default function Intro() {
-  // idle (prerendered) → chick → in (mosaic flips in) → hold → out (flips out) → done
+  // idle (prerendered) -> wait (JS holding) -> out (fading) -> done
   const [phase, setPhase] = useState("idle");
-  const timerRef = useRef(0);
 
   useEffect(() => {
     const reduce = window.matchMedia(
@@ -24,22 +34,38 @@ export default function Intro() {
       setPhase("done");
       return undefined;
     }
-    setPhase("chick");
-    timerRef.current = setTimeout(
-      () => setPhase("in"),
-      Math.max(0, CHICK_MS - now),
-    );
-    return () => clearTimeout(timerRef.current);
+    setPhase("wait");
+    let cancelled = false;
+    const ready = Promise.all([
+      wait(CHICK_MS - now),
+      document.fonts.ready,
+      pageLoaded(),
+      sceneReady,
+    ]);
+    Promise.race([ready, wait(MAX_MS - now)]).then(() => {
+      if (!cancelled) setPhase("out");
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  useEffect(() => {
+    if (phase !== "out") return undefined;
+    // Backstop in case transitionend never fires (tab hidden, style change).
+    const timer = setTimeout(() => setPhase("done"), FADE_MS + 200);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
   if (phase === "done") return null;
-  const live = phase !== "idle";
-  const mosaic = phase === "in" || phase === "hold" || phase === "out";
-  const covered = phase === "hold" || phase === "out";
   return (
     <div
-      className={`site-intro${live ? " site-intro--live" : ""}${covered ? " is-covered" : ""}${phase === "out" ? " is-out" : ""}`}
+      className={`site-intro${phase !== "idle" ? " site-intro--live" : ""}${phase === "out" ? " is-out" : ""}`}
       aria-hidden="true"
+      onTransitionEnd={(event) => {
+        if (event.target === event.currentTarget && phase === "out")
+          setPhase("done");
+      }}
     >
       <div className="site-intro-content">
         <svg className="site-intro-chick" viewBox="0 0 120 112">
@@ -83,36 +109,6 @@ export default function Intro() {
           <path pathLength="1" d="M38 38V5l14 20L66 5v33" />
         </svg>
       </div>
-      {mosaic && (
-        <HoloMosaic
-          className="site-intro-mosaic"
-          color="#0a090e"
-          metalColor="#e8ebf1"
-          spectrum="full"
-          tileSize={1}
-          gap={0.08}
-          scatter={0.3}
-          tilt={0.35}
-          saturation={0.1}
-          intensity={1.25}
-          ripple={0.6}
-          glitter={0.85}
-          sheen={0.8}
-          grain={0.08}
-          speed={0.5}
-          intro
-          introSpeed={2}
-          outro={phase === "out"}
-          mouseInteraction={false}
-          flipOnClick={false}
-          onIntroEnd={() => {
-            setPhase("hold");
-            timerRef.current = setTimeout(() => setPhase("out"), HOLD_MS);
-          }}
-          onOutroEnd={() => setPhase("done")}
-          onFail={() => setPhase("done")}
-        />
-      )}
     </div>
   );
 }

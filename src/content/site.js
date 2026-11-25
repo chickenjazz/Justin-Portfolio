@@ -26,7 +26,7 @@ export const profile = {
     { label: "Email", href: "mailto:justinmanuzon413@gmail.com" },
   ],
   email: "justinmanuzon413@gmail.com",
-  // Public GitHub username; the Education slide shows its contribution calendar.
+  // Public GitHub username (not rendered on the page at the moment).
   github: "chickenjazz",
   phone: { label: "+63 915 312 9975", href: "tel:+639153129975" },
   mascot: "Holographic Cube Chick",
@@ -47,6 +47,8 @@ export const projects = [
     shortTitle: "Promptee",
     oneLiner: "Turning rough ideas into clearer AI prompts.",
     keyTechnologies: ["React", "FastAPI", "PyTorch", "QLoRA"],
+    // The card's headline number (counts up on arrival).
+    metric: { value: 85, suffix: "%", label: "Expert preference win rate" },
     title: "Promptee",
     category: "Featured project · Thesis / AI Engineering",
     description:
@@ -89,6 +91,8 @@ export const projects = [
     shortTitle: "Vertex 7",
     oneLiner: "A digital home for heavy equipment and construction services.",
     keyTechnologies: ["React", "JavaScript", "CSS", "Vercel"],
+    metric: { text: "Live", label: "vertex7.com.ph · own domain" },
+    liveUrl: "https://vertex7.com.ph",
     title: "Vertex 7 Heavy Equipment Rentals and Construction Supplies",
     category: "Featured project · Client project",
     description:
@@ -118,73 +122,167 @@ export const projects = [
       "Live website, screenshots, and GitHub repository (if publicly shareable) to be provided.",
   },
 ];
-export const credentials = [
+// Each honor is shown in the Honors carousel from its image in public/honors/.
+export const honors = [
   {
     title: "PMI Project Management Ready®",
     issuer: "Project Management Institute",
     year: "2026",
+    kind: "Certification",
+    image: "pmi-project-management-ready.webp",
   },
   {
     title: "Information Technology Specialist: Python",
-    issuer: "Certiport",
+    issuer: "Certiport · Pearson",
     year: "2025",
+    kind: "Certification",
+    image: "it-specialist-python.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "3rd Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-3T2526.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "2nd Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-2T2526.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "1st Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-1T2526.webp",
+  },
+  {
+    title: "Dean’s Silver Certificate",
+    detail: "3rd Term, S.Y. 2024–2025",
+    issuer: "FEU Institute of Technology",
+    year: "2025",
+    kind: "Honor",
+    image: "deans-3T2425.webp",
+  },
+  {
+    title: "Dean’s Silver Certificate",
+    detail: "2nd Term, S.Y. 2024–2025",
+    issuer: "FEU Institute of Technology",
+    year: "2025",
+    kind: "Honor",
+    image: "deans-2T2425.webp",
   },
 ];
-// Placeholder: replace with the quote you want above the Milestones cards (cite is optional).
-export const milestonesQuote = {
-  text: "Every milestone here started as something I didn’t know how to do yet.",
-  cite: "",
+export const description = {
+  tagline: "Curious by nature. Builder by habit.",
+  copy: "I chase the why behind how things work, then turn what I find into software that solves real problems for real people.",
 };
-export const achievements = [
-  { value: "5", label: "Dean’s List terms", context: "Academic distinction" },
-  { value: "3", label: "Years top performer", context: "2024 to 2026" },
+export const stats = [
+  { value: 5, title: "Dean’s List" },
+  { value: 3, title: "Top-Performer Years" },
   {
-    value: String(credentials.length),
-    label: "Certifications",
-    context: "PMI and Certiport",
+    value: honors.filter((h) => h.kind === "Certification").length,
+    title: "Certifications",
   },
-  {
-    value: String(projects.length),
-    label: "Projects built",
-    context: "Thesis system and client website",
-  },
+  { value: projects.length, title: "Projects Shipped" },
 ];
-// Tool experience is grounded in the supplied project descriptions.
-// Interests and target roles are kept separate from demonstrated experience.
+export const aboutStory =
+  "I’m fascinated by the little problems people learn to live with. The repetitive tasks, the unnecessary complexity, the things that could simply work better. I enjoy finding ways to make those things easier through thoughtful solutions.";
 export const skills = [
-  { category: "Programming languages", items: ["Python", "JavaScript"] },
   {
-    category: "Frontend development",
-    items: ["React", "HTML", "CSS", "Responsive layouts", "UI/UX design"],
+    category: "Programming Languages",
+    items: ["Python", "JavaScript", "HTML", "CSS"],
   },
-  { category: "Backend development", items: ["FastAPI", "API integration"] },
   {
-    category: "AI & machine learning",
+    category: "Frontend Development",
     items: [
+      "Responsive Layouts",
+      "UI/UX Design",
+      "Reusable Components",
+      "SEO Metadata",
+    ],
+  },
+  {
+    category: "Backend Development",
+    items: ["REST APIs", "API Integration", "Prompt Evaluation Pipelines"],
+  },
+  {
+    category: "AI & Machine Learning",
+    items: [
+      "QLoRA / LoRA",
+      "Supervised Fine-Tuning",
+      "DPO",
+      "Prompt Optimization",
+      "Heuristic Evaluation",
+    ],
+  },
+  {
+    category: "Frameworks & Libraries",
+    items: [
+      "React",
+      "FastAPI",
       "PyTorch",
       "Hugging Face Transformers",
-      "QLoRA / LoRA",
-      "DPO",
       "PEFT",
       "TRL",
       "spaCy",
       "SentenceTransformers",
-      "Prompt optimization",
     ],
   },
   {
-    category: "Cloud computing & DevOps",
+    category: "Tools & Platforms",
     items: [
-      "Vercel deployment",
+      "Vercel",
       "RunPod",
       "CUDA",
-      "DNS and domain configuration",
-      "Automation",
+      "Google Search Console",
+      "DNS & Domains",
+      "GitHub",
     ],
   },
-  {
-    category: "Databases & developer tools",
-    items: ["Google Search Console"],
-    note: "Database technologies to be provided.",
-  },
+];
+export const skillIcons = [
+  { name: "Python", blurb: "Main language: fine-tuning pipelines, prompt scoring and data tooling. Certiport ITS: Python certified.", icon: "python" },
+  { name: "JavaScript", blurb: "Interactive frontends and the client side of Vertex 7 and this portfolio.", icon: "javascript" },
+  { name: "React", blurb: "Component-based UIs: Promptee’s frontend, the Vertex 7 site and this page.", icon: "react" },
+  { name: "FastAPI", blurb: "Python REST backend serving Promptee’s prompt evaluation and rewriting.", icon: "fastapi" },
+  { name: "PyTorch", blurb: "Model training for QLoRA, supervised fine-tuning and DPO in Promptee.", icon: "pytorch" },
+  { name: "Hugging Face", blurb: "Transformers, PEFT and TRL for loading and fine-tuning language models.", icon: "huggingface" },
+  { name: "spaCy", blurb: "NLP parsing behind Promptee’s multi-criteria heuristic prompt scoring.", icon: "spacy" },
+  { name: "HTML", blurb: "Semantic, accessible markup with SEO metadata, sitemaps and robots.txt.", icon: "html5" },
+  { name: "Vercel", blurb: "Deploys, custom domains and DNS for client sites like Vertex 7.", icon: "vercel" },
+  { name: "CUDA", blurb: "GPU-accelerated training on RunPod for transformer fine-tuning.", icon: "nvidia" },
+  { name: "GitHub", blurb: "Version control, branches and pull requests for every project.", icon: "github" },
+];
+// The quote and tags are not shown right now (the CTA's text boxes are out for now); `bands`
+// feeds the moving word bands behind the chick.
+const ctaQuoteParts = [
+  "The best problems hide in plain sight.",
+  "I like finding them — and building what fixes them.",
+];
+export const cta = {
+  quoteParts: ctaQuoteParts,
+  quote: ctaQuoteParts.join(" "),
+  // Short labels for the smaller boxes and the text bands behind the chick.
+  tags: ["Open to work", "Let's build", "Make it matter"],
+  bands: ["Problem solver", "Builder", "Designer", "Developer"],
+  resumeLabel: "View my résumé",
+};
+export const gallery = [];
+export const navSections = [
+  { id: "top", label: "Home", inHeader: false, inRail: true },
+  { id: "description", label: "Intro", inHeader: false, inRail: false },
+  { id: "stats", label: "Highlights", inHeader: false, inRail: false },
+  { id: "about", label: "About", inHeader: true, inRail: true },
+  { id: "work", label: "Work", inHeader: true, inRail: true },
+  { id: "skills", label: "Skills", inHeader: true, inRail: true },
+  { id: "honors", label: "Honors", inHeader: true, inRail: true },
+  { id: "milestones", label: "Milestones", inHeader: false, inRail: true },
+  { id: "contact", label: "Contact", inHeader: true, inRail: true },
 ];

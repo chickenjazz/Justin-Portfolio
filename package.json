@@ -11,6 +11,8 @@
     "start": "vite",
     "build": "node scripts/build.js",
     "preview": "vite preview",
+    "test": "node --test \"tests/unit/**/*.test.js\"",
+    "test:page": "npm run build && node --test \"tests/page/**/*.test.js\"",
     "format": "prettier --write src scripts index.html vite.config.js"
   },
   "dependencies": {

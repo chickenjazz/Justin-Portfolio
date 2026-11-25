@@ -1,36 +1,60 @@
 import { useEffect, useRef, useState } from "react";
 import { projects } from "../../content/site.js";
 import ProjectDetails from "../ProjectDetails.jsx";
-import useHeldScroll from "../useHeldScroll.js";
+import ProjectDemo from "../ProjectDemo.jsx";
+import CountUp from "../CountUp.jsx";
+import useInView from "../useInView.js";
+import useScrollStack from "../useScrollStack.js";
+import { stackLayer } from "../stackMath.js";
+
+const pad = (n) => String(n).padStart(2, "0");
+// "Featured project · Thesis / AI Engineering" -> "Thesis / AI Engineering"
+const kind = (project) => project.category.split("·").pop().trim();
+
+// CSS custom properties for one card's place in the stack.
+const layerStyle = (layer) => ({
+  "--y": layer.yVh,
+  "--peek": layer.peekPx,
+  "--s": layer.scale,
+  "--blur": layer.blur,
+  "--dim": layer.dim,
+  "--fade": layer.opacity,
+});
 
 export default function Projects() {
   const track = useRef(null);
   const dialog = useRef(null);
   const trigger = useRef(null);
-  const arcList = useRef(null);
   const showcase = useRef(null);
   const [selected, setSelected] = useState(null);
   const [ready, setReady] = useState(false);
+  // The demo loops run only while the section is on screen.
+  const inView = useInView(showcase, { threshold: 0.2 });
 
   useEffect(() => {
     setReady(true);
   }, []);
-  // Places every card and title on the arc for a progress p (0 … count - 1).
+  // Stacks every card for a progress p (0 … count - 1): later cards rise from
+  // the bottom over earlier ones, which shrink, blur, dim and peek out above.
   const place = (p) => {
-    const lay = (elements, depth) =>
-      Array.from(elements ?? [], (element, index) => {
-        const d = index - p;
-        element.style.setProperty("--d", d.toFixed(4));
-        element.style.setProperty("--ad", Math.abs(d).toFixed(4));
-        if (!depth) return;
-        element.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
-        element.inert = Math.abs(d) > 0.5;
-      });
-    lay(track.current?.children, true);
-    lay(arcList.current?.children, false);
+    Array.from(track.current?.children ?? [], (card, index) => {
+      const d = index - p;
+      const layer = stackLayer(d);
+      for (const [name, value] of Object.entries(layerStyle(layer)))
+        card.style.setProperty(name, String(value));
+      card.style.zIndex = String(index + 1);
+      card.style.visibility = layer.hidden ? "hidden" : "";
+      card.inert = Math.abs(d) > 0.5;
+      card.classList.toggle("is-current", Math.abs(d) < 0.5);
+      // Not yet arrived: its content waits below, then plays in on arrival.
+      card.classList.toggle("is-ahead", d >= 0.5);
+    });
+    showcase.current?.style.setProperty(
+      "--progress",
+      String(projects.length > 1 ? p / (projects.length - 1) : 1),
+    );
   };
-  // Page scroll steps through the projects, then releases after the last.
-  const [active, goTo] = useHeldScroll(showcase, projects.length, place, ready);
+  const [active, goTo] = useScrollStack(showcase, projects.length, place, ready);
   useEffect(() => {
     if (!selected) return;
     const panel = dialog.current;
@@ -53,7 +77,7 @@ export default function Projects() {
 
   return (
     <section
-      className={`project-showcase${ready ? " arc-ready" : ""}`}
+      className={`project-showcase${ready ? " stack-ready" : ""}${inView ? " demos-live" : ""}`}
       ref={showcase}
       id="work"
       aria-label="Selected projects"
@@ -62,16 +86,16 @@ export default function Projects() {
         <div className="showcase-heading">
           <h2>
             Selected work
-            <span> / {String(projects.length).padStart(2, "0")}</span>
+            <span> / {pad(projects.length)}</span>
           </h2>
-          <a href="#credentials">Skip projects ↓</a>
+          <a href="#skills">Skip projects ↓</a>
         </div>
         <div
           className="project-track"
           ref={track}
           role="region"
           aria-roledescription="carousel"
-          aria-label="Projects. Scroll down or use the arrow buttons."
+          aria-label="Projects. Scroll down or use the arrow keys."
           tabIndex={0}
           onKeyDown={(event) => {
             if (event.target !== event.currentTarget) return;
@@ -86,76 +110,74 @@ export default function Projects() {
               className={`project-slide project-slide-${index}`}
               id={project.id}
               key={project.id}
-              style={{ "--d": index, "--ad": index }}
+              style={layerStyle(stackLayer(index))}
               aria-roledescription="slide"
               aria-label={`${index + 1} of ${projects.length}: ${project.shortTitle}`}
             >
-              <div className="slide-art" aria-hidden="true">
-                <div className="sculpture">
-                  <i />
-                  <i />
-                  <i />
-                </div>
-                <div className="floor-grid" />
-              </div>
-              <div className="slide-content">
-                <p className="eyebrow">
-                  {String(index + 1).padStart(2, "0")} / SELECTED PROJECT
+              <p className="slide-counter" aria-hidden="true">
+                {pad(index + 1)}/{pad(projects.length)}
+              </p>
+              <p className="pc-eyebrow pc-in" style={{ "--o": 2 }}>
+                {pad(index + 1)} · {kind(project)}
+              </p>
+              <h3 className="pc-mask">
+                <span className="pc-title pc-in" style={{ "--o": 0 }}>
+                  {project.shortTitle}
+                </span>
+              </h3>
+              <ProjectDemo id={project.id} className="pc-in" style={{ "--o": 1 }} />
+              <p className="pc-one pc-in" style={{ "--o": 2 }}>
+                {project.oneLiner}
+              </p>
+              {project.metric && (
+                <p className="pc-metric pc-in" style={{ "--o": 2 }}>
+                  <strong>
+                    {project.metric.text ?? (
+                      <>
+                        <CountUp
+                          to={project.metric.value}
+                          delay={480}
+                          duration={1100}
+                          play={inView && active === index}
+                        />
+                        {project.metric.suffix}
+                      </>
+                    )}
+                  </strong>
+                  <span>{project.metric.label}</span>
                 </p>
-                <h3>{project.shortTitle}</h3>
-                <p className="slide-summary">{project.oneLiner}</p>
-                <ul className="slide-tech">
-                  {project.keyTechnologies.map((tech) => (
-                    <li key={tech}>{tech}</li>
-                  ))}
-                </ul>
+              )}
+              <ul className="pc-tech pc-in" style={{ "--o": 3 }}>
+                {project.keyTechnologies.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+              <div className="pc-actions pc-in" style={{ "--o": 3 }}>
                 <details className="project-fallback">
                   <summary onClick={(event) => openDetails(event, project)}>
                     View project <span aria-hidden="true">↗</span>
                   </summary>
                   <ProjectDetails project={project} />
                 </details>
+                {project.liveUrl && (
+                  <a className="pc-visit" href={project.liveUrl} target="_blank" rel="noopener">
+                    Visit site <span aria-hidden="true">↗</span>
+                  </a>
+                )}
               </div>
             </article>
           ))}
         </div>
         {ready && (
-          <ol className="arc-list" ref={arcList} aria-label="Projects">
-            {projects.map((project, index) => (
-              <li key={project.id} style={{ "--d": index, "--ad": index }}>
-                <button
-                  aria-current={active === index ? "true" : undefined}
-                  onClick={() => goTo(index)}
-                >
-                  {project.shortTitle}
-                </button>
-              </li>
-            ))}
-          </ol>
-        )}
-        {ready && (
-          <div className="carousel-controls">
-            <p aria-live="polite" aria-atomic="true">
-              {String(active + 1).padStart(2, "0")}{" "}
-              <span>/ {String(projects.length).padStart(2, "0")}</span>
-            </p>
-            <div className="carousel-arrows">
-              <button
-                aria-label="Previous project"
-                disabled={active === 0}
-                onClick={() => goTo(active - 1)}
-              >
-                ←
-              </button>
-              <button
-                aria-label="Next project"
-                disabled={active === projects.length - 1}
-                onClick={() => goTo(active + 1)}
-              >
-                →
-              </button>
+          <>
+            <div className="stack-progress" aria-hidden="true">
+              <span />
             </div>
-          </div>
+            <p className="visually-hidden" aria-live="polite" aria-atomic="true">
+              Project {active + 1} of {projects.length}:{" "}
+              {projects[active]?.shortTitle}
+            </p>
+          </>
         )}
       </div>
       <dialog
