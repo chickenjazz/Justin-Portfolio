@@ -4,6 +4,7 @@ import Topography from "./Topography.jsx";
 import { TRACK_UNITS, nextScene, holdDrift } from "./sceneMath.js";
 import { hurryTiming, caughtUp } from "./motion.js";
 import { profile, description } from "../content/site.js";
+import { Arrow } from "./Glyph.jsx";
 
 // Hero (state 0) and Description (state 1) are two states of one scene, morphed over time.
 const MORPH_MS = 1100;
@@ -374,7 +375,7 @@ export default function HeroAbout() {
       <div className="scene-panel scene-panel-0" data-active={active === 0}>
         <p className="scene-label">01 / A PORTFOLIO IN PROGRESS · 2026</p>
         <p className="scene-description">{profile.tagline}</p>
-        <div className="scene-actions"><a className="button dark" href="#work">Explore my work <span aria-hidden="true">↗</span></a><a className="button scene-button-ghost" href="#about">A little about me</a></div>
+        <div className="scene-actions"><a className="button dark" href="#work">Explore my work <Arrow /></a><a className="button scene-button-ghost" href="#about">A little about me</a></div>
       </div>
       <div className="scene-panel scene-panel-1" data-active={active === 1}>
         <p className="scene-label">02 / IN SHORT</p>
@@ -382,7 +383,7 @@ export default function HeroAbout() {
         <p className="scene-description">{description.copy}</p>
       </div>
       <div className="scene-bottom">
-        <nav className="scene-social" aria-label="Social and contact links">{profile.links.map(link => <a href={link.href} key={link.label}><span className="scene-social-label">{link.label}</span> <span className="scene-social-arrow" aria-hidden="true">↗</span></a>)}</nav>
+        <nav className="scene-social" aria-label="Social and contact links">{profile.links.map(link => <a href={link.href} key={link.label}><span className="scene-social-label">{link.label}</span> <Arrow className="scene-social-arrow" /></a>)}</nav>
       </div>
     </section>
     </div>

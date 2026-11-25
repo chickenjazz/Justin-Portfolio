@@ -290,3 +290,18 @@ button:focus-visible {
   white-space: nowrap;
   border: 0;
 }
+
+/* Inline SVG arrows/asterisk (see Glyph.jsx) sized to the surrounding text. */
+.glyph {
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  vertical-align: -0.06em;
+  overflow: visible;
+  flex: none;
+}
+.glyph-asterisk {
+  width: 0.62em;
+  height: 0.62em;
+  vertical-align: 0.04em;
+}

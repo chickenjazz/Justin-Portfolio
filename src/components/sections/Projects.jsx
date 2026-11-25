@@ -6,6 +6,7 @@ import CountUp from "../CountUp.jsx";
 import useInView from "../useInView.js";
 import useScrollStack from "../useScrollStack.js";
 import { stackLayer } from "../stackMath.js";
+import { Arrow } from "../Glyph.jsx";
 
 const pad = (n) => String(n).padStart(2, "0");
 // "Featured project · Thesis / AI Engineering" -> "Thesis / AI Engineering"
@@ -88,7 +89,7 @@ export default function Projects() {
             Selected work
             <span> / {pad(projects.length)}</span>
           </h2>
-          <a href="#skills">Skip projects ↓</a>
+          <a href="#skills">Skip projects <Arrow dir="down" /></a>
         </div>
         <div
           className="project-track"
@@ -155,13 +156,13 @@ export default function Projects() {
               <div className="pc-actions pc-in" style={{ "--o": 3 }}>
                 <details className="project-fallback">
                   <summary onClick={(event) => openDetails(event, project)}>
-                    View project <span aria-hidden="true">↗</span>
+                    View project <Arrow />
                   </summary>
                   <ProjectDetails project={project} />
                 </details>
                 {project.liveUrl && (
                   <a className="pc-visit" href={project.liveUrl} target="_blank" rel="noopener">
-                    Visit site <span aria-hidden="true">↗</span>
+                    Visit site <Arrow />
                   </a>
                 )}
               </div>

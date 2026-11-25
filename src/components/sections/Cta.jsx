@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 import { cta, profile } from "../../content/site.js";
 import BackdropShapes from "../BackdropShapes.jsx";
+import CtaChick from "../CtaChick.jsx";
 import { nextScene } from "../sceneMath.js";
 import { smoothstep, hurryTiming, caughtUp } from "../motion.js";
+import { Arrow } from "../Glyph.jsx";
+import { icons } from "../../content/icons.js";
 
 // Like the hero, the CTA is two states of one pinned scene: arriving from the white
 // Milestones it is still all white (state 0); a short scroll commits to the dark purple
@@ -17,10 +20,60 @@ const TRACK_UNITS = 1.5;
 const SHAPES = [
   { sprite: "knot-b", x: "12%", y: "22%", size: "clamp(70px, 9vw, 160px)", depth: 0.45, turn: -8 },
   { sprite: "torus-a", x: "88%", y: "70%", mx: "88%", my: "10%", size: "clamp(80px, 10vw, 180px)", depth: 0.8, turn: 20, layer: "front" },
-  { sprite: "cube-b", x: "82%", y: "14%", size: "clamp(40px, 4vw, 72px)", depth: 0.2, fade: 0.8, mobile: false },
+  { sprite: "cube-b", x: "93%", y: "34%", size: "clamp(40px, 4vw, 72px)", depth: 0.2, fade: 0.8, mobile: false },
 ];
 
 const base = import.meta.env.BASE_URL;
+
+const linkTo = (label) => profile.links.find((l) => l.label === label)?.href;
+
+// Line icons for the contact tiles without a brand mark (24x24, stroked).
+const LINE_ICONS = {
+  email: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="m3.5 7 8.5 6 8.5-6" />
+    </>
+  ),
+  phone: (
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+  ),
+};
+
+// Floating contact tiles around the chick (a 2x2 grid under the buttons on narrow screens).
+const CONTACTS = [
+  { id: "github", label: "GitHub", value: `@${profile.github}`, href: linkTo("GitHub"), brand: "github", external: true },
+  { id: "linkedin", label: "LinkedIn", value: "in/jrmanuzon", href: linkTo("LinkedIn"), brand: "linkedin", external: true },
+  { id: "email", label: "Email", value: profile.email, href: `mailto:${profile.email}`, line: "email" },
+  { id: "phone", label: "Phone", value: profile.phone.label, href: profile.phone.href, line: "phone" },
+];
+
+const ContactTile = ({ contact, index }) => (
+  <a
+    className={`cta-tile cta-tile-${contact.id}`}
+    href={contact.href}
+    style={{ "--i": index }}
+    {...(contact.external ? { target: "_blank", rel: "noopener" } : {})}
+  >
+    <span className="cta-tile-float">
+      <span className="cta-tile-icon" aria-hidden="true">
+        {contact.brand ? (
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d={icons[contact.brand]} fill="currentColor" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" focusable="false" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            {LINE_ICONS[contact.line]}
+          </svg>
+        )}
+      </span>
+      <span className="cta-tile-text">
+        <span className="cta-tile-label">{contact.label}</span>
+        <span className="cta-tile-value">{contact.value}</span>
+      </span>
+    </span>
+  </a>
+);
 
 // One band of oversized words; the run repeats so it never shows an end while it slides.
 const Band = ({ words, variant }) => {
@@ -152,16 +205,17 @@ export default function Cta() {
         <BackdropShapes shapes={SHAPES} bleed />
 
         <div className="cta-scene">
-          <div className="cta-mascot">
-            <img src={`${base}mascot/chick.webp`} alt="" width="720" height="720" />
-          </div>
+          <CtaChick src={`${base}mascot/chick.webp`} />
+
+          <nav className="cta-tiles" aria-label="Contact links">
+            {CONTACTS.map((contact, index) => (
+              <ContactTile key={contact.id} contact={contact} index={index} />
+            ))}
+          </nav>
 
           <div className="cta-actions">
             <a className="button cta-primary" href={`${base}resume.pdf`} target="_blank" rel="noopener">
-              {cta.resumeLabel} ↗
-            </a>
-            <a className="button cta-secondary" href={`mailto:${profile.email}`}>
-              Get in touch
+              {cta.resumeLabel} <Arrow />
             </a>
           </div>
         </div>

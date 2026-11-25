@@ -4,7 +4,8 @@ import { markSceneReady } from "./sceneReady.js";
 // Full-stage WebGL layer. Renders nothing on the server; the DOM name and chick poster are
 // the fallback until onReady fires (and stay if WebGL or the models fail to load).
 // Calls made before the renderer is ready are cached and replayed on ready.
-const SceneCanvas = forwardRef(function SceneCanvas({ onReady }, ref) {
+// signalsReady: only the hero's canvas releases the entry intro (sceneReady.js).
+const SceneCanvas = forwardRef(function SceneCanvas({ onReady, signalsReady = true }, ref) {
   const boxRef = useRef(null);
   const rendererRef = useRef(null);
   const pending = useRef({ frame: null, visible: true });
@@ -39,10 +40,10 @@ const SceneCanvas = forwardRef(function SceneCanvas({ onReady }, ref) {
         requestAnimationFrame(() => {
           if (disposed) return;
           readyRef.current?.(true);
-          markSceneReady(true);
+          if (signalsReady) markSceneReady(true);
         });
       })
-      .catch(() => { if (!disposed) markSceneReady(false); });
+      .catch(() => { if (!disposed && signalsReady) markSceneReady(false); });
     return () => {
       disposed = true;
       rendererRef.current?.dispose();
