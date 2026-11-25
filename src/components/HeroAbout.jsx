@@ -57,8 +57,10 @@ const SHAPES = {
   mobile: [
     { kind: "torus", tone: "mint", x: .12, y: .27, size: .08, depth: .5 },
     { kind: "knot", tone: "ink", x: .86, y: .23, size: .07, depth: .3 },
-    { kind: "cube", tone: "ink", x: .93, y: .71, size: .1, depth: .9 },
-    { kind: "sphere", tone: "mint", x: .05, y: .68, size: .08, depth: .7 },
+    // belowCopy: kept under the Introduction's copy, whose tagline spans almost the full phone
+    // width, so the two lower shapes never sit over its line ends at any stage height.
+    { kind: "cube", tone: "ink", x: .93, y: .71, size: .1, depth: .9, belowCopy: 14 },
+    { kind: "sphere", tone: "mint", x: .05, y: .68, size: .08, depth: .7, belowCopy: 34 },
     { kind: "sphere", tone: "ink", x: .64, y: .21, size: .025, depth: 0 },
   ],
 };
@@ -217,14 +219,21 @@ export default function HeroAbout() {
         height,
         chick: { x, y, size, glass: mix("glass"), turn: mix("turn"), hue: mix("hue"), pitch: mix("pitch") },
         letters: letterLayout.map(l => ({ ...l, y: l.y - lift * (1 + l.depth * PARALLAX) })),
-        shapes: SHAPES[mobile ? "mobile" : "desktop"].map((shape, i) => ({
-          kind: shape.kind,
-          tone: shape.tone,
-          x: width * shape.x,
-          y: height * shape.y - lift * (1 + shape.depth * PARALLAX * 2),
-          size: shapeUnit * shape.size,
-          rot: i * .35,
-        })).concat(mobile ? [] : POP_SHAPES.map((shape, i) => ({
+        shapes: SHAPES[mobile ? "mobile" : "desktop"].map((shape, i) => {
+          const shapeSize = shapeUnit * shape.size;
+          // The shape's top edge stays shape.belowCopy px under the copy's bottom (buttons included).
+          const restY = mobile && shape.belowCopy !== undefined
+            ? Math.max(height * shape.y, introY + introHeight + shape.belowCopy + shapeSize / 2)
+            : height * shape.y;
+          return {
+            kind: shape.kind,
+            tone: shape.tone,
+            x: width * shape.x,
+            y: restY - lift * (1 + shape.depth * PARALLAX * 2),
+            size: shapeSize,
+            rot: i * .35,
+          };
+        }).concat(mobile ? [] : POP_SHAPES.map((shape, i) => ({
           kind: shape.kind,
           tone: "crystal",
           x: width * shape.x,
