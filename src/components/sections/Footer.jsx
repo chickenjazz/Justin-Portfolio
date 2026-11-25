@@ -1,4 +1,5 @@
 import { navSections, profile } from "../../content/site.js";
+import { Arrow, Asterisk } from "../Glyph.jsx";
 
 export default function Footer() {
   return (
@@ -7,7 +8,7 @@ export default function Footer() {
       <div className="site-footer-grid">
         <div className="site-footer-brand">
           <a href="#top" className="brand">
-            JM<span>✳</span>
+            JM<span><Asterisk /></span>
           </a>
           <p>Building thoughtful software, one problem at a time.</p>
         </div>
@@ -31,7 +32,7 @@ export default function Footer() {
             ))}
             <li>
               <a href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" rel="noopener">
-                Résumé ↗
+                Résumé <Arrow />
               </a>
             </li>
           </ul>
@@ -50,7 +51,7 @@ export default function Footer() {
       </div>
       <div className="site-footer-bottom">
         <span>© 2026 Justin Manuzon</span>
-        <a href="#top">Back to top ↑</a>
+        <a href="#top">Back to top <Arrow dir="up" /></a>
       </div>
     </footer>
   );

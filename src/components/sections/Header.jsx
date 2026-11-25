@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { navSections } from "../../content/site.js";
+import { Arrow, Asterisk } from "../Glyph.jsx";
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -132,7 +133,7 @@ export default function Header() {
     <>
       <header className="header" ref={headerRef}>
         <a href="#top" className="brand">
-          JM<span>✳</span>
+          JM<span><Asterisk /></span>
         </a>
         <nav aria-label="Main navigation" className="header-links" ref={linksRef}>
           <span className="nav-lozenge" aria-hidden="true" />
@@ -145,7 +146,7 @@ export default function Header() {
             ))}
         </nav>
         <a className="header-resume" href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" rel="noopener">
-          Résumé ↗
+          Résumé <Arrow />
         </a>
       </header>
       <nav

@@ -160,10 +160,9 @@
   display: inline-block;
   translate: -12% 0;
 }
-/* Two motions that never share a property: a continuous marquee loop on transform (one run of
-   the repeated text per cycle, so it wraps seamlessly; band b runs the other way and slower)
-   and, where supported, a scroll-linked drift on translate. The loop pauses while the stage
-   is off-screen (BackdropShapes toggles .shapes-floating on the stage). */
+/* A continuous marquee loop on transform (one run of the repeated text per cycle, so it wraps
+   seamlessly; band b runs the other way and slower). Time-based only: no scroll-linked drift.
+   The loop pauses while the stage is off-screen (BackdropShapes toggles .shapes-floating). */
 @media (prefers-reduced-motion: no-preference) {
   .cta-band-run {
     animation: cta-band-loop 38s linear infinite;
@@ -176,22 +175,6 @@
   .shapes-floating .cta-band-run {
     animation-play-state: running;
   }
-  @supports (animation-timeline: view()) {
-    .cta-band-run {
-      animation:
-        cta-band-loop 38s linear infinite,
-        cta-band-slide linear both;
-      animation-timeline: auto, view();
-      animation-play-state: paused, running;
-    }
-    .cta-band-b .cta-band-run {
-      animation-duration: 52s, auto;
-      animation-direction: reverse, reverse;
-    }
-    .shapes-floating .cta-band-run {
-      animation-play-state: running, running;
-    }
-  }
   @keyframes cta-band-loop {
     from {
       transform: translateX(0);
@@ -200,35 +183,54 @@
       transform: translateX(-25%);
     }
   }
-  @keyframes cta-band-slide {
-    from {
-      translate: -4% 0;
-    }
-    to {
-      translate: -20% 0;
-    }
-  }
 }
 
 /* Composition: the chick centred over the bands, buttons below. (The quote and label boxes are
    out for now; their words stay in site.js.) */
 .cta-scene {
+  /* Shared with the tiles, which are placed relative to the chick. */
+  --mascot: clamp(240px, 30vw, 420px);
+  --scene-pad: clamp(3rem, 7vw, 6rem);
   position: relative;
   z-index: 1;
   width: min(100% - 3rem, 1240px);
-  padding-block: clamp(3rem, 7vw, 6rem);
+  padding-block: var(--scene-pad);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .cta-mascot {
-  width: clamp(240px, 30vw, 420px);
+  position: relative;
+  width: var(--mascot);
 }
-.cta-mascot img {
+.cta-mascot-poster {
   display: block;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 40px 50px rgb(0 0 0 / 0.55));
+  transition: opacity 300ms ease;
+}
+/* The 3D chromatic chick (CtaChick.jsx) draws in a canvas larger than the poster, so wing
+   flaps, the tuft and the cursor turn never clip; it replaces the poster once it has drawn. */
+.cta-mascot .scene-canvas {
+  inset: -30%;
+  z-index: 1;
+}
+.cta-mascot.is-3d .scene-canvas canvas {
+  opacity: 1;
+}
+.cta-mascot.is-3d .cta-mascot-poster {
+  opacity: 0;
+}
+/* A soft glow under the crystal chick, so its pearl finish reads against the dark stage. */
+.cta-mascot::before {
+  content: "";
+  position: absolute;
+  inset: 8% 4% -6%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(185 160 255 / 0.32), rgb(185 160 255 / 0));
+  pointer-events: none;
 }
 
 /* Entrance (state 1), once the gradient is mostly in: the chick pops in with the snap easing,
@@ -238,6 +240,7 @@
 .cta-ready .cta-mascot,
 .cta-ready .cta-bands,
 .cta-ready .cta .backdrop-shapes,
+.cta-ready .cta-tiles,
 .cta-ready .cta-actions {
   opacity: 0;
   transition:
@@ -251,12 +254,14 @@
 .cta-ready .cta .backdrop-shapes {
   transform: translateY(40px);
 }
-.cta-ready .cta-actions {
+.cta-ready .cta-actions,
+.cta-ready .cta-tiles {
   transform: translateY(14px);
 }
 .cta-ready .cta[data-state="1"] .cta-mascot,
 .cta-ready .cta[data-state="1"] .cta-bands,
 .cta-ready .cta[data-state="1"] .backdrop-shapes,
+.cta-ready .cta[data-state="1"] .cta-tiles,
 .cta-ready .cta[data-state="1"] .cta-actions {
   opacity: 1;
   transform: none;
@@ -279,11 +284,15 @@
 .cta-ready .cta[data-state="1"] .cta-actions {
   --enter-delay: 1090ms;
 }
+.cta-ready .cta[data-state="1"] .cta-tiles {
+  --enter-delay: 1210ms;
+}
 /* Reduced motion: no pop or rise, only the fades. */
 @media (prefers-reduced-motion: reduce) {
   .cta-ready .cta-mascot,
   .cta-ready .cta-bands,
   .cta-ready .cta .backdrop-shapes,
+  .cta-ready .cta-tiles,
   .cta-ready .cta-actions {
     transform: none !important;
   }
@@ -300,24 +309,218 @@
   border: 1px solid #fff;
   border-radius: 50px;
 }
+/* The one CTA button: larger than the site's standard button, so it leads the section. */
 .cta-primary {
   background: #fff;
   color: var(--ink);
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.2rem);
+  padding: 1.25em 1.9em;
+  gap: 1.5em;
+  box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.6);
+}
+.cta-primary .glyph {
+  width: 0.9em;
+  height: 0.9em;
 }
 .cta-primary:hover {
   background: var(--accent);
   border-color: var(--accent);
 }
-.cta-secondary {
-  background: transparent;
-  color: #fff;
-}
-.cta-secondary:hover {
-  background: rgb(255 255 255 / 0.12);
-}
 .cta-actions .button:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 4px;
+}
+
+/* Contact tiles: frosted cards floating around the chick. Each tile keeps three separate
+   properties: rotate (its resting tilt) and translate (hover lift) on the link, and transform
+   (the float loop, which runs only while the stage is on screen) on the inner span. */
+.cta-tiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cta-tile {
+  position: absolute;
+  pointer-events: auto;
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  rotate: var(--tilt, 0deg);
+  transition:
+    translate 320ms var(--ease-snap),
+    rotate 320ms var(--ease-snap);
+}
+/* A loose, uneven scatter: GitHub rides high and Email sits beside the chick's shoulder, both close to it; LinkedIn and Phone
+   sit lower and wider, at different heights, tilts and sizes (scale), so nothing mirrors. */
+.cta-tile-github {
+  --tilt: -7deg;
+  left: 18%;
+  top: 9%;
+  scale: 1.04;
+}
+/* Anchored to the chick, not the scene width: just off its right shoulder (the visible body
+   spans about 80% of the mascot box) with a fixed 2.5rem gap at every width. */
+.cta-tile-email {
+  --tilt: 4deg;
+  left: calc(50% + var(--mascot) * 0.4 + 6.5rem);
+  top: calc(var(--scene-pad) + var(--mascot) * 0.2);
+}
+.cta-tile-linkedin {
+  --tilt: 3deg;
+  left: 2%;
+  top: 50%;
+  scale: 0.94;
+}
+.cta-tile-phone {
+  --tilt: -5deg;
+  right: 4%;
+  top: 61%;
+  scale: 0.97;
+}
+.cta-tile-float {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.8rem 1.15rem 0.8rem 0.8rem;
+  border-radius: inherit;
+  /* Nearly opaque: the word bands pass behind the tiles and must not show through. */
+  background: rgb(30 18 60 / 0.88);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 24px 48px -18px rgb(0 0 0 / 0.6),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+.cta-tile-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--night);
+  transition:
+    background 220ms ease,
+    color 220ms ease;
+}
+.cta-tile-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+.cta-tile-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+  text-align: left;
+}
+.cta-tile-label {
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+.cta-tile-value {
+  font-size: 0.78rem;
+  color: rgb(255 255 255 / 0.68);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cta-tile:hover,
+.cta-tile:focus-visible {
+  translate: 0 -6px;
+  rotate: 0deg;
+}
+.cta-tile:hover .cta-tile-float,
+.cta-tile:focus-visible .cta-tile-float {
+  background: rgb(44 28 86 / 0.94);
+  border-color: rgb(255 255 255 / 0.4);
+  box-shadow:
+    0 32px 56px -18px rgb(0 0 0 / 0.7),
+    0 0 0 1px rgb(185 160 255 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+.cta-tile:hover .cta-tile-icon,
+.cta-tile:focus-visible .cta-tile-icon {
+  background: var(--accent);
+}
+.cta-tile:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cta-tile-float {
+    animation: cta-tile-float 6s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -1.7s);
+    animation-duration: calc(5.6s + var(--i) * 0.7s);
+    animation-play-state: paused;
+  }
+  .shapes-floating .cta-tile-float {
+    animation-play-state: running;
+  }
+  @keyframes cta-tile-float {
+    from {
+      transform: translateY(-7px);
+    }
+    to {
+      transform: translateY(7px);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-tile {
+    transition: none;
+  }
+}
+/* Below wide desktop there is no room beside the chick: a centred 2x2 grid under the buttons. */
+@media (max-width: 1099px) {
+  .cta-tiles {
+    position: static;
+    order: 3;
+    pointer-events: auto;
+    margin-top: clamp(1.5rem, 4vw, 2.25rem);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 15rem));
+    gap: 0.75rem;
+    justify-content: center;
+    width: 100%;
+  }
+  .cta-tile {
+    position: static;
+    min-width: 0;
+    rotate: calc(var(--tilt) / 4);
+    scale: 1;
+  }
+}
+@media (max-width: 480px) {
+  .cta-tiles {
+    gap: 0.6rem;
+  }
+  .cta-tile-float {
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem 0.6rem 0.6rem;
+    border-radius: 16px;
+  }
+  .cta-tile-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 11px;
+  }
+  .cta-tile-icon svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .cta-tile-label {
+    font-size: 0.9rem;
+  }
+  .cta-tile-value {
+    font-size: 0.72rem;
+  }
 }
 
 /* Narrow screens: smaller chick and band lettering, bands framing it top and bottom. */
