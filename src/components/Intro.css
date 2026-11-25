@@ -1,5 +1,5 @@
-/* Entry intro: chick hop (~2.3s) → HoloMosaic flip in (~1.2s), hold, flip out (~1.2s).
-   See MOTION.md. */
+/* Entry intro: the chick hops until the page has loaded (2.3s min, 7s max), then the overlay
+   fades out (700ms) to reveal it. See MOTION.md. */
 .site-intro {
   --site-intro-ink: #d9ccff;
   --site-intro-bg: #0a090e;
@@ -7,20 +7,27 @@
   inset: 0;
   z-index: 1000;
   background: var(--site-intro-bg);
+  transition: opacity 700ms ease-in-out;
   /* Fallback when JS never takes over: fade the overlay away. */
-  animation: site-intro-out 600ms cubic-bezier(0.65, 0, 0.35, 1) 3500ms forwards;
+  animation: site-intro-out 600ms ease-in-out 3500ms forwards;
 }
-/* JS took over: the mosaic ends the intro instead. */
+/* JS took over: it ends the intro once the page is ready. */
 .site-intro.site-intro--live {
   animation: none;
 }
-/* Tiles fully cover the chick: drop it, then (on flip-out) the backdrop so the page shows. */
-.site-intro.is-covered .site-intro-content {
-  visibility: hidden;
-}
+/* Fade out: the chick settles back and shrinks a touch while the overlay clears. */
 .site-intro.is-out {
-  background: transparent;
+  opacity: 0;
   pointer-events: none;
+}
+.site-intro-content {
+  transition:
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 450ms ease;
+}
+.site-intro.is-out .site-intro-content {
+  opacity: 0;
+  transform: scale(0.94);
 }
 .site-intro-content {
   position: absolute;
@@ -29,10 +36,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-.site-intro-mosaic {
-  position: absolute;
-  inset: 0;
 }
 .site-intro-chick {
   width: 120px;
@@ -79,7 +82,7 @@
 .site-intro-mark path {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: site-intro-draw 900ms cubic-bezier(0.65, 0, 0.35, 1) 300ms forwards;
+  animation: site-intro-draw 900ms ease-in-out 300ms forwards;
 }
 .site-intro-mark path + path {
   animation-delay: 650ms;

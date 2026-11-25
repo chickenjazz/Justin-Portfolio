@@ -1,9 +1,9 @@
 /* Milestones, closing CTA and site footer. */
 .milestones {
-  background: var(--paper);
+  background: transparent;
   color: var(--ink);
   padding: clamp(4rem, 9vw, 8rem) 0;
-  overflow: hidden;
+  overflow-x: clip;
 }
 .milestones-inner {
   width: min(100% - 8vw, 1440px);
@@ -53,82 +53,301 @@
   }
 }
 
-.cta {
-  background: var(--paper);
-  color: var(--ink);
-  padding: clamp(4rem, 9vw, 8rem) 0;
-  text-align: center;
+/* CTA: a dark purple scene (after the "kora" studio reference). Like the hero it is two states
+   of one pinned scene. Arriving from the white Milestones the stage is still all white (state 0);
+   a short scroll commits to state 1: the dark purple gradient fades in (Cta.jsx tweens --morph,
+   0..1), then the chick pops in, followed by the word bands, the crystal shapes and the buttons.
+   The gradient ends in --night, the footer's colour, so the scene runs on into the footer.
+   Without JS the scene is simply shown (--morph defaults to 1, nothing is hidden). */
+:root {
+  --night: #140b24;
+  --night-glow: #3c2770;
 }
-.cta-inner {
-  width: min(100% - 8vw, 1100px);
-  margin: auto;
+.cta {
+  --morph: 1;
+  position: relative;
+  color: #fff;
+}
+.cta-stage {
+  position: relative;
+  isolation: isolate;
+  /* clip, not hidden: hidden would make the stage a scroll container and capture the
+     view() timelines that drive the parallax inside it. */
+  overflow: clip;
+  min-height: clamp(560px, 100svh, 1100px);
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+/* The colour change is two stacked opacity fades, so it passes through the site's lavender (like
+   the About seam) instead of a muddy grey: the lavender layer is in by the halfway point, then the
+   dark purple gradient covers it. */
+.cta-stage::before,
+.cta-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.cta-stage::before {
+  opacity: clamp(0, calc(var(--morph) * 2), 1);
+  background: linear-gradient(to bottom, #e4d9ff 0%, #b9a0ff 100%);
+}
+.cta-stage::after {
+  opacity: clamp(0, calc(var(--morph) * 2 - 1), 1);
+  background:
+    radial-gradient(ellipse 55% 50% at 50% 50%, var(--night-glow) 0%, rgb(60 39 112 / 0) 70%),
+    linear-gradient(to bottom, #2c1a52 0%, #1d1138 45%, var(--night) 100%);
+}
+/* With JS: a sticky 100svh scene inside an explicit-height track (stage + scroll travel). */
+.cta-ready {
+  position: relative;
+  height: calc(var(--cta-stage-height, 100svh) + var(--cta-scroll-distance, 150vh));
+  /* The white state is transparent, so the track slides up under the end of Milestones: the
+     stage pins while the milestone frames are still in view and the colour change starts right
+     after them, instead of after a screen of empty white. */
+  margin-top: calc(-1 * var(--cta-overlap));
+}
+.cta-track {
+  --cta-overlap: 65svh;
+}
+/* While white, the stage lets the pointer through to the Milestones underneath. */
+.cta-ready .cta[data-state="0"] {
+  pointer-events: none;
+}
+.cta-ready .cta {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+.cta-ready .cta-stage {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+
+/* Word bands: two tilted runs behind everything, sliding in opposite directions. */
+.cta-bands {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+.cta-band {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  white-space: nowrap;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(3.25rem, 9vw, 9.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+.cta-band-a {
+  top: 24%;
+  rotate: -5deg;
+  color: rgb(255 255 255 / 0.92);
+}
+.cta-band-b {
+  top: 60%;
+  rotate: 3deg;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.45);
+}
+.cta-band-run {
+  display: inline-block;
+  translate: -12% 0;
+}
+/* Two motions that never share a property: a continuous marquee loop on transform (one run of
+   the repeated text per cycle, so it wraps seamlessly; band b runs the other way and slower)
+   and, where supported, a scroll-linked drift on translate. The loop pauses while the stage
+   is off-screen (BackdropShapes toggles .shapes-floating on the stage). */
+@media (prefers-reduced-motion: no-preference) {
+  .cta-band-run {
+    animation: cta-band-loop 38s linear infinite;
+    animation-play-state: paused;
+  }
+  .cta-band-b .cta-band-run {
+    animation-duration: 52s;
+    animation-direction: reverse;
+  }
+  .shapes-floating .cta-band-run {
+    animation-play-state: running;
+  }
+  @supports (animation-timeline: view()) {
+    .cta-band-run {
+      animation:
+        cta-band-loop 38s linear infinite,
+        cta-band-slide linear both;
+      animation-timeline: auto, view();
+      animation-play-state: paused, running;
+    }
+    .cta-band-b .cta-band-run {
+      animation-duration: 52s, auto;
+      animation-direction: reverse, reverse;
+    }
+    .shapes-floating .cta-band-run {
+      animation-play-state: running, running;
+    }
+  }
+  @keyframes cta-band-loop {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-25%);
+    }
+  }
+  @keyframes cta-band-slide {
+    from {
+      translate: -4% 0;
+    }
+    to {
+      translate: -20% 0;
+    }
+  }
+}
+
+/* Composition: the chick centred over the bands, buttons below. (The quote and label boxes are
+   out for now; their words stay in site.js.) */
+.cta-scene {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 3rem, 1240px);
+  padding-block: clamp(3rem, 7vw, 6rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.cta-mascot {
+  width: clamp(240px, 30vw, 420px);
 }
 .cta-mascot img {
   display: block;
-  width: clamp(220px, 28vw, 320px);
+  width: 100%;
   height: auto;
+  filter: drop-shadow(0 40px 50px rgb(0 0 0 / 0.55));
 }
-.cta-quote {
-  margin: 0;
-  max-width: 18ch;
-  font-size: clamp(2rem, 4.5vw, 4.25rem);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  font-weight: 700;
+
+/* Entrance (state 1), once the gradient is mostly in: the chick pops in with the snap easing,
+   then the bands, the crystal shapes and the buttons rise in, one after another. Leaving
+   (state 0), everything fades out at once, before the gradient fades back to white.
+   The buttons stay focusable while hidden: focus inside the scene commits to state 1. */
+.cta-ready .cta-mascot,
+.cta-ready .cta-bands,
+.cta-ready .cta .backdrop-shapes,
+.cta-ready .cta-actions {
+  opacity: 0;
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+.cta-ready .cta-mascot {
+  transform: scale(0.4);
+}
+.cta-ready .cta-bands,
+.cta-ready .cta .backdrop-shapes {
+  transform: translateY(40px);
+}
+.cta-ready .cta-actions {
+  transform: translateY(14px);
+}
+.cta-ready .cta[data-state="1"] .cta-mascot,
+.cta-ready .cta[data-state="1"] .cta-bands,
+.cta-ready .cta[data-state="1"] .backdrop-shapes,
+.cta-ready .cta[data-state="1"] .cta-actions {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms var(--ease-out) var(--enter-delay),
+    transform 700ms var(--ease-out) var(--enter-delay);
+}
+.cta-ready .cta[data-state="1"] .cta-mascot {
+  --enter-delay: 600ms;
+  transition:
+    opacity 240ms ease var(--enter-delay),
+    transform 560ms var(--ease-snap) var(--enter-delay);
+}
+.cta-ready .cta[data-state="1"] .cta-bands {
+  --enter-delay: 850ms;
+}
+.cta-ready .cta[data-state="1"] .backdrop-shapes {
+  --enter-delay: 970ms;
+}
+.cta-ready .cta[data-state="1"] .cta-actions {
+  --enter-delay: 1090ms;
+}
+/* Reduced motion: no pop or rise, only the fades. */
+@media (prefers-reduced-motion: reduce) {
+  .cta-ready .cta-mascot,
+  .cta-ready .cta-bands,
+  .cta-ready .cta .backdrop-shapes,
+  .cta-ready .cta-actions {
+    transform: none !important;
+  }
 }
 .cta-actions {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
 }
-/* Ink buttons on the white page (the global .dark style is tuned for the dark stage). */
+/* Light buttons on the dark stage. */
 .cta-actions .button {
-  border: 1px solid var(--ink);
+  border: 1px solid #fff;
   border-radius: 50px;
 }
 .cta-primary {
-  background: var(--ink);
-  color: #fff;
+  background: #fff;
+  color: var(--ink);
 }
 .cta-primary:hover {
-  background: var(--accent-ink);
-  border-color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .cta-secondary {
   background: transparent;
-  color: var(--ink);
+  color: #fff;
 }
 .cta-secondary:hover {
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  background: rgb(255 255 255 / 0.12);
 }
 .cta-actions .button:focus-visible {
-  outline: 3px solid var(--accent-ink);
+  outline: 3px solid var(--accent);
   outline-offset: 4px;
 }
-@media (prefers-reduced-motion: no-preference) {
-  .cta-float {
-    animation: cta-float 5s ease-in-out infinite;
+
+/* Narrow screens: smaller chick and band lettering, bands framing it top and bottom. */
+@media (max-width: 760px) {
+  .cta-scene {
+    width: 100%;
+    padding: 2.5rem 1rem;
   }
-  @keyframes cta-float {
-    0%,
-    100% {
-      translate: 0 0;
-    }
-    50% {
-      translate: 0 -14px;
-    }
+  .cta-mascot {
+    width: min(64vw, 280px);
+  }
+  .cta-band {
+    font-size: clamp(2.75rem, 15vw, 5rem);
+  }
+  .cta-band-a {
+    top: 22%;
+  }
+  .cta-band-b {
+    top: 52%;
   }
 }
 
+/* The footer continues the CTA's dark purple, so the scene runs straight into it. */
 .site-footer {
-  background: var(--paper);
-  color: var(--ink);
-  border-top: 1px solid var(--line);
+  --line: rgb(255 255 255 / 0.12);
+  --muted: #b3a8cc;
+  background: var(--night);
+  color: #f3efff;
+  /* Covers the sub-pixel seam where the CTA track ends, so no white hairline shows. */
+  box-shadow: 0 -2px 0 var(--night);
   padding: clamp(2.5rem, 5vw, 4rem) 4vw 1.5rem;
   font-size: 0.9rem;
 }
@@ -162,7 +381,10 @@
   line-height: 1.5;
 }
 .site-footer .brand span {
-  color: var(--accent-ink);
+  color: var(--accent);
+}
+.site-footer a:focus-visible {
+  outline-color: var(--accent);
 }
 .site-footer-bottom {
   max-width: 1440px;

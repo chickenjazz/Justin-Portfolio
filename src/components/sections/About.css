@@ -1,8 +1,30 @@
+/* The seam: a white-to-dark blend at the bottom that hands over to the project stage's #08070b. */
 .about {
+  --seam: clamp(9rem, 34svh, 22rem);
   background: var(--paper);
   color: var(--ink);
-  padding: clamp(4rem, 10vw, 9rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(4rem, 10vw, 9rem) clamp(1rem, 4vw, 3rem)
+    calc(var(--seam) + clamp(2rem, 5vw, 5rem));
   overflow: clip;
+}
+.about::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--seam);
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    #08070b 0%,
+    #120e1b 14%,
+    #251c38 30%,
+    #5a4a7e 48%,
+    #a898c9 66%,
+    #dcd3f0 82%,
+    #f6f3fc 93%,
+    var(--paper) 100%
+  );
 }
 .about-grid {
   display: grid;
@@ -17,6 +39,9 @@
   isolation: isolate;
   min-width: 0;
 }
+.about-figure {
+  position: relative;
+}
 .about-disc {
   position: absolute;
   inset: 12% 0 0 8%;
@@ -28,6 +53,14 @@
   display: block;
   width: 100%;
   height: auto;
+  /* The head rises above the disc, but below its widest line the photo is clipped to the
+     disc's ellipse (inset 12% 0 0 8%), so the crop follows the curve instead of a flat cut. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 56% no-repeat,
+    radial-gradient(ellipse 46% 44% at 54% 56%, #000 99%, transparent 100%);
+  mask:
+    linear-gradient(#000 0 0) top / 100% 56% no-repeat,
+    radial-gradient(ellipse 46% 44% at 54% 56%, #000 99%, transparent 100%);
 }
 .about-copy {
   min-width: 0;

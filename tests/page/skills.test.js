@@ -3,16 +3,22 @@ import assert from "node:assert/strict";
 import { skills, skillIcons } from "../../src/content/site.js";
 import { text, section, count, builtCss } from "./page.js";
 
-test("skills: giant heading, icon row, six categories in a looping band", () => {
+test("skills: giant heading, icon row with tooltips, categories on a decorative tile wall", () => {
   const s = section("skills");
   assert.match(s, /<h2[^>]*class="skills-title"[^>]*>SKILLS<\/h2>/);
   assert.equal(count(s, 'class="skill-icon"'), skillIcons.length);
+  assert.equal(count(s, 'role="tooltip"'), skillIcons.length);
+  for (const { blurb } of skillIcons) assert.ok(blurb && text(s).includes(blurb.slice(0, 20)));
   for (const c of skills) assert.ok(text(s).includes(c.category));
-  assert.match(s, /class="marquee-copy"[^>]*aria-hidden="true"[^>]*inert/);
+  assert.match(s, /class="tilted-tiles[^"]*"[^>]*aria-hidden="true"/);
+  assert.equal(count(s, 'class="tilted-tiles-row'), 3);
+  // Not inert (that would block hover-to-pause), so the wall must hold nothing focusable.
+  const wall = s.slice(s.indexOf('class="tilted-tiles'));
+  assert.doesNotMatch(wall.slice(0, wall.indexOf('class="visually-hidden"')), /<(a|button|input)|tabindex=/i);
 });
 
-test("marquee stops under reduced motion", () => {
-  assert.match(builtCss(), /prefers-reduced-motion:\s*reduce\)[^{]*\{[^@]*\.marquee-track\{[^}]*animation:\s*none/);
+test("tilted tile rows stop under reduced motion", () => {
+  assert.match(builtCss(), /prefers-reduced-motion:\s*reduce\)[^{]*\{[^@]*\.tilted-tiles-row\{[^}]*animation:\s*none/);
 });
 
 const stripHidden = (html) => {

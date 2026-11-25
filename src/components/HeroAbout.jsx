@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import SceneCanvas from "./SceneCanvas.jsx";
 import Topography from "./Topography.jsx";
 import { TRACK_UNITS, nextScene, holdDrift } from "./sceneMath.js";
+import { hurryTiming, caughtUp } from "./motion.js";
 import { profile, description } from "../content/site.js";
 
 // Hero (state 0) and Description (state 1) are two states of one scene, morphed over time.
@@ -10,6 +11,9 @@ const MORPH_MS = 1100;
 const INTRO_GAP = 16;
 // Highest the Description may rise, in px, so it stays clear of the site header.
 const DESCRIPTION_TOP = 84;
+// On narrow screens the floating header wraps onto two rows; the stacked name and the Description
+// start below it (px from the top of the stage).
+const MOBILE_HEADER = 100;
 
 // Fixed, hand-picked offsets (em, deg) so letters sit unevenly but stay readable.
 const LETTER_JITTER = [[.06, 4], [-.1, -5], [.12, 3], [-.04, -6], [.09, 5], [-.12, -3], [.05, 6]];
@@ -76,12 +80,13 @@ export default function HeroAbout() {
   const sceneRef = useRef(null);
   const repaintRef = useRef(() => {});
   const [active, setActive] = useState(0);
-  const [backgroundPaused, setBackgroundPaused] = useState(false);
+  const [backgroundPaused, setBackgroundPausedState] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
     const mascot = root.querySelector(".scene-character");
     const identity = root.querySelector(".scene-identity");
+    const words = [...identity.querySelectorAll(".scene-word")];
     const panels = [...root.querySelectorAll(".scene-panel")];
     const letterNodes = [...root.querySelectorAll(".scene-letter")];
     let letterLayout = [];
@@ -92,6 +97,7 @@ export default function HeroAbout() {
     let unit = window.innerHeight;
     let position = 0;
     let destination = 0;
+    let origin = 0;
     let frame = 0;
     let scrollFrame = 0;
     let from = weights.slice();
@@ -106,6 +112,15 @@ export default function HeroAbout() {
     let visible = true;
     let introHeight = 0;
     let descriptionHeight = 0;
+    // The stacked mobile name's two word heights, measured on resize (never read per frame).
+    let wordHeights = [0, 0];
+    // Only hand React a change, so the morph's frames never queue renders.
+    let paused = false;
+    const setBackgroundPaused = (next) => {
+      if (next === paused) return;
+      paused = next;
+      setBackgroundPausedState(next);
+    };
     let disposed = false;
     const mix = (key) => scenes.reduce((sum, scene, i) => sum + scene[key] * weights[i], 0);
     const color = (key) => `rgb(${[0, 1, 2].map(channel => scenes.reduce((sum, scene, i) => sum + scene[key][channel] * weights[i], 0)).join(" ")})`;
@@ -157,9 +172,24 @@ export default function HeroAbout() {
       let y = (mobile ? Math.min(155, height * .25) : height * mix("y")) + Math.sin(Math.PI * depart) * height * .08;
       // The Introduction's copy never scrolls: it sits fully above the bottom bar, and the chick
       // rises (or, on short stages, shrinks) to stay clear of it.
-      const introY = Math.min(mobile ? Math.min(255, height * .43) : height * .66, height - introHeight - (mobile ? 125 : 95));
+      let introY = Math.min(mobile ? Math.min(255, height * .43) : height * .66, height - introHeight - (mobile ? 125 : 95));
+      // Mobile Introduction: JUSTIN / chick / MANUZON stacked and centred, the group (with the
+      // copy below it) spread down the stage; on short stages the chick and gap shrink to fit.
+      let nameTop = MOBILE_HEADER;
+      let nameGap = 0;
+      if (mobile) {
+        const [top, bottom] = wordHeights;
+        const copyGap = 36;
+        const room = height - introHeight - 125 - MOBILE_HEADER - top - bottom - copyGap;
+        const introSize = Math.max(56, Math.min(width * .48, height * .27, 240, room / 1.05));
+        nameGap = introSize * 1.05;
+        nameTop = MOBILE_HEADER + Math.max(0, room - nameGap) * .35;
+        introY = nameTop + top + nameGap + bottom + copyGap;
+        size += (introSize - size) * first;
+        y += (nameTop + top + nameGap / 2 - y) * first;
+      }
       const clearance = introY - INTRO_GAP - (y + size / 2);
-      if (clearance < 0) {
+      if (!mobile && clearance < 0) {
         const minTop = height * (mobile ? .12 : .08);
         const fitSize = Math.max(0, Math.min(size, introY - INTRO_GAP - minTop));
         const fitY = introY - INTRO_GAP - fitSize / 2;
@@ -173,11 +203,11 @@ export default function HeroAbout() {
       mascot.style.width = mascot.style.height = `${size}px`;
       mascot.style.transform = `translate3d(${x - size / 2}px, ${y - size / 2}px, 0)`;
       // The DOM name stays in its Introduction layout and is left behind, rising away.
-      const titleX = width * (mobile ? .07 : .05);
-      const titleY = mobile ? 24 : height * .22;
-      identity.style.transform = `translate3d(${titleX}px, ${titleY - lift}px, 0) scale(${mobile ? .7 : 1})`;
-      identity.style.width = `${mobile ? width * 1.3 : width * .9}px`;
-      identity.style.setProperty("--name-gap", `${mobile ? 0 : width * .04}px`);
+      const titleX = mobile ? 0 : width * .05;
+      const titleY = mobile ? nameTop : height * .22;
+      identity.style.transform = `translate3d(${titleX}px, ${titleY - lift}px, 0)`;
+      identity.style.width = `${mobile ? width : width * .9}px`;
+      identity.style.setProperty("--name-gap", `${mobile ? nameGap : width * .04}px`);
       identity.style.opacity = first;
       // Height-based so shapes keep their proportions, capped on narrow or tall stages.
       const shapeUnit = Math.min(height, width * (mobile ? 1.6 : .62));
@@ -211,7 +241,7 @@ export default function HeroAbout() {
         let baseY = i === 0 ? introY : mobile ? Math.min(255, height * .43) : height * .34;
         // The Description never scrolls: on short stages it rises until it clears the bottom bar,
         // but stays under the site header.
-        if (i === 1) baseY = Math.max(DESCRIPTION_TOP, Math.min(baseY, height - descriptionHeight - (mobile ? 125 : 95)));
+        if (i === 1) baseY = Math.max(mobile ? MOBILE_HEADER : DESCRIPTION_TOP, Math.min(baseY, height - descriptionHeight - (mobile ? 125 : 95)));
         // The Introduction swings out sideways; the Description floats up from below into place.
         const offset = displacement * (width + 80);
         panel.style.transform = i === 1
@@ -223,7 +253,7 @@ export default function HeroAbout() {
         panel.style.visibility = i === 1 || weight >= .0001 ? "visible" : "hidden";
       });
     }
-    repaintRef.current = () => { if (!disposed) { measureLetters(); paint(); } };
+    repaintRef.current = () => { if (!disposed) { wordHeights = words.map(word => word.offsetHeight); measureLetters(); paint(); } };
 
     // Scroll only chooses the destination state; the morph itself is time-based,
     // so the scene never rests between two states, wherever the scroll stops.
@@ -241,6 +271,7 @@ export default function HeroAbout() {
       if (index === destination) return;
       // Restart from wherever the scene currently is, so interruptions stay continuous.
       from = weights.slice();
+      origin = destination;
       tweenStart = performance.now();
       // The first placement (e.g. reload mid-track) jumps instead of replaying the morph.
       duration = preference.matches || !settled ? 0 : MORPH_MS;
@@ -254,13 +285,16 @@ export default function HeroAbout() {
       const direction = Math.sign(window.scrollY - lastScroll);
       lastScroll = window.scrollY;
       goToState(nextScene(destination, position, direction, settled));
+      // Scrolled all the way to the destination while the morph still runs (a fast flick or an
+      // anchor jump): finish it now, so the scene never leaves the screen half-morphed.
+      if (frame && caughtUp(position, destination, origin)) ({ start: tweenStart, duration } = hurryTiming(tweenStart, duration, performance.now()));
       // The hold drift follows scroll directly; during a morph the running frame paints it.
       if (!frame && visible) paint();
     }
     function schedule() {
       if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; updateScroll(); });
     }
-    // #top goes to the very top of the page so the in-flow header shows; #description to its state.
+    // #top goes to the very top of the page (where the header always shows); #description to its state.
     function navigate(index, instant = false) {
       window.scrollTo({ top: index === 0 ? 0 : trackTop + index * unit, behavior: instant || preference.matches ? "instant" : "smooth" });
     }
@@ -269,6 +303,7 @@ export default function HeroAbout() {
       height = root.clientHeight;
       introHeight = panels[0].offsetHeight;
       descriptionHeight = panels[1].offsetHeight;
+      wordHeights = words.map(word => word.offsetHeight);
       unit = Math.max(window.innerHeight, height);
       // Sticky positioning needs scroll room in the parent's content box, not padding.
       track.style.setProperty("--stage-height", `${height}px`);
@@ -347,7 +382,7 @@ export default function HeroAbout() {
         <p className="scene-description">{description.copy}</p>
       </div>
       <div className="scene-bottom">
-        <nav className="scene-social" aria-label="Social and contact links">{profile.links.map(link => <a href={link.href} key={link.label}>{link.label} ↗</a>)}</nav>
+        <nav className="scene-social" aria-label="Social and contact links">{profile.links.map(link => <a href={link.href} key={link.label}><span className="scene-social-label">{link.label}</span> <span className="scene-social-arrow" aria-hidden="true">↗</span></a>)}</nav>
       </div>
     </section>
     </div>

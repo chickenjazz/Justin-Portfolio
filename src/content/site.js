@@ -47,6 +47,8 @@ export const projects = [
     shortTitle: "Promptee",
     oneLiner: "Turning rough ideas into clearer AI prompts.",
     keyTechnologies: ["React", "FastAPI", "PyTorch", "QLoRA"],
+    // The card's headline number (counts up on arrival).
+    metric: { value: 85, suffix: "%", label: "Expert preference win rate" },
     title: "Promptee",
     category: "Featured project · Thesis / AI Engineering",
     description:
@@ -89,6 +91,8 @@ export const projects = [
     shortTitle: "Vertex 7",
     oneLiner: "A digital home for heavy equipment and construction services.",
     keyTechnologies: ["React", "JavaScript", "CSS", "Vercel"],
+    metric: { text: "Live", label: "vertex7.com.ph · own domain" },
+    liveUrl: "https://vertex7.com.ph",
     title: "Vertex 7 Heavy Equipment Rentals and Construction Supplies",
     category: "Featured project · Client project",
     description:
@@ -118,30 +122,61 @@ export const projects = [
       "Live website, screenshots, and GitHub repository (if publicly shareable) to be provided.",
   },
 ];
+// Each honor is shown in the Honors carousel from its image in public/honors/.
 export const honors = [
-  {
-    title: "Top Performing Student",
-    issuer: "FEU Institute of Technology",
-    year: "2024–2026",
-    kind: "Honor",
-  },
-  {
-    title: "Dean’s Lister (5 Terms)",
-    issuer: "FEU Institute of Technology",
-    year: "2024–2026",
-    kind: "Honor",
-  },
   {
     title: "PMI Project Management Ready®",
     issuer: "Project Management Institute",
     year: "2026",
     kind: "Certification",
+    image: "pmi-project-management-ready.webp",
   },
   {
     title: "Information Technology Specialist: Python",
-    issuer: "Certiport",
+    issuer: "Certiport · Pearson",
     year: "2025",
     kind: "Certification",
+    image: "it-specialist-python.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "3rd Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-3T2526.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "2nd Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-2T2526.webp",
+  },
+  {
+    title: "Dean’s Bronze Certificate",
+    detail: "1st Term, S.Y. 2025–2026",
+    issuer: "FEU Institute of Technology",
+    year: "2026",
+    kind: "Honor",
+    image: "deans-1T2526.webp",
+  },
+  {
+    title: "Dean’s Silver Certificate",
+    detail: "3rd Term, S.Y. 2024–2025",
+    issuer: "FEU Institute of Technology",
+    year: "2025",
+    kind: "Honor",
+    image: "deans-3T2425.webp",
+  },
+  {
+    title: "Dean’s Silver Certificate",
+    detail: "2nd Term, S.Y. 2024–2025",
+    issuer: "FEU Institute of Technology",
+    year: "2025",
+    kind: "Honor",
+    image: "deans-2T2425.webp",
   },
 ];
 export const description = {
@@ -213,32 +248,41 @@ export const skills = [
   },
 ];
 export const skillIcons = [
-  { name: "Python", icon: "python" },
-  { name: "JavaScript", icon: "javascript" },
-  { name: "React", icon: "react" },
-  { name: "FastAPI", icon: "fastapi" },
-  { name: "PyTorch", icon: "pytorch" },
-  { name: "Hugging Face", icon: "huggingface" },
-  { name: "spaCy", icon: "spacy" },
-  { name: "HTML", icon: "html5" },
-  { name: "Vercel", icon: "vercel" },
-  { name: "CUDA", icon: "nvidia" },
-  { name: "GitHub", icon: "github" },
+  { name: "Python", blurb: "Main language: fine-tuning pipelines, prompt scoring and data tooling. Certiport ITS: Python certified.", icon: "python" },
+  { name: "JavaScript", blurb: "Interactive frontends and the client side of Vertex 7 and this portfolio.", icon: "javascript" },
+  { name: "React", blurb: "Component-based UIs: Promptee’s frontend, the Vertex 7 site and this page.", icon: "react" },
+  { name: "FastAPI", blurb: "Python REST backend serving Promptee’s prompt evaluation and rewriting.", icon: "fastapi" },
+  { name: "PyTorch", blurb: "Model training for QLoRA, supervised fine-tuning and DPO in Promptee.", icon: "pytorch" },
+  { name: "Hugging Face", blurb: "Transformers, PEFT and TRL for loading and fine-tuning language models.", icon: "huggingface" },
+  { name: "spaCy", blurb: "NLP parsing behind Promptee’s multi-criteria heuristic prompt scoring.", icon: "spacy" },
+  { name: "HTML", blurb: "Semantic, accessible markup with SEO metadata, sitemaps and robots.txt.", icon: "html5" },
+  { name: "Vercel", blurb: "Deploys, custom domains and DNS for client sites like Vertex 7.", icon: "vercel" },
+  { name: "CUDA", blurb: "GPU-accelerated training on RunPod for transformer fine-tuning.", icon: "nvidia" },
+  { name: "GitHub", blurb: "Version control, branches and pull requests for every project.", icon: "github" },
+];
+// The quote and tags are not shown right now (the CTA's text boxes are out for now); `bands`
+// feeds the moving word bands behind the chick.
+const ctaQuoteParts = [
+  "The best problems hide in plain sight.",
+  "I like finding them — and building what fixes them.",
 ];
 export const cta = {
-  quote:
-    "The best problems hide in plain sight. I like finding them — and building what fixes them.",
+  quoteParts: ctaQuoteParts,
+  quote: ctaQuoteParts.join(" "),
+  // Short labels for the smaller boxes and the text bands behind the chick.
+  tags: ["Open to work", "Let's build", "Make it matter"],
+  bands: ["Problem solver", "Builder", "Designer", "Developer"],
   resumeLabel: "View my résumé",
 };
 export const gallery = [];
 export const navSections = [
-  { id: "top", label: "Home", inHeader: false },
-  { id: "description", label: "Intro", inHeader: false },
-  { id: "stats", label: "Highlights", inHeader: false },
-  { id: "about", label: "About", inHeader: true },
-  { id: "work", label: "Work", inHeader: true },
-  { id: "skills", label: "Skills", inHeader: true },
-  { id: "honors", label: "Honors", inHeader: true },
-  { id: "milestones", label: "Milestones", inHeader: false },
-  { id: "contact", label: "Contact", inHeader: true },
+  { id: "top", label: "Home", inHeader: false, inRail: true },
+  { id: "description", label: "Intro", inHeader: false, inRail: false },
+  { id: "stats", label: "Highlights", inHeader: false, inRail: false },
+  { id: "about", label: "About", inHeader: true, inRail: true },
+  { id: "work", label: "Work", inHeader: true, inRail: true },
+  { id: "skills", label: "Skills", inHeader: true, inRail: true },
+  { id: "honors", label: "Honors", inHeader: true, inRail: true },
+  { id: "milestones", label: "Milestones", inHeader: false, inRail: true },
+  { id: "contact", label: "Contact", inHeader: true, inRail: true },
 ];

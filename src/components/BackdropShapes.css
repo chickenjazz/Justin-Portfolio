@@ -1,5 +1,5 @@
-/* The host section becomes a stacking context so the shapes (z-index -1) paint above its
-   background but below all of its content. */
+/* The host section becomes a stacking context so the back shapes (z-index -1) paint above its
+   background but below all of its content; front shapes (z-index 20) float above the copy. */
 .has-backdrop {
   position: relative;
   isolation: isolate;
@@ -11,7 +11,15 @@
   overflow: hidden;
   pointer-events: none;
 }
-/* Centred on (--x, --y) with negative margins, because .parallax owns the translate property. */
+.backdrop-shapes-front {
+  z-index: 20;
+}
+/* Bleeding shapes cross into the sections above and below, but are still clipped sideways. */
+.backdrop-shapes-bleed {
+  overflow: clip visible;
+}
+/* Centred on (--x, --y) with negative margins, because .parallax owns the translate property
+   and the float loop owns transform. */
 .backdrop-shape {
   position: absolute;
   left: var(--x);
@@ -22,6 +30,51 @@
   rotate: var(--turn);
   opacity: var(--fade);
   user-select: none;
+}
+/* Front shapes are nearer the eye: a touch of soft focus. (No drop-shadow: the sprites carry
+   faint alpha across their whole square, which a shadow turns into a visible box.) */
+.backdrop-shapes-front .backdrop-shape {
+  filter: blur(1.5px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .backdrop-shape {
+    animation-name: shape-float;
+    animation-duration: var(--float-time, 8s);
+    animation-delay: var(--float-delay, 0s);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-play-state: paused;
+  }
+  .shapes-floating .backdrop-shape {
+    animation-play-state: running;
+  }
+  /* Parallax shapes run two animations: the scroll-linked drift (translate) and the float
+     (transform), so they never fight over a property. */
+  @supports (animation-timeline: view()) {
+    .backdrop-shape.parallax {
+      animation-name: parallax, shape-float;
+      animation-duration: auto, var(--float-time, 8s);
+      animation-delay: 0s, var(--float-delay, 0s);
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: 1, infinite;
+      animation-direction: normal, alternate;
+      animation-fill-mode: both, none;
+      animation-timeline: view(), auto;
+      animation-play-state: running, paused;
+    }
+    .shapes-floating .backdrop-shape.parallax {
+      animation-play-state: running, running;
+    }
+  }
+}
+@keyframes shape-float {
+  from {
+    transform: translate3d(0, -10px, 0) rotate(-4deg);
+  }
+  to {
+    transform: translate3d(0, 12px, 0) rotate(5deg);
+  }
 }
 /* On narrow screens shapes may move (mx/my) or drop out, where they would crowd the copy. */
 @media (max-width: 700px) {

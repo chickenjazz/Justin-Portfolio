@@ -15,8 +15,9 @@ test("skills use the six resume categories, no item listed twice", () => {
   const all = skills.flatMap(s => s.items); assert.equal(new Set(all).size, all.length);
 });
 test("every skill icon exists in icons.js", () => { for (const s of skillIcons) assert.ok(icons[s.icon], s.name); });
-test("honors cover both certifications and both distinctions", () => {
+test("honors cover both certifications and the five Dean’s certificates", () => {
   assert.equal(honors.filter(h => h.kind === "Certification").length, 2);
-  assert.equal(honors.filter(h => h.kind === "Honor").length, 2);
+  assert.equal(honors.filter(h => h.kind === "Honor").length, 5);
+  for (const h of honors) assert.ok(h.image, h.title);
 });
 test("description copy is one or two sentences", () => { assert.ok((description.copy.match(/[.!?](\s|$)/g) ?? []).length <= 2); });

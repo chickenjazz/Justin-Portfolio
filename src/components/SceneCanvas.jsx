@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { markSceneReady } from "./sceneReady.js";
 
 // Full-stage WebGL layer. Renders nothing on the server; the DOM name and chick poster are
 // the fallback until onReady fires (and stay if WebGL or the models fail to load).
@@ -35,9 +36,13 @@ const SceneCanvas = forwardRef(function SceneCanvas({ onReady }, ref) {
         const { frame, visible } = pending.current;
         renderer.setVisible(visible);
         if (frame) renderer.update(frame);
-        requestAnimationFrame(() => { if (!disposed) readyRef.current?.(true); });
+        requestAnimationFrame(() => {
+          if (disposed) return;
+          readyRef.current?.(true);
+          markSceneReady(true);
+        });
       })
-      .catch(() => {});
+      .catch(() => { if (!disposed) markSceneReady(false); });
     return () => {
       disposed = true;
       rendererRef.current?.dispose();

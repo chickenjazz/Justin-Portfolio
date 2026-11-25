@@ -2,9 +2,11 @@ import { gallery } from "../../content/site.js";
 import BackdropShapes from "../BackdropShapes.jsx";
 
 const SHAPES = [
-  { sprite: "torus-b", x: "95%", y: "22%", size: "clamp(80px, 10vw, 170px)", depth: 0.5, turn: 14 },
+  // Reaches up from Honors' side of the seam.
+  { sprite: "cube-a", x: "68%", y: "1%", size: "clamp(40px, 4vw, 72px)", depth: 0.15, fade: 0.75, mobile: false },
+  // Drifts over the right-hand frames.
+  { sprite: "torus-b", x: "95%", y: "58%", size: "clamp(90px, 11vw, 190px)", depth: 0.8, turn: 14, layer: "front", mobile: false },
   { sprite: "knot-a", x: "3%", y: "86%", size: "clamp(90px, 11vw, 180px)", depth: 0.4, turn: -10 },
-  { sprite: "cube-a", x: "30%", y: "8%", size: "clamp(36px, 3.5vw, 62px)", depth: 0.12, fade: 0.7, mobile: false },
 ];
 
 const frames = [
@@ -19,7 +21,7 @@ export default function Gallery() {
   const hasImages = gallery.length > 0;
   return (
     <section className="milestones has-backdrop" id="milestones">
-      <BackdropShapes shapes={SHAPES} />
+      <BackdropShapes shapes={SHAPES} bleed />
       <div className="milestones-inner">
         <h2 data-reveal="rise">Moments &amp; milestones</h2>
         <p className="milestones-sub" data-reveal="rise" style={{ "--i": 1 }}>

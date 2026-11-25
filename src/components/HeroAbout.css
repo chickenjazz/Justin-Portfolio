@@ -65,20 +65,44 @@
 .scene-button-ghost { color: inherit; border-color: currentColor !important; background: transparent; }
 .scene-button-ghost:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 .scene-bottom { position: absolute; bottom: 22px; left: 4vw; right: 4vw; display: flex; align-items: center; gap: 1.5rem; z-index: 4; font-size: .65rem; }
-.scene-social { margin-left: auto; display: flex; gap: 1.5rem; }
-.scene-social a { padding: 14px 0; text-decoration: none; }
+.scene-bottom { justify-content: center; }
+.scene-social { display: flex; justify-content: center; gap: 1.5rem; }
+.scene-social a { padding: 14px 0; text-decoration: none; display: inline-flex; align-items: baseline; gap: .3em; }
+/* Hover/focus: an underline draws in from the left (the site easing curve) and the arrow nudges up-right
+   with the snap easing, the same vocabulary as the Skills and Honors hovers. */
+.scene-social-label { position: relative; }
+.scene-social-label::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: right center;
+  transition: transform 320ms cubic-bezier(.22, 1, .36, 1);
+}
+.scene-social-arrow { display: inline-block; transition: transform 240ms cubic-bezier(.34, 1.56, .64, 1); }
+.scene-social a:hover .scene-social-label::after,
+.scene-social a:focus-visible .scene-social-label::after { transform: scaleX(1); transform-origin: left center; }
+.scene-social a:hover .scene-social-arrow,
+.scene-social a:focus-visible .scene-social-arrow { transform: translate(2px, -2px); }
 @media (max-width: 800px) {
   .morph-scene { height: 100svh; }
-  .scene-identity { font-size: clamp(3.6rem, 10vw, 5rem); }
+  /* Mobile: JUSTIN above the chick, MANUZON below, centred; the chick sits in the --name-gap.
+     Letters drop the arc for uneven, hand-placed elevations (also read by the 3D letters). */
+  .scene-identity { font-size: clamp(3.4rem, 17vw, 6rem); flex-direction: column; align-items: center; justify-content: flex-start; }
+  .scene-letter { --arc: 0; --jitter: 1.4; transform: translateY(calc(var(--jy) * 1.6em)) rotate(calc(var(--jr) * 1.4deg)); }
   .scene-panel { width: 86%; max-width: none; }
   .scene-panel h2 { max-width: 530px; }
   .scene-description { font-size: 1rem; }
   .scene-bottom { flex-wrap: wrap; gap: 0 1rem; bottom: 15px; }
-  .scene-social { width: 100%; margin-left: 10px; }
+  .scene-social { width: 100%; }
   .scene-actions { flex-wrap: wrap; gap: .6rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .scene-canvas canvas, .mascot-poster { transition: none; }
+  /* No travel: the underline fades in instead of drawing, the arrow stays put. */
+  .scene-social-label::after { transform: none; opacity: 0; transition: opacity 200ms ease; }
+  .scene-social a:hover .scene-social-label::after,
+  .scene-social a:focus-visible .scene-social-label::after { transform: none; opacity: 1; }
+  .scene-social-arrow { transition: none; }
+  .scene-social a:hover .scene-social-arrow,
+  .scene-social a:focus-visible .scene-social-arrow { transform: none; }
   .scene-letter { animation: none; }
 }
 

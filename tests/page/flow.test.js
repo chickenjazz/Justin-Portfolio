@@ -16,9 +16,9 @@ test("every footer section link resolves to an id on the page", () => {
   }
 });
 
-test("CTA shows the mascot, quote and résumé link", () => {
+test("CTA shows the mascot, word bands and résumé link", () => {
   const s = section("contact");
-  assert.ok(text(s).includes(cta.quote));
+  assert.ok(text(s).includes(cta.bands[0]));
   assert.match(s, /href="[^"]*resume\.pdf"/);
   assert.match(s, /mascot\/chick\.webp/);
 });

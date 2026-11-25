@@ -24,7 +24,7 @@ export default function App() {
     let id = location.hash.slice(1);
     try { id = decodeURIComponent(id); } catch { /* malformed escape: use the raw hash */ }
     const target = id && document.getElementById(id);
-    if (!target || target.id === "top" || target.id === "description") return;
+    if (!target || target.id === "top" || target.id === "description" || target.id === "contact") return;
     let cancelled = false;
     const events = ["wheel", "touchstart", "keydown"];
     const stop = () => events.forEach((name) => window.removeEventListener(name, cancel));
