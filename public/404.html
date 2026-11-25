@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page not found — Justin Manuzon</title>
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:wght@500&family=DM+Sans:wght@400;600&display=swap"
+    />
+    <style>
+      :root {
+        --paper: #fff;
+        --ink: #0d0c12;
+        --muted: #6b6778;
+        --accent: #b9a0ff;
+        --accent-ink: #5b3fd0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "DM Sans", system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        padding: 32px max(16px, 4vw);
+        text-align: center;
+      }
+      main {
+        display: grid;
+        justify-items: center;
+        gap: 20px;
+        max-width: 34rem;
+      }
+      .code {
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        margin: 0;
+      }
+      h1 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Anton", Impact, sans-serif;
+        font-weight: 400;
+        font-size: clamp(6rem, 26vw, 13rem);
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+      h1 img {
+        width: 0.9em;
+        height: 0.9em;
+        margin: 0 -0.04em;
+        animation: bob 2.6s ease-in-out infinite;
+      }
+      @keyframes bob {
+        50% {
+          transform: translateY(-0.06em) rotate(-4deg);
+        }
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.1rem;
+        line-height: 1.55;
+        text-wrap: balance;
+      }
+      a {
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 26px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--paper);
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          transform 160ms ease,
+          background 160ms ease;
+      }
+      a:hover {
+        transform: translateY(-2px);
+        background: var(--accent-ink);
+      }
+      a:active {
+        transform: translateY(0);
+      }
+      a:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        h1 img {
+          animation: none;
+        }
+        a {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="code">Error 404</p>
+      <h1 aria-label="404">
+        <span aria-hidden="true">4</span>
+        <img src="/mascot/chick.webp" alt="" width="720" height="720" aria-hidden="true" />
+        <span aria-hidden="true">4</span>
+      </h1>
+      <p>This page wandered off. It may have moved, or the link might be mistyped.</p>
+      <a href="/">Back to the portfolio <span aria-hidden="true">→</span></a>
+    </main>
+  </body>
+</html>
