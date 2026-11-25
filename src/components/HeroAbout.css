@@ -50,13 +50,12 @@
 .scene-panel {
   position: absolute; left: 0; top: 0; width: 40%; max-width: 620px;
   transform-origin: 0 50%; will-change: transform;
-  overflow-y: auto; scrollbar-width: none;
 }
-.scene-panel::-webkit-scrollbar { display: none; }
 .scene-panel:not(.scene-panel-0) { visibility: hidden; }
 .scene-panel-0 { transform: translate(calc((100vw - min(40vw, 620px)) / 2), 55vh); }
 .scene-label { margin: 0 0 1.5rem; font-size: .68rem; letter-spacing: .14em; font-weight: 600; }
-.scene-panel h2 { margin: 0 0 1.5rem; font-size: clamp(2.5rem, 4.6vw, 5rem); line-height: 1.06; letter-spacing: -.055em; font-weight: 500; }
+/* Sized by width and height so the tagline always fits its panel; the panel never scrolls. */
+.scene-panel h2 { margin: 0 0 1.5rem; font-size: clamp(2.2rem, min(4.6vw, 8svh), 5.5rem); line-height: 1.02; letter-spacing: -.05em; font-weight: 600; }
 .scene-description { margin: 0; font-size: clamp(1rem, 1.35vw, 1.25rem); line-height: 1.65; max-width: 550px; }
 .scene-panel-0 { text-align: center; overflow: visible; }
 .scene-panel-0 .scene-description { margin-inline: auto; }
@@ -66,129 +65,62 @@
 .scene-button-ghost { color: inherit; border-color: currentColor !important; background: transparent; }
 .scene-button-ghost:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 .scene-bottom { position: absolute; bottom: 22px; left: 4vw; right: 4vw; display: flex; align-items: center; gap: 1.5rem; z-index: 4; font-size: .65rem; }
-.scene-dots { display: flex; gap: 2px; }
-.scene-dots button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; background: transparent; color: inherit; border: 0; cursor: pointer; }
-.scene-dots button span { display: block; width: 7px; height: 7px; border: 1px solid currentColor; border-radius: 50%; opacity: .5; transition: transform 160ms ease, opacity 160ms ease; }
-.scene-dots button[aria-current] span { background: currentColor; opacity: 1; transform: scale(1.5); }
-.scene-dots button:hover span { opacity: 1; transform: scale(1.5); }
-.scene-social { margin-left: auto; display: flex; gap: 1.5rem; }
-.scene-social a { padding: 14px 0; text-decoration: none; }
-.scene-count { text-transform: uppercase; letter-spacing: .1em; }
+.scene-bottom { justify-content: center; }
+.scene-social { display: flex; justify-content: center; gap: 1.5rem; }
+.scene-social a { padding: 14px 0; text-decoration: none; display: inline-flex; align-items: baseline; gap: .3em; }
+/* Hover/focus: an underline draws in from the left (the site easing curve) and the arrow nudges up-right
+   with the snap easing, the same vocabulary as the Skills and Honors hovers. */
+.scene-social-label { position: relative; }
+.scene-social-label::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: right center;
+  transition: transform 320ms cubic-bezier(.22, 1, .36, 1);
+}
+.scene-social-arrow { display: inline-block; transition: transform 240ms cubic-bezier(.34, 1.56, .64, 1); }
+.scene-social a:hover .scene-social-label::after,
+.scene-social a:focus-visible .scene-social-label::after { transform: scaleX(1); transform-origin: left center; }
+.scene-social a:hover .scene-social-arrow,
+.scene-social a:focus-visible .scene-social-arrow { transform: translate(2px, -2px); }
 @media (max-width: 800px) {
   .morph-scene { height: 100svh; }
-  .scene-identity { font-size: clamp(3.6rem, 10vw, 5rem); }
+  /* Mobile: JUSTIN above the chick, MANUZON below, centred; the chick sits in the --name-gap.
+     Letters drop the arc for uneven, hand-placed elevations (also read by the 3D letters). */
+  .scene-identity { font-size: clamp(3.4rem, 17vw, 6rem); flex-direction: column; align-items: center; justify-content: flex-start; }
+  .scene-letter { --arc: 0; --jitter: 1.4; transform: translateY(calc(var(--jy) * 1.6em)) rotate(calc(var(--jr) * 1.4deg)); }
   .scene-panel { width: 86%; max-width: none; }
-  .scene-panel h2 { font-size: clamp(2.5rem, 8vw, 3.5rem); max-width: 530px; }
+  .scene-panel h2 { max-width: 530px; }
   .scene-description { font-size: 1rem; }
   .scene-bottom { flex-wrap: wrap; gap: 0 1rem; bottom: 15px; }
-  .scene-social { width: 100%; margin-left: 10px; }
-  .scene-count { font-size: .6rem; }
+  .scene-social { width: 100%; }
   .scene-actions { flex-wrap: wrap; gap: .6rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .scene-canvas canvas, .mascot-poster { transition: none; }
+  /* No travel: the underline fades in instead of drawing, the arrow stays put. */
+  .scene-social-label::after { transform: none; opacity: 0; transition: opacity 200ms ease; }
+  .scene-social a:hover .scene-social-label::after,
+  .scene-social a:focus-visible .scene-social-label::after { transform: none; opacity: 1; }
+  .scene-social-arrow { transition: none; }
+  .scene-social a:hover .scene-social-arrow,
+  .scene-social a:focus-visible .scene-social-arrow { transform: none; }
   .scene-letter { animation: none; }
-  .scene-dots button span { transition: none; }
 }
 
-.scene-scroll-track { position: relative; height: calc(var(--stage-height, 100svh) + var(--scroll-distance, 355vh)); }
+.scene-scroll-track { position: relative; height: calc(var(--stage-height, 100svh) + var(--scroll-distance, 160vh)); }
 .scene-scroll-track .morph-scene { position: sticky; top: 0; }
-.scene-panel-2 h2, .scene-panel-3 h2 { font-size: clamp(2.2rem, 3.5vw, 3.8rem); }
-/* Milestones: the chick has left, so the slide spans the stage. A quote leads into four
-   cards; the light, oversized numerals carry each card. The slide never scrolls. */
-.scene-panel-2 { width: 84%; max-width: none; overflow: visible; }
-.scene-panel-2 h2 { max-width: none; margin-bottom: 0; }
-.scene-quote { margin: clamp(1.25rem, 4vh, 2.5rem) 0 0; max-width: 46rem; padding-left: 1.1rem; border-left: 2px solid color-mix(in srgb, currentColor 45%, transparent); }
-.scene-quote p { margin: 0; font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.45; font-style: italic; opacity: .85; }
-.scene-quote cite { display: block; margin-top: .5rem; font-size: .75rem; font-style: normal; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
-/* Four equal columns split by hairlines: heavy condensed numerals over short mono labels. */
-.scene-milestones {
-  --rule: color-mix(in srgb, currentColor 16%, transparent);
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: clamp(1.5rem, 5vh, 3rem) 0 0;
-  border-block: 1px solid var(--rule);
-}
-.scene-milestones > div {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: clamp(1.75rem, 6vh, 4rem) 1rem; text-align: center;
-}
-.scene-milestones > div + div { border-left: 1px solid var(--rule); }
-.scene-milestones .milestone-value {
-  order: -1; margin: 0;
-  font-family: "Anton", "DM Sans", sans-serif; font-weight: 400;
-  font-size: clamp(3.5rem, 7vw, 7rem); line-height: .9; letter-spacing: -.01em;
-  font-variant-numeric: tabular-nums;
-}
-.scene-milestones dt {
-  margin-top: clamp(1rem, 2.6vh, 1.75rem);
-  font-family: "DM Mono", ui-monospace, monospace; font-weight: 500;
-  font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; line-height: 1.5;
-}
-@media (max-width: 1100px) {
-  .scene-milestones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .scene-milestones > div:nth-child(3) { border-left: 0; }
-  .scene-milestones > div:nth-child(n + 3) { border-top: 1px solid var(--rule); }
-}
-.scene-timeline { list-style: none; padding: 0 0 0 1.3rem; margin: 1.5rem 0 0; border-left: 1px solid currentColor; }
-.scene-timeline li { position: relative; margin-bottom: 1.3rem; }
-.scene-timeline li::before { content: ""; position: absolute; left: -1.55rem; top: .3rem; width: 7px; height: 7px; background: currentColor; border-radius: 50%; }
-.scene-timeline span { font-size: .6rem; letter-spacing: .09em; }
-.scene-timeline h3 { font-size: 1rem; margin: .4rem 0; }
-.scene-timeline p { margin: 0; font-size: .82rem; line-height: 1.5; }
-@media (max-width: 800px) {
-  .scene-panel-2 { width: 86%; }
-  .scene-quote { margin-top: 1rem; }
-  .scene-quote p { font-size: .95rem; }
-  .scene-milestones { margin-top: 1rem; }
-  .scene-milestones > div { padding: 1.4rem .4rem; }
-  .scene-milestones .milestone-value { font-size: 3rem; }
-  .scene-milestones dt { margin-top: .75rem; font-size: .6rem; letter-spacing: .16em; }
-  .scene-panel-2 h2, .scene-panel-3 h2 { font-size: 2.3rem; }
-}
-
-/* Education: the chick has left, so the timeline shares the stage with GitHub activity. */
-.scene-panel-3 { width: 84%; max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: clamp(2rem, 6vw, 6rem); align-items: start; }
-.scene-panel-3 > .scene-label, .scene-panel-3 > h2 { grid-column: 1 / -1; }
-.github-activity { margin: 1.5rem 0 0; min-width: 0; }
-.github-total { display: flex; align-items: flex-end; gap: 1rem; margin: 0 0 1.25rem; }
-.github-count { font-family: "Anton", "DM Sans", sans-serif; font-size: clamp(3rem, 5vw, 4.75rem); line-height: .9; font-variant-numeric: tabular-nums; }
-.github-activity[data-status="loading"] .github-count { visibility: hidden; }
-.github-caption { padding-bottom: .35rem; font-family: "DM Mono", ui-monospace, monospace; font-weight: 500; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; line-height: 1.5; max-width: 16ch; }
-/* Columns are weeks (oldest left). On narrow stages the oldest weeks clip on the left. */
-.github-graph {
-  --cell: clamp(6px, .72vw, 11px);
-  display: grid; grid-template-rows: repeat(7, var(--cell)); grid-auto-flow: column; grid-auto-columns: var(--cell);
-  gap: 3px; justify-content: end; overflow: hidden;
-}
-.github-day { border-radius: 2px; background: color-mix(in srgb, currentColor 7%, transparent); transition: background-color 400ms ease; }
-.github-day[data-level="1"] { background: color-mix(in srgb, currentColor 28%, transparent); }
-.github-day[data-level="2"] { background: color-mix(in srgb, currentColor 50%, transparent); }
-.github-day[data-level="3"] { background: color-mix(in srgb, currentColor 74%, transparent); }
-.github-day[data-level="4"] { background: currentColor; }
-.github-activity figcaption { margin-top: 1rem; font-size: .8rem; }
-.github-activity figcaption a { color: inherit; text-underline-offset: 4px; }
-@media (max-width: 800px) {
-  .scene-panel-3 { width: 86%; grid-template-columns: 1fr; }
-  .scene-panel-3 h2 { margin-bottom: 1rem; }
-  .scene-panel-3 .scene-timeline { margin-top: .5rem; }
-  .scene-panel-3 .scene-timeline li { margin-bottom: 1rem; }
-  .github-activity { margin-top: 1rem; }
-  .github-total { margin-bottom: .9rem; }
-  .github-count { font-size: 2.6rem; }
-  .github-graph { --cell: 8px; gap: 2px; }
-}
-@media (prefers-reduced-motion: reduce) { .github-day { transition: none; } }
 
 /* Entering copy rises in after the morph begins; leaving copy fades at once. */
 .scene-ready .scene-panel > * { opacity: 0; transform: translateY(14px); transition: opacity 260ms ease, transform 260ms ease; }
-.scene-ready .scene-panel[aria-hidden="false"] > * {
+.scene-ready .scene-panel[data-active="true"] > * {
   opacity: 1; transform: none;
   transition: opacity 700ms cubic-bezier(.22, 1, .36, 1), transform 700ms cubic-bezier(.22, 1, .36, 1);
   transition-delay: calc(380ms + var(--reveal-index, 0) * 80ms);
 }
+/* An inactive panel never catches the pointer; the inactive Description stays readable to
+   screen readers. */
+.scene-ready .scene-panel[data-active="false"] { pointer-events: none; }
 .scene-panel > :nth-child(2) { --reveal-index: 1; }
 .scene-panel > :nth-child(3) { --reveal-index: 2; }
-.scene-panel > :nth-child(4) { --reveal-index: 3; }
 @media (prefers-reduced-motion: reduce) {
-  .scene-ready .scene-panel > *, .scene-ready .scene-panel[aria-hidden="false"] > * { transform: none; transition: opacity 200ms ease; transition-delay: 0ms; }
+  .scene-ready .scene-panel > *, .scene-ready .scene-panel[data-active="true"] > * { transform: none; transition: opacity 200ms ease; transition-delay: 0ms; }
 }

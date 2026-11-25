@@ -1,28 +1,57 @@
-import { profile } from "../../content/site.js";
+import { navSections, profile } from "../../content/site.js";
 
 export default function Footer() {
   return (
-    <footer className="footer wrap">
-      <a href="#top" className="brand">
-        JM<span>✳</span>
-      </a>
-      <p>
-        JUSTIN MANUZON
-        <br />
-        <span>© 2026 · Portfolio in progress</span>
-      </p>
-      <div className="footer-contact">
-        <nav className="social-links" aria-label="Footer social links">
-          {profile.links.map((link) => (
-            <a key={link.label} href={link.href}>
-              {link.label}
-            </a>
-          ))}
+    <footer className="site-footer">
+      <h2 className="visually-hidden">Site footer</h2>
+      <div className="site-footer-grid">
+        <div className="site-footer-brand">
+          <a href="#top" className="brand">
+            JM<span>✳</span>
+          </a>
+          <p>Building thoughtful software, one problem at a time.</p>
+        </div>
+        <nav aria-label="Sections">
+          <h3>Sections</h3>
+          <ul>
+            {navSections.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`}>{s.label}</a>
+              </li>
+            ))}
+          </ul>
         </nav>
-        <a href={`mailto:${profile.email}`}>{profile.email}</a>
-        <a href={profile.phone.href}>{profile.phone.label}</a>
+        <nav aria-label="Elsewhere">
+          <h3>Elsewhere</h3>
+          <ul>
+            {profile.links.map((l) => (
+              <li key={l.label}>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+            <li>
+              <a href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" rel="noopener">
+                Résumé ↗
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div>
+          <h3>Contact</h3>
+          <ul>
+            <li>
+              <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            </li>
+            <li>
+              <a href={profile.phone.href}>{profile.phone.label}</a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <a href="#top">BACK TO TOP ↑</a>
+      <div className="site-footer-bottom">
+        <span>© 2026 Justin Manuzon</span>
+        <a href="#top">Back to top ↑</a>
+      </div>
     </footer>
   );
 }

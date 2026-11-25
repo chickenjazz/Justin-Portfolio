@@ -3,8 +3,17 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./styles.css";
 import "./theme.css";
+import "./components/ProjectCard.css";
 import "./components/HeroAbout.css";
 import "./components/Intro.css";
+import "./components/BackdropShapes.css";
+import "./components/sections/Stats.css";
+import "./components/sections/About.css";
+import "./components/TiltedTiles.css";
+import "./components/sections/Skills.css";
+import "./components/sections/Honors.css";
+import "./components/sections/Closing.css";
+import "./motion.css";
 
 const container = document.getElementById("root");
 const app = (

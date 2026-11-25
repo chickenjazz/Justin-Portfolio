@@ -1,0 +1,200 @@
+/* Heading and tech stack centred in the top quarter; the tilted tile wall fills the bottom
+   three quarters of the section below them (its top fades up behind the icon row). */
+.skills {
+  position: relative;
+  /* The seam: a dark-to-white blend that continues the project stage's #08070b. */
+  --seam: clamp(9rem, 34svh, 22rem);
+  padding: calc(var(--seam) + clamp(2rem, 5vw, 5rem)) 0 0;
+  background: transparent;
+  color: var(--ink);
+  overflow-x: clip;
+}
+.skills::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--seam);
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    #08070b 0%,
+    #120e1b 14%,
+    #251c38 30%,
+    #5a4a7e 48%,
+    #a898c9 66%,
+    #dcd3f0 82%,
+    #f6f3fc 93%,
+    var(--paper) 100%
+  );
+}
+.skills-wall {
+  position: relative;
+  z-index: 0;
+  height: clamp(30rem, 88svh, 58rem);
+  margin-top: clamp(-4rem, -5vw, -2rem);
+}
+.skills-head {
+  position: relative;
+  z-index: 1;
+  padding-inline: clamp(1rem, 4vw, 3rem);
+  text-align: center;
+}
+.skills-title {
+  margin: 0;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(6rem, 20vw, 18rem);
+  line-height: 0.85;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.skill-icons {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.7rem, 1.6vw, 1.3rem);
+  max-width: 70rem;
+  margin: clamp(1.25rem, 3vw, 2.5rem) auto 0;
+  padding: 0 clamp(1rem, 4vw, 3rem);
+  list-style: none;
+}
+.skill-icon {
+  position: relative;
+}
+/* Hover lives on the face, not the [data-reveal] li (its revealed state owns transform). */
+.skill-icon-face {
+  display: grid;
+  place-items: center;
+  width: clamp(2.8rem, 4.5vw, 3.8rem);
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: help;
+  transition:
+    translate 240ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 240ms ease,
+    color 240ms ease;
+}
+.skill-icon-face svg {
+  width: 52%;
+  height: 52%;
+}
+.skill-icon:hover .skill-icon-face,
+.skill-icon-face:focus-visible {
+  translate: 0 -4px;
+  background: var(--ink);
+  color: #fff;
+}
+.skill-icon-face:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+.skill-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  z-index: 3;
+  width: max-content;
+  max-width: min(17rem, 80vw);
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #ffffffd9;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: var(--shadow-float);
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% 6px;
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    translate 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 240ms;
+}
+.skill-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
+  border: 6px solid transparent;
+  border-top-color: var(--ink);
+}
+.skill-tip strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.skill-icon:hover .skill-tip,
+.skill-icon:focus-within .skill-tip {
+  opacity: 1;
+  visibility: visible;
+  translate: -50% 0;
+  transition-delay: 0s;
+}
+/* Narrow screens: centre every tooltip over the whole icon row so edge icons never push it
+   off-screen (the section clips overflow). */
+@media (max-width: 640px) {
+  .skill-icon {
+    position: static;
+  }
+  .skill-tip {
+    max-width: min(20rem, calc(100vw - 2rem));
+  }
+  .skill-tip::after {
+    display: none;
+  }
+}
+/* Every tile shares one look: warm light grey card, small purple mono eyebrow, bold sans
+   title, muted mono item list pushed to the bottom. */
+.skills-tiles .tilted-tile {
+  --tile-bg: #e9e8e5;
+  --tile-edge: #dddbd7;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  aspect-ratio: 1.7;
+}
+.skills-tiles {
+  --tile-w: clamp(19rem, 30vw, 30rem);
+}
+.skills-tiles .tile-eyebrow {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: clamp(0.62rem, 0.75vw, 0.72rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.skills-tiles .tilted-tile h3 {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.35rem, 2.1vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.skills-tiles .tilted-tile p {
+  margin: auto 0 0;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: clamp(0.74rem, 0.9vw, 0.86rem);
+  line-height: 1.55;
+  color: #7d7a86;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-icon-face,
+  .skill-tip {
+    transition: none;
+  }
+}

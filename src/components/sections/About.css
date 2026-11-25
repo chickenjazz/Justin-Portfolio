@@ -1,0 +1,94 @@
+/* The seam: a white-to-dark blend at the bottom that hands over to the project stage's #08070b. */
+.about {
+  --seam: clamp(9rem, 34svh, 22rem);
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(4rem, 10vw, 9rem) clamp(1rem, 4vw, 3rem)
+    calc(var(--seam) + clamp(2rem, 5vw, 5rem));
+  overflow: clip;
+}
+.about::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--seam);
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    #08070b 0%,
+    #120e1b 14%,
+    #251c38 30%,
+    #5a4a7e 48%,
+    #a898c9 66%,
+    #dcd3f0 82%,
+    #f6f3fc 93%,
+    var(--paper) 100%
+  );
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.about-portrait {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+}
+.about-figure {
+  position: relative;
+}
+.about-disc {
+  position: absolute;
+  inset: 12% 0 0 8%;
+  z-index: -1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.about-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* The head rises above the disc, but below its widest line the photo is clipped to the
+     disc's ellipse (inset 12% 0 0 8%), so the crop follows the curve instead of a flat cut. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 56% no-repeat,
+    radial-gradient(ellipse 46% 44% at 54% 56%, #000 99%, transparent 100%);
+  mask:
+    linear-gradient(#000 0 0) top / 100% 56% no-repeat,
+    radial-gradient(ellipse 46% 44% at 54% 56%, #000 99%, transparent 100%);
+}
+.about-copy {
+  min-width: 0;
+}
+/* The eyebrow is the section's h2; keep the paragraph spacing it had as a <p>. */
+.about-copy .eyebrow {
+  margin: 1em 0;
+}
+.about-story {
+  margin: 1.5rem 0 2rem;
+  max-width: 24ch;
+  font-size: clamp(1.6rem, 2.8vw, 2.7rem);
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
+.about-education {
+  margin: 0;
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+@media (max-width: 800px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-portrait {
+    width: min(100%, 360px);
+    margin: 0 auto;
+  }
+}

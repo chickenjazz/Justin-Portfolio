@@ -1,0 +1,537 @@
+/* Project cards, "Poster" direction (picked from the prototype, see MOTION.md).
+   A wall-sized Anton title leads, the device demo steps in front of it, small mono
+   details hold the corners. Solid fills only, no gradients.
+
+   Base styles are a centred column: the no-JS scroll-snap fallback and phones use
+   it. The poster composition applies to the JS stack on screens over 800px, where
+   each card is a size container (cqw / cqh). */
+.project-slide {
+  --acc: #b9a0ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+.project-slide-1 {
+  --acc: #a3e635;
+}
+.pc-eyebrow {
+  margin: 0;
+  font: 500 0.72rem/1.2 "DM Mono", monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.pc-mask {
+  margin: 0;
+  overflow: hidden;
+  /* room for Anton's descent so the mask never clips the letters at rest */
+  padding-block: 0.04em 0.02em;
+  font-weight: 400;
+}
+.pc-title {
+  display: block;
+  font-family: "Anton", sans-serif;
+  font-size: clamp(4rem, 19vw, 11rem);
+  line-height: 0.86;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #f3eefa;
+}
+.pc-one {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #d5cbe3;
+  text-wrap: balance;
+}
+.pc-metric {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 0;
+}
+.pc-metric strong {
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 9vw, 4.4rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--acc);
+  font-variant-numeric: tabular-nums;
+}
+.pc-metric > span {
+  font: 500 0.66rem/1.3 "DM Mono", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffffa6;
+}
+.pc-tech {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pc-tech li {
+  font: 500 0.68rem/1 "DM Mono", monospace;
+  padding: 8px 12px;
+  border: 1px solid #ffffff33;
+  border-radius: 99px;
+  color: #e2dcea;
+}
+.pc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 28px;
+}
+.pc-actions .project-fallback > summary {
+  gap: 28px;
+  padding: 12px 0;
+}
+.pc-visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 48px;
+  font-size: 0.9rem;
+  color: #f3eefa;
+  text-decoration: none;
+  border-bottom: 1px solid #ffffff40;
+}
+.pc-device {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: min(46svh, 440px);
+  min-height: 0;
+  order: -1;
+}
+
+/* ---- Poster composition: JS stack, wide screens ---- */
+@media (min-width: 801px) {
+  .stack-ready .project-slide {
+    display: block;
+    container: card / size;
+  }
+  .stack-ready .project-slide > :not(.slide-counter) {
+    position: absolute;
+  }
+  .stack-ready .pc-eyebrow {
+    top: 5.4cqh;
+    left: 3cqw;
+    font-size: clamp(0.68rem, 0.8cqw, 0.85rem);
+  }
+  .stack-ready .pc-mask {
+    top: 8.5cqh;
+    left: 0;
+    right: 0;
+  }
+  .stack-ready .pc-title {
+    font-size: min(19.5cqw, 35cqh);
+  }
+  .stack-ready .pc-device {
+    left: 50%;
+    top: 27cqh;
+    width: 48cqw;
+    height: 52cqh;
+    translate: -50% 0;
+    z-index: 1;
+  }
+  .stack-ready .pc-one {
+    left: 3cqw;
+    bottom: calc(6cqh + min(6.4cqw, 13cqh) + 3.4em);
+    width: min(24cqw, 30ch);
+    text-align: left;
+    font-size: clamp(0.9rem, 1.2cqw, 1.15rem);
+  }
+  .stack-ready .pc-metric {
+    left: 3cqw;
+    bottom: 6cqh;
+    justify-items: start;
+    text-align: left;
+  }
+  .stack-ready .pc-metric strong {
+    font-size: min(6.4cqw, 13cqh);
+  }
+  .stack-ready .pc-tech {
+    left: 30cqw;
+    right: 30cqw;
+    bottom: 6cqh;
+  }
+  .stack-ready .pc-actions {
+    right: 3cqw;
+    bottom: calc(6cqh - 12px);
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+  }
+}
+/* Phones in the stack: the same column, sized to the card. */
+@media (max-width: 800px) {
+  .stack-ready .project-slide {
+    container: card / size;
+    gap: 1.8cqh;
+    padding: 6cqh 6vw 3cqh;
+  }
+  .stack-ready .pc-device {
+    height: 38cqh;
+  }
+  .stack-ready .pc-title {
+    font-size: min(22cqw, 11cqh);
+  }
+  .stack-ready .pc-metric strong {
+    font-size: min(13cqw, 6.5cqh);
+  }
+  .stack-ready .pc-one {
+    font-size: 0.92rem;
+  }
+}
+
+/* ---- Arrival: plays once as a card arrives (MOTION.md, Poster) ----
+   Order: title (0) masks up, device (1) steps in, details (2) and chips and links (3)
+   follow, 240ms apart. 900ms, ease-out. Cards still ahead in the stack hold the
+   start frame; covered cards keep their content. */
+.stack-ready .project-slide:not(.is-ahead) .pc-in {
+  transition:
+    opacity 900ms var(--ease-out) calc(var(--o, 0) * 240ms),
+    transform 900ms var(--ease-out) calc(var(--o, 0) * 240ms);
+}
+.stack-ready .project-slide.is-ahead .pc-in {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.stack-ready .project-slide.is-ahead .pc-title {
+  opacity: 1;
+  transform: translateY(105%);
+}
+.stack-ready .project-slide.is-ahead .pc-device {
+  transform: translateY(42px);
+}
+
+/* ---------- Promptee phone ---------- */
+.ph {
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 9 / 19;
+  padding: 2.4%;
+  border-radius: 13% / 6.2%;
+  background: #0b0910;
+  border: 1px solid #ffffff2b;
+  box-shadow: 0 30px 60px -24px #000c;
+  container-type: inline-size;
+}
+.ph-screen {
+  position: relative;
+  height: 100%;
+  border-radius: 11% / 5.2%;
+  background: #f4f0fb;
+  color: #1a1424;
+  padding: 19cqw 7cqw 7cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 4.4cqw;
+  overflow: hidden;
+  text-align: left;
+}
+.ph-notch {
+  position: absolute;
+  top: 4cqw;
+  left: 50%;
+  width: 28cqw;
+  height: 7cqw;
+  translate: -50% 0;
+  border-radius: 99px;
+  background: #0b0910;
+}
+.ph-app {
+  margin: 0;
+  font: 600 8cqw/1 "DM Sans", sans-serif;
+  letter-spacing: -0.03em;
+  color: #5b3fd0;
+}
+.ph-label {
+  display: block;
+  margin-bottom: 1.6cqw;
+  font: 500 3.8cqw/1 "DM Mono", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7a7388;
+}
+.ph-prompt {
+  position: relative;
+  overflow: hidden;
+  padding: 4.4cqw 5cqw;
+  border: 1px solid #e2dbee;
+  border-radius: 5cqw;
+  background: #fff;
+}
+.ph-typed {
+  display: block;
+  width: fit-content;
+  white-space: nowrap;
+  font: 500 6cqw/1.3 "DM Mono", monospace;
+}
+.ph-scan {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 30%;
+  background: #b9a0ff;
+  mix-blend-mode: multiply;
+  opacity: 0;
+}
+.ph-lines {
+  display: grid;
+  gap: 2.6cqw;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ph-lines li {
+  padding: 2.6cqw 3.4cqw;
+  border-left: 1.2cqw solid #7a5af0;
+  border-radius: 0 3cqw 3cqw 0;
+  background: #e9e1fb;
+  font: 500 4.3cqw/1.35 "DM Mono", monospace;
+}
+.ph-lines b {
+  font-weight: 500;
+  color: #5b3fd0;
+}
+.ph-score {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4cqw;
+}
+.ph-score p {
+  margin: 0;
+  font: 500 3.8cqw/1.35 "DM Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6778;
+}
+.ph-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26cqw;
+  height: 26cqw;
+}
+.ph-ring svg {
+  position: absolute;
+  inset: 0;
+  rotate: -90deg;
+}
+.ph-ring circle {
+  fill: none;
+  stroke-width: 7;
+}
+.ph-ring-track {
+  stroke: #e2dbee;
+}
+.ph-ring-value {
+  stroke: #7a5af0;
+  stroke-linecap: round;
+  stroke-dasharray: 226.2;
+  stroke-dashoffset: 74.6;
+}
+/* The score is a counter so the loop can count it in CSS. */
+@property --score {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 67;
+}
+.ph-num {
+  --score: 67;
+  counter-reset: score var(--score);
+  font: 400 9.5cqw/1 "Anton", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.ph-num::after {
+  content: counter(score);
+}
+
+/* ---------- Vertex 7: crane over a desktop ---------- */
+.desk {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 13 / 10;
+}
+.crane {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  overflow: visible;
+}
+.crane-cable {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+.mon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 68%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mon-screen {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 2%;
+  border-radius: 10px;
+  background: #0b0910;
+  border: 1px solid #ffffff2b;
+  box-shadow: 0 30px 60px -24px #000c;
+}
+.mon-view {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #1a1d16;
+  container-type: size;
+}
+.mon-view img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mon-neck {
+  width: 12%;
+  height: 12px;
+  background: #2c2834;
+}
+.mon-foot {
+  width: 34%;
+  height: 6px;
+  border-radius: 6px 6px 2px 2px;
+  background: #3a3542;
+}
+
+/* ---- Demo loop (one loop family, MOTION.md): runs on the current card only,
+   restarts on each arrival, pauses while the section is off screen. ---- */
+.stack-ready .is-current .ph-typed {
+  animation: pd-type 8s steps(17, end) infinite;
+}
+.stack-ready .is-current .ph-scan {
+  animation: pd-scan 8s linear infinite;
+}
+.stack-ready .is-current .ph-lines li {
+  animation: pd-line-1 8s infinite;
+}
+.stack-ready .is-current .ph-lines li:nth-child(2) {
+  animation-name: pd-line-2;
+}
+.stack-ready .is-current .ph-lines li:nth-child(3) {
+  animation-name: pd-line-3;
+}
+.stack-ready .is-current .ph-ring-value {
+  animation: pd-ring 8s infinite;
+}
+.stack-ready .is-current .ph-num {
+  animation: pd-score 8s infinite;
+}
+.stack-ready .is-current .mon-view img {
+  animation: v7-scroll 9s infinite;
+}
+.stack-ready .is-current .crane-trolley {
+  animation: v7-trolley 9s infinite;
+}
+.stack-ready .is-current .crane-cable {
+  animation: v7-cable 9s infinite;
+}
+.stack-ready .is-current .crane-lift {
+  animation: v7-lift 9s infinite;
+}
+.stack-ready:not(.demos-live) .is-current :is(.ph-typed, .ph-scan, .ph-lines li, .ph-ring-value, .ph-num, .mon-view img, .crane-trolley, .crane-cable, .crane-lift) {
+  animation-play-state: paused;
+}
+/* type 2-20%, scan 22-32%, lines from 32%, ring and count 45-65%, hold, reset 90-98% */
+@keyframes pd-type {
+  0%, 2% { clip-path: inset(0 100% 0 0); }
+  20%, 90% { clip-path: inset(0 0 0 0); }
+  96%, 100% { clip-path: inset(0 100% 0 0); }
+}
+@keyframes pd-scan {
+  0%, 22% { opacity: 0; transform: translateY(-100%); }
+  22.5% { opacity: 0.55; transform: translateY(-100%); }
+  32% { opacity: 0.55; transform: translateY(340%); }
+  32.5%, 100% { opacity: 0; transform: translateY(340%); }
+}
+@keyframes pd-line-1 {
+  0%, 32% { opacity: 0; transform: translateY(14px); animation-timing-function: var(--ease-out); }
+  40%, 90% { opacity: 1; transform: none; }
+  96%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pd-line-2 {
+  0%, 36% { opacity: 0; transform: translateY(14px); animation-timing-function: var(--ease-out); }
+  44%, 90% { opacity: 1; transform: none; }
+  96%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pd-line-3 {
+  0%, 40% { opacity: 0; transform: translateY(14px); animation-timing-function: var(--ease-out); }
+  48%, 90% { opacity: 1; transform: none; }
+  96%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pd-ring {
+  0%, 45% { stroke-dashoffset: 167.4; animation-timing-function: var(--ease-out); }
+  65%, 90% { stroke-dashoffset: 74.6; animation-timing-function: ease-in-out; }
+  98%, 100% { stroke-dashoffset: 167.4; }
+}
+@keyframes pd-score {
+  0%, 45% { --score: 26; animation-timing-function: var(--ease-out); }
+  65%, 90% { --score: 67; animation-timing-function: ease-in-out; }
+  98%, 100% { --score: 26; }
+}
+/* the screen scrolls the real site down and back; the crane runs out and lowers its load */
+@keyframes v7-scroll {
+  0%, 8% { transform: translateY(0); animation-timing-function: ease-in-out; }
+  55%, 64% { transform: translateY(calc(-100% + 100cqh)); animation-timing-function: ease-in-out; }
+  95%, 100% { transform: translateY(0); }
+}
+@keyframes v7-trolley {
+  0% { transform: translateX(-70px); animation-timing-function: ease-in-out; }
+  22%, 75% { transform: translateX(0); animation-timing-function: ease-in-out; }
+  95%, 100% { transform: translateX(-70px); }
+}
+@keyframes v7-cable {
+  0%, 22% { transform: scaleY(0.2); animation-timing-function: var(--ease-out); }
+  40%, 60% { transform: scaleY(1); animation-timing-function: ease-in-out; }
+  74%, 100% { transform: scaleY(0.2); }
+}
+@keyframes v7-lift {
+  0%, 22% { transform: translateY(-25px); animation-timing-function: var(--ease-out); }
+  40%, 60% { transform: translateY(0); animation-timing-function: ease-in-out; }
+  74%, 100% { transform: translateY(-25px); }
+}
+
+/* Reduced motion: no travel, no loop. Arrival is a plain fade; demos hold the
+   finished frame. */
+@media (prefers-reduced-motion: reduce) {
+  .stack-ready .project-slide.is-ahead :is(.pc-in, .pc-title, .pc-device) {
+    transform: none;
+  }
+  .stack-ready .project-slide.is-ahead .pc-title {
+    opacity: 0;
+  }
+  .stack-ready .project-slide:not(.is-ahead) .pc-in {
+    transition: opacity 200ms linear;
+  }
+  .stack-ready .is-current :is(.ph-typed, .ph-scan, .ph-lines li, .ph-ring-value, .ph-num, .mon-view img, .crane-trolley, .crane-cable, .crane-lift) {
+    animation: none;
+  }
+}
