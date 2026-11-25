@@ -64,6 +64,6 @@ Use `npm run format` to keep the source readable. Dependencies are pinned in `pa
 
 Your supplied profile, projects, study results, education, credentials, and contact links are included. Projects use full-screen horizontal slides with arrow, dot, swipe, and keyboard navigation. View project opens the full case study in a modal; native expandable details are the no-JavaScript fallback. The mascot, gallery photos, resume, and missing project URLs remain explicitly marked placeholders.
 
-Interactive 3D, a gallery lightbox, full production content validation, and the complete accessibility/performance audit remain future work. The site stays `noindex` until launch content is ready. `docs/CONTENT.md` records outstanding assets.
+Interactive 3D, a gallery lightbox, full production content validation, and the complete accessibility/performance audit remain future work. The site is indexable (`public/robots.txt` allows all crawlers). The build adds the canonical URL, share-image tags and `sitemap.xml` for https://justin-manuzon.vercel.app/; set `SITE_URL` to build for a different domain. `docs/CONTENT.md` records outstanding assets.
 
 The repository's existing `.gitignore` excludes `docs/`; those local documents are authoritative but are not currently versioned. Do not put sensitive evidence in public content files: all imported portfolio data ships to the browser.
